@@ -1,0 +1,70 @@
+Running iteration: 0, seed: 1626306115033942443
+Parallel BZIP2 v0.9.4 - by: Jeff Gilchrist [http://compression.ca]
+[Aug. 30, 2005]             (uses libbzip2  by Julian Seward)
+
+** This is a BETA version - Use at your own risk! **
+
+         # CPUs: 3
+ BWT Block Size: 900k
+File Block Size: 900k
+-------------------------------------------
+         File #: 1 of 1
+     Input Name: ../test.tar
+    Output Name: ../test.tar.bz2
+
+     Input Size: 81920 bytes
+Compressing data...
+Completed: 100%                 Output Size: 17086 bytes
+-------------------------------------------
+
+     Wall Clock: 0.036453 seconds
+Running iteration: 1, seed: 1626306115033942443
+Parallel BZIP2 v0.9.4 - by: Jeff Gilchrist [http://compression.ca]
+[Aug. 30, 2005]             (uses libbzip2  by Julian Seward)
+
+** This is a BETA version - Use at your own risk! **
+
+         # CPUs: 3
+ BWT Block Size: 900k
+File Block Size: 900k
+-------------------------------------------
+         File #: 1 of 1
+     Input Name: ../test.tar
+    Output Name: ../test.tar.bz2
+
+     Input Size: 81920 bytes
+Compressing data...
+Completed: 100%                 Output Size: 17086 bytes
+-------------------------------------------
+
+     Wall Clock: 0.021308 seconds
+Running iteration: 2, seed: 1626306115033942444
+Parallel BZIP2 v0.9.4 - by: Jeff Gilchrist [http://compression.ca]
+[Aug. 30, 2005]             (uses libbzip2  by Julian Seward)
+
+** This is a BETA version - Use at your own risk! **
+
+         # CPUs: 3
+ BWT Block Size: 900k
+File Block Size: 900k
+-------------------------------------------
+         File #: 1 of 1
+     Input Name: ../test.tar
+    Output Name: ../test.tar.bz2
+
+     Input Size: 81920 bytes
+Compressing data...
+Completed: 100%                 Output Size: 17086 bytes
+-------------------------------------------
+
+     Wall Clock: 0.026458 seconds
+Running iteration: 3, seed: 1626306115033942445
+Parallel BZIP2 v0.9.4 - by: Jeff Gilchrist [http://compression.ca]
+[Aug. 30, 2005]             (uses libbzip2  by Julian Seward)
+
+** This is a BETA version - Use at your own risk! **
+
+         # CPUs: 3
+ BWT Block Size: 900k
+File Block Size: 900k
+-------------------------------------------

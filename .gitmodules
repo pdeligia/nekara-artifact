@@ -1,0 +1,3 @@
+[submodule "Nekara"]
+	path = Nekara
+	url = https://github.com/microsoft/coyote-scheduler.git

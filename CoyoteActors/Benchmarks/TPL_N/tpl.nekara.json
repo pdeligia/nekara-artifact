@@ -1,0 +1,10 @@
+{
+  "AssembliesPath": "bin/net5.0",
+  "Assemblies": [
+    "Microsoft.Coyote.Actors.dll",
+    "ChainReplication.dll",
+    "FailureDetector.dll",
+    "Paxos.dll",
+    "Raft.dll"
+  ]
+}

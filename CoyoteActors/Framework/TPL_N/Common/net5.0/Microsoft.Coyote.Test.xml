@@ -1,0 +1,1694 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+    <assembly>
+        <name>Microsoft.Coyote.Test</name>
+    </assembly>
+    <members>
+        <member name="T:Microsoft.Coyote.Rewriting.IsAssemblyRewrittenAttribute">
+            <summary>
+            Attribute for checking if an assembly has been rewritten by Coyote. If this attribute
+            is applied to an assembly, it denotes that the assembly has been rewritten.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Rewriting.IsAssemblyRewrittenAttribute.Version">
+            <summary>
+            The version of Coyote used for the rewritting.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.IsAssemblyRewrittenAttribute.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Coyote.Rewriting.IsAssemblyRewrittenAttribute" /> class.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Coyote.Rewriting.CachedNameProvider">
+            <summary>
+            Provider of cached names for known types.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Coyote.Rewriting.RewritingEngine">
+            <summary>
+            Engine that can rewrite a set of assemblies for systematic testing.
+            </summary>
+            <remarks>
+            See <see href="/coyote/learn/tools/rewriting">Coyote rewriting tool</see> for more information.
+            </remarks>
+        </member>
+        <member name="F:Microsoft.Coyote.Rewriting.RewritingEngine.TempDirectory">
+            <summary>
+            Temporary directory that is used to write the rewritten assemblies
+            in the case that they are replacing the original ones.
+            </summary>
+            <remarks>
+            We need this because it seems Mono.Cecil does not allow to rewrite in-place.
+            </remarks>
+        </member>
+        <member name="F:Microsoft.Coyote.Rewriting.RewritingEngine.Options">
+            <summary>
+            Options for rewriting assemblies.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Rewriting.RewritingEngine.Configuration">
+            <summary>
+            The test configuration to use when rewriting unit tests.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Rewriting.RewritingEngine.DisallowedAssemblies">
+            <summary>
+            List of assemblies that are not allowed to be rewritten.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Rewriting.RewritingEngine.Transforms">
+            <summary>
+            List of transforms we are applying while rewriting.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Rewriting.RewritingEngine.RewrittenAssemblies">
+            <summary>
+            Map from assembly name to full name definition of the rewritten assemblies.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Rewriting.RewritingEngine.Pending">
+            <summary>
+            List of assemblies to be rewritten.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Rewriting.RewritingEngine.Logger">
+            <summary>
+            The installed logger.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Rewriting.RewritingEngine.Profiler">
+            <summary>
+            The profiler.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.RewritingEngine.#ctor(Microsoft.Coyote.Configuration,Microsoft.Coyote.Rewriting.RewritingOptions)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Coyote.Rewriting.RewritingEngine" /> class.
+            </summary>
+            <param name="configuration">The test configuration to use when rewriting unit tests.</param>
+            <param name="options">The <see cref="T:Microsoft.Coyote.Rewriting.RewritingOptions" /> for this rewriter.</param>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.RewritingEngine.Run(Microsoft.Coyote.Configuration,Microsoft.Coyote.Rewriting.RewritingOptions)">
+            <summary>
+            Runs the engine using the specified rewriting options.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.RewritingEngine.Run">
+            <summary>
+            Runs the engine.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.RewritingEngine.RewriteAssembly(System.String,System.String)">
+            <summary>
+            Rewrites the specified assembly definition.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.RewritingEngine.AddLocalDependencies(System.String,Mono.Cecil.AssemblyDefinition)">
+            <summary>
+            Enqueue any dependent assemblies that also exist in the assemblyPath and have not
+            already been rewritten.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.RewritingEngine.RewriteModule(Mono.Cecil.ModuleDefinition,Microsoft.Coyote.Rewriting.AssemblyTransform)">
+            <summary>
+            Rewrites the specified module definition using the specified transform.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.RewritingEngine.RewriteType(Mono.Cecil.TypeDefinition,Microsoft.Coyote.Rewriting.AssemblyTransform)">
+            <summary>
+            Rewrites the specified type definition using the specified transform.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.RewritingEngine.RewriteMethod(Mono.Cecil.MethodDefinition,Microsoft.Coyote.Rewriting.AssemblyTransform)">
+            <summary>
+            Rewrites the specified method definition using the specified transform.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.RewritingEngine.ApplyIsAssemblyRewrittenAttribute(Mono.Cecil.AssemblyDefinition)">
+            <summary>
+            Applies the <see cref="T:Microsoft.Coyote.Rewriting.IsAssemblyRewrittenAttribute" /> attribute to the specified assembly. This attribute
+            indicates that the assembly has been rewritten with the current version of Coyote.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.RewritingEngine.CreateOutputDirectoryAndCopyFiles">
+            <summary>
+            Creates the output directory, if it does not already exists, and copies all necessery files.
+            </summary>
+            <returns>The output directory path.</returns>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.RewritingEngine.CopyFile(System.String,System.String)">
+            <summary>
+            Copies the specified file to the destination.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.RewritingEngine.IsDisallowed(System.String)">
+            <summary>
+            Checks if the assembly with the specified name is not allowed.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.RewritingEngine.IsAssemblyRewritten(System.Reflection.Assembly)">
+            <summary>
+            Checks if the specified assembly has been already rewritten with the current version of Coyote.
+            </summary>
+            <param name="assembly">The assembly to check.</param>
+            <returns>True if the assembly has been rewritten, else false.</returns>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.RewritingEngine.IsAssemblyRewritten(Mono.Cecil.AssemblyDefinition)">
+            <summary>
+            Checks if the specified assembly has been already rewritten with the current version of Coyote.
+            </summary>
+            <param name="assembly">The assembly to check.</param>
+            <returns>True if the assembly has been rewritten, else false.</returns>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.RewritingEngine.IsMixedModeAssembly(Mono.Cecil.AssemblyDefinition)">
+            <summary>
+            Checks if the specified assembly is a mixed-mode assembly.
+            </summary>
+            <param name="assembly">The assembly to check.</param>
+            <returns>True if the assembly only contains IL, else false.</returns>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.RewritingEngine.IsSymbolFileAvailable(System.String)">
+            <summary>
+            Checks if the symbol file for the specified assembly is available.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.RewritingEngine.GetCustomAttribute(Mono.Cecil.AssemblyDefinition,System.Type)">
+            <summary>
+            Returns the first found custom attribute with the specified type, if such an attribute
+            is applied to the specified assembly, else null.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.RewritingEngine.GetAssemblyRewritterVersion">
+            <summary>
+            Returns the version of the assembly rewritter.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.RewritingEngine.GetAssemblyResolver">
+            <summary>
+            Returns a new assembly resolver.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.RewritingEngine.OnResolveAssemblyFailure(System.Object,Mono.Cecil.AssemblyNameReference)">
+            <summary>
+            Handles an assembly resolution error.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Coyote.Rewriting.RewritingOptions">
+            <summary>
+            Options for rewriting binaries.
+            </summary>
+            <remarks>
+            See <see href="/coyote/learn/tools/rewriting">Coyote rewriting tool</see> for more information.
+            </remarks>
+        </member>
+        <member name="P:Microsoft.Coyote.Rewriting.RewritingOptions.AssembliesDirectory">
+            <summary>
+            The directory containing the assemblies to rewrite.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Coyote.Rewriting.RewritingOptions.OutputDirectory">
+            <summary>
+            The output directory where rewritten assemblies are placed.
+            If this is the same as the <see cref="P:Microsoft.Coyote.Rewriting.RewritingOptions.AssembliesDirectory" /> then
+            the rewritten assemblies will replace the original assemblies.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Coyote.Rewriting.RewritingOptions.AssemblyPaths">
+            <summary>
+            The file names of the assemblies to rewrite.  If this list is empty then it will
+            rewrite all assemblies in the <see cref="P:Microsoft.Coyote.Rewriting.RewritingOptions.AssembliesDirectory" />.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Coyote.Rewriting.RewritingOptions.IgnoredAssemblies">
+            <summary>
+            The regular expressions used to match against assembly names to determine which assemblies
+            to ignore when rewriting dependencies or a whole directory.
+            </summary>
+            <remarks>
+            The list automatically includes the following expressions:
+            Microsoft\.Coyote.*
+            Microsoft\.TestPlatform.*
+            Microsoft\.VisualStudio\.TestPlatform.*
+            Newtonsoft\.Json.*
+            System\.Private\.CoreLib
+            mscorlib.
+            </remarks>
+        </member>
+        <member name="P:Microsoft.Coyote.Rewriting.RewritingOptions.DependencySearchPaths">
+            <summary>
+            The paths to search for resolving dependencies.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Coyote.Rewriting.RewritingOptions.IsReplacingAssemblies">
+            <summary>
+            True if the input assemblies are being replaced by the rewritten ones.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Rewriting.RewritingOptions.DotnetVersion">
+            <summary>
+            The .NET platform version that Coyote was compiled for.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Coyote.Rewriting.RewritingOptions.StrongNameKeyFile">
+            <summary>
+            Path of strong name key to use for signing rewritten assemblies.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Coyote.Rewriting.RewritingOptions.IsRewritingDependencies">
+            <summary>
+            Whether to also rewrite dependent assemblies that are found in the same location.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Coyote.Rewriting.RewritingOptions.Logger">
+            <summary>
+            The logger used for rewriting.
+            </summary>
+            <remarks>
+            By default the logger write to Console.
+            </remarks>
+        </member>
+        <member name="P:Microsoft.Coyote.Rewriting.RewritingOptions.LogLevel">
+            <summary>
+            The amount of log output to produce.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Coyote.Rewriting.RewritingOptions.IsRewritingUnitTests">
+            <summary>
+            True if rewriting of unit test methods is enabled, else false.
+            </summary>
+            <remarks>
+            If unit test rewriting is enabled, Coyote will instrument the binary to run unit test
+            methods in the scope of the Coyote testing engine. Note that this rewriting does not
+            change the semantics of the original test. For example, if the test is sequential it
+            will remain sequential, limiting the concurrency coverage that Coyote can achieve.
+            </remarks>
+        </member>
+        <member name="P:Microsoft.Coyote.Rewriting.RewritingOptions.IsRewritingThreads">
+            <summary>
+            True if rewriting Threads as controlled tasks.
+            </summary>
+            <remarks>
+            Normally Thread is not supported by Coyote, but this experimental feature wraps the
+            thread in a Task so that Coyote knows about it which avoids uncontrolled concurrency
+            errors in some cases.
+            </remarks>
+        </member>
+        <member name="P:Microsoft.Coyote.Rewriting.RewritingOptions.PlatformVersion">
+            <summary>
+            The .NET platform version that Coyote was compiled for.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.RewritingOptions.ParseFromJSON(System.String)">
+            <summary>
+            Parses the <see cref="T:Microsoft.Coyote.Rewriting.RewritingOptions" /> from the specified JSON configuration file.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Coyote.Rewriting.RewritingOptions.JsonConfiguration">
+            <summary>
+            Implements a JSON configuration object.
+            </summary>
+            <example>
+            The JSON schema is:
+            <code>
+            {
+                // The directory with the assemblies to rewrite. This path is relative
+                // to this configuration file.
+                "AssembliesPath": "./bin/net5.0",
+                // The output directory where rewritten assemblies are placed. This path
+                // is relative to this configuration file.
+                "OutputPath": "./bin/net5.0/RewrittenBinaries",
+                // The assemblies to rewrite. The paths are relative to 'AssembliesPath'.
+                "Assemblies": [
+                    "Example.exe"
+                ]
+            }
+            </code></example>
+        </member>
+        <member name="T:Microsoft.Coyote.Rewriting.AssemblyTransform">
+            <summary>
+            An abstract interface for transforming code using a visitor pattern.
+            This is used by the <see cref="T:Microsoft.Coyote.Rewriting.RewritingEngine" /> to manage multiple different
+            transforms in a single pass over an assembly.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Rewriting.AssemblyTransform.CachedQualifiedNames">
+            <summary>
+            Cache of qualified names.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Rewriting.AssemblyTransform.Logger">
+            <summary>
+            The installed logger.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.AssemblyTransform.#ctor(Microsoft.Coyote.IO.ILogger)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Coyote.Rewriting.AssemblyTransform" /> class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.AssemblyTransform.VisitModule(Mono.Cecil.ModuleDefinition)">
+            <summary>
+            Visits the specified <see cref="T:Mono.Cecil.ModuleDefinition" /> inside the <see cref="T:Mono.Cecil.AssemblyDefinition" />
+            that was visited by the <see cref="T:Microsoft.Coyote.Rewriting.RewritingEngine" />.
+            </summary>
+            <param name="module">The module definition to visit.</param>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.AssemblyTransform.VisitType(Mono.Cecil.TypeDefinition)">
+            <summary>
+            Visits the specified <see cref="T:Mono.Cecil.TypeDefinition" /> inside the <see cref="T:Mono.Cecil.ModuleDefinition" />
+            that was visited by the last <see cref="M:Microsoft.Coyote.Rewriting.AssemblyTransform.VisitModule(Mono.Cecil.ModuleDefinition)" />.
+            </summary>
+            <param name="type">The type definition to visit.</param>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.AssemblyTransform.VisitField(Mono.Cecil.FieldDefinition)">
+            <summary>
+            Visits the specified <see cref="T:Mono.Cecil.FieldDefinition" /> inside the <see cref="T:Mono.Cecil.TypeDefinition" /> that was visited
+            by the last <see cref="M:Microsoft.Coyote.Rewriting.AssemblyTransform.VisitType(Mono.Cecil.TypeDefinition)" />.
+            </summary>
+            <param name="field">The field definition to visit.</param>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.AssemblyTransform.VisitMethod(Mono.Cecil.MethodDefinition)">
+            <summary>
+            Visits the specified <see cref="T:Mono.Cecil.MethodDefinition" /> inside the <see cref="T:Mono.Cecil.TypeDefinition" /> that was visited
+            by the last <see cref="M:Microsoft.Coyote.Rewriting.AssemblyTransform.VisitType(Mono.Cecil.TypeDefinition)" />.
+            </summary>
+            <param name="method">The method definition to visit.</param>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.AssemblyTransform.VisitVariables(Mono.Cecil.MethodDefinition)">
+            <summary>
+            If you want to transform individual method variables, then call this method.
+            </summary>
+            <param name="method">The method whose variables are being transformed.</param>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.AssemblyTransform.VisitVariable(Mono.Cecil.Cil.VariableDefinition)">
+            <summary>
+            Visits the specified <see cref="T:Mono.Cecil.Cil.VariableDefinition" /> inside the <see cref="T:Mono.Cecil.MethodDefinition" /> that was visited
+            by the last <see cref="M:Microsoft.Coyote.Rewriting.AssemblyTransform.VisitMethod(Mono.Cecil.MethodDefinition)" />.
+            </summary>
+            <param name="variable">The variable definition to visit.</param>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.AssemblyTransform.VisitInstructions(Mono.Cecil.MethodDefinition)">
+            <summary>
+            If you want to transform individual instructions, then call this method.
+            </summary>
+            <param name="method">The method whose instructions will be transformed.</param>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.AssemblyTransform.VisitInstruction(Mono.Cecil.Cil.Instruction)">
+            <summary>
+            Visits the specified IL <see cref="T:Mono.Cecil.Cil.Instruction" /> inside the body of the <see cref="T:Mono.Cecil.MethodDefinition" />
+            that was visited by the last <see cref="M:Microsoft.Coyote.Rewriting.AssemblyTransform.VisitMethod(Mono.Cecil.MethodDefinition)" />.
+            </summary>
+            <param name="instruction">The instruction to visit.</param>
+            <returns>The last modified instruction, or the original if it was not changed.</returns>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.AssemblyTransform.RewriteMethodReference(Mono.Cecil.MethodReference,Mono.Cecil.ModuleDefinition)">
+            <summary>
+            Rewrites the specified <see cref="T:Mono.Cecil.MethodReference" />.
+            </summary>
+            <param name="method">The method reference to rewrite.</param>
+            <param name="module">The module definition that is being visited.</param>
+            <returns>The rewritten method, or the original if it was not changed.</returns>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.AssemblyTransform.RewriteParameterDefinition(Mono.Cecil.ParameterDefinition)">
+            <summary>
+            Rewrites the specified <see cref="T:Mono.Cecil.ParameterDefinition" />.
+            </summary>
+            <param name="parameter">The parameter definition to rewrite.</param>
+            <returns>The rewritten parameter definition, or the original if it was not changed.</returns>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.AssemblyTransform.RewriteDeclaringTypeReference(Mono.Cecil.MethodReference)">
+            <summary>
+            Rewrites the declaring <see cref="T:Mono.Cecil.TypeReference" /> of the specified <see cref="T:Mono.Cecil.MethodReference" />.
+            </summary>
+            <param name="method">The method with the declaring type to rewrite.</param>
+            <returns>The rewritten declaring type, or the original if it was not changed.</returns>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.AssemblyTransform.RewriteTypeReference(Mono.Cecil.TypeReference)">
+            <summary>
+            Rewrites the specified <see cref="T:Mono.Cecil.TypeReference" />.
+            </summary>
+            <param name="type">The type reference to rewrite.</param>
+            <returns>The rewritten type reference, or the original if it was not changed.</returns>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.AssemblyTransform.FindMatchingMethodInDeclaringType(Mono.Cecil.MethodDefinition,Mono.Cecil.TypeDefinition)">
+            <summary>
+            Finds the matching method in the specified declaring type, if any.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.AssemblyTransform.CheckMethodSignaturesMatch(Mono.Cecil.MethodDefinition,Mono.Cecil.MethodDefinition)">
+            <summary>
+            Checks if the signatures of the original and the replacement methods match.
+            </summary>
+            <remarks>
+            This method also checks the use case where we are converting an instance method into a static method.
+            In such a case case, we are inserting a first parameter that has the same type as the declaring type
+            of the original method. For example we can convert `task.Wait()` to `ControlledTask.Wait(task)`.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.AssemblyTransform.FindMatchingMethod(Mono.Cecil.TypeDefinition,System.String,Mono.Cecil.TypeReference[])">
+            <summary>
+            Find a matching method declaration in the given declaring type.
+            </summary>
+            <returns>The matching method or null if it is not found.</returns>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.AssemblyTransform.CheckMethodParametersMatch(Mono.Cecil.MethodDefinition,Mono.Cecil.MethodDefinition)">
+            <summary>
+            Checks if the parameters of the two specified methods match.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.AssemblyTransform.TryResolve(Mono.Cecil.MethodReference,Mono.Cecil.MethodDefinition@)">
+            <summary>
+            Returns true if the specified <see cref="T:Mono.Cecil.MethodReference" /> can be resolved,
+            as well as the resolved method definition, else return false.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.AssemblyTransform.Resolve(Mono.Cecil.TypeReference)">
+            <summary>
+            Returns the resolved definition of the specified <see cref="T:Mono.Cecil.TypeReference" />.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.AssemblyTransform.ImportGenericTypeInstance(Mono.Cecil.ModuleDefinition,Mono.Cecil.TypeReference,Mono.Cecil.TypeReference[])">
+            <summary>
+            Create a GenericInstanceType for the given generic type instantiated with the given generic arguments.
+            </summary>
+            <param name="module">The module we are operating on.</param>
+            <param name="genericType">The generic type to instantiate.</param>
+            <param name="genericArgs">The generic arguments needed to instantiate the generic type.</param>
+            <returns>The new generic instance type.</returns>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.AssemblyTransform.ImportGenericMethodInstance(Mono.Cecil.ModuleDefinition,Mono.Cecil.MethodReference,Mono.Cecil.TypeReference[])">
+            <summary>
+            Create a GenericInstanceMethod from the given generic method and the given generic arguments.
+            Note: this can also handle the case where the DeclaringType is also generic.  Simply pass the combined
+            generic args for the declaring type and the method.
+            </summary>
+            <param name="module">The module we are operating on.</param>
+            <param name="genericMethod">A generic method to instantiate.</param>
+            <param name="genericArgs">The combined generic arguments for the declaring type (if it is generic) and for the method.</param>
+            <returns>The new method reference.</returns>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.AssemblyTransform.FixInstructionOffsets(Mono.Cecil.MethodDefinition)">
+            <summary>
+            Fixes the instruction offsets of the specified method.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.AssemblyTransform.GetFullyQualifiedTypeName(Mono.Cecil.TypeReference)">
+            <summary>
+            Gets the fully qualified name of the specified type.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.AssemblyTransform.GetFullyQualifiedMethodName(Mono.Cecil.MethodReference)">
+            <summary>
+            Gets the fully qualified name of the specified method.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Coyote.Rewriting.AssertionInjectionTransform">
+            <summary>
+            Rewriting pass that injects assertions.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Rewriting.AssertionInjectionTransform.Module">
+            <summary>
+            The current module being transformed.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Rewriting.AssertionInjectionTransform.Method">
+            <summary>
+            The current method being transformed.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Rewriting.AssertionInjectionTransform.Processor">
+            <summary>
+            A helper class for editing method body.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.AssertionInjectionTransform.#ctor(Microsoft.Coyote.IO.ILogger)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Coyote.Rewriting.AssertionInjectionTransform" /> class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.AssertionInjectionTransform.VisitModule(Mono.Cecil.ModuleDefinition)">
+            <summary>
+            Visits the specified <see cref="T:Mono.Cecil.ModuleDefinition" /> inside the <see cref="T:Mono.Cecil.AssemblyDefinition" />
+            that was visited by the <see cref="T:Microsoft.Coyote.Rewriting.RewritingEngine" />.
+            </summary>
+            <param name="module">The module definition to visit.</param>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.AssertionInjectionTransform.VisitType(Mono.Cecil.TypeDefinition)">
+            <summary>
+            Visits the specified <see cref="T:Mono.Cecil.TypeDefinition" /> inside the <see cref="T:Mono.Cecil.ModuleDefinition" />
+            that was visited by the last <see cref="M:Microsoft.Coyote.Rewriting.AssemblyTransform.VisitModule(Mono.Cecil.ModuleDefinition)" />.
+            </summary>
+            <param name="type">The type definition to visit.</param>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.AssertionInjectionTransform.VisitMethod(Mono.Cecil.MethodDefinition)">
+            <summary>
+            Visits the specified <see cref="T:Mono.Cecil.MethodDefinition" /> inside the <see cref="T:Mono.Cecil.TypeDefinition" /> that was visited
+            by the last <see cref="M:Microsoft.Coyote.Rewriting.AssemblyTransform.VisitType(Mono.Cecil.TypeDefinition)" />.
+            </summary>
+            <param name="method">The method definition to visit.</param>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.AssertionInjectionTransform.VisitInstruction(Mono.Cecil.Cil.Instruction)">
+            <summary>
+            Visits the specified IL <see cref="T:Mono.Cecil.Cil.Instruction" /> inside the body of the <see cref="T:Mono.Cecil.MethodDefinition" />
+            that was visited by the last <see cref="M:Microsoft.Coyote.Rewriting.AssemblyTransform.VisitMethod(Mono.Cecil.MethodDefinition)" />.
+            </summary>
+            <param name="instruction">The instruction to visit.</param>
+            <returns>The last modified instruction, or the original if it was not changed.</returns>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.AssertionInjectionTransform.IsForeignType(Mono.Cecil.TypeDefinition)">
+            <summary>
+            Checks if the specified type is foreign.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.AssertionInjectionTransform.IsTaskType(Mono.Cecil.TypeReference)">
+            <summary>
+            Checks if the specified type is a supported task type.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Coyote.Rewriting.ExceptionFilterTransform">
+            <summary>
+            Rewriting pass that ensures user defined try/catch blocks do not consume runtime exceptions.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Rewriting.ExceptionFilterTransform.TypeDef">
+            <summary>
+            The type being transformed.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Rewriting.ExceptionFilterTransform.Method">
+            <summary>
+            The current method being transformed.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Rewriting.ExceptionFilterTransform.IsAsyncStateMachineType">
+            <summary>
+            True if the visited type is a generated async state machine.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Rewriting.ExceptionFilterTransform.ModifiedHandlers">
+            <summary>
+            True if the current method has modified handlers.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.ExceptionFilterTransform.#ctor(Microsoft.Coyote.IO.ILogger)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Coyote.Rewriting.ExceptionFilterTransform" /> class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.ExceptionFilterTransform.VisitType(Mono.Cecil.TypeDefinition)">
+            <summary>
+            Visits the specified <see cref="T:Mono.Cecil.TypeDefinition" /> inside the <see cref="T:Mono.Cecil.ModuleDefinition" />
+            that was visited by the last <see cref="M:Microsoft.Coyote.Rewriting.AssemblyTransform.VisitModule(Mono.Cecil.ModuleDefinition)" />.
+            </summary>
+            <param name="type">The type definition to visit.</param>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.ExceptionFilterTransform.VisitMethod(Mono.Cecil.MethodDefinition)">
+            <summary>
+            Visits the specified <see cref="T:Mono.Cecil.MethodDefinition" /> inside the <see cref="T:Mono.Cecil.TypeDefinition" /> that was visited
+            by the last <see cref="M:Microsoft.Coyote.Rewriting.AssemblyTransform.VisitType(Mono.Cecil.TypeDefinition)" />.
+            </summary>
+            <param name="method">The method definition to visit.</param>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.ExceptionFilterTransform.VisitExceptionHandler(Mono.Cecil.Cil.ExceptionHandler)">
+            <summary>
+            Visits the specified <see cref="T:Mono.Cecil.Cil.ExceptionHandler" /> inside the body of the <see cref="T:Mono.Cecil.MethodDefinition" />
+            that was visited by the last <see cref="M:Microsoft.Coyote.Rewriting.ExceptionFilterTransform.VisitMethod(Mono.Cecil.MethodDefinition)" />.
+            </summary>
+            <remarks>
+            In the case of nested try/catch blocks the inner block is visited first before the outer block.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.ExceptionFilterTransform.IsRethrowHandler(Mono.Cecil.Cil.ExceptionHandler)">
+            <summary>
+            Checks if the specified handler is only rethrowing an exception.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.ExceptionFilterTransform.IsStoreLoadOpCodeMatching(Mono.Cecil.Cil.Code,Mono.Cecil.Cil.Code)">
+            <summary>
+            Checks if the specified store and load op codes are matching.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.ExceptionFilterTransform.IsAsyncStateMachineHandler(Mono.Cecil.Cil.ExceptionHandler)">
+            <summary>
+            Checks if the specified handler is generated for the async state machine.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Coyote.Rewriting.MonitorTransform">
+            <summary>
+            Rewrites Monitor.Enter, Monitor.Wait, Monitor.Pulse, Monitor.Exit to use the
+            Coyote ControlledMonitor instead which allows systematic testing of code that
+            uses monitors.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Rewriting.MonitorTransform.Module">
+            <summary>
+            The current module being transformed.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Rewriting.MonitorTransform.Method">
+            <summary>
+            The current method being transformed.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Rewriting.MonitorTransform.Processor">
+            <summary>
+            A helper class for editing method body.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Rewriting.MonitorTransform.ControlledMonitorType">
+            <summary>
+            The cached imported TypeDefinition for the Microsoft.Coyote.SystematicTesting.Interception.ControlledMonitor.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.MonitorTransform.#ctor(Microsoft.Coyote.IO.ILogger)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Coyote.Rewriting.MonitorTransform" /> class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.MonitorTransform.VisitModule(Mono.Cecil.ModuleDefinition)">
+            <summary>
+            Visits the specified <see cref="T:Mono.Cecil.ModuleDefinition" /> inside the <see cref="T:Mono.Cecil.AssemblyDefinition" />
+            that was visited by the <see cref="T:Microsoft.Coyote.Rewriting.RewritingEngine" />.
+            </summary>
+            <param name="module">The module definition to visit.</param>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.MonitorTransform.VisitMethod(Mono.Cecil.MethodDefinition)">
+            <summary>
+            Visits the specified <see cref="T:Mono.Cecil.MethodDefinition" /> inside the <see cref="T:Mono.Cecil.TypeDefinition" /> that was visited
+            by the last <see cref="M:Microsoft.Coyote.Rewriting.AssemblyTransform.VisitType(Mono.Cecil.TypeDefinition)" />.
+            </summary>
+            <param name="method">The method definition to visit.</param>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.MonitorTransform.VisitInstruction(Mono.Cecil.Cil.Instruction)">
+            <summary>
+            Visits the specified IL <see cref="T:Mono.Cecil.Cil.Instruction" /> inside the body of the <see cref="T:Mono.Cecil.MethodDefinition" />
+            that was visited by the last <see cref="M:Microsoft.Coyote.Rewriting.AssemblyTransform.VisitMethod(Mono.Cecil.MethodDefinition)" />.
+            </summary>
+            <param name="instruction">The instruction to visit.</param>
+            <returns>The last modified instruction, or the original if it was not changed.</returns>
+        </member>
+        <member name="T:Microsoft.Coyote.Rewriting.MSTestTransform" />
+        <member name="F:Microsoft.Coyote.Rewriting.MSTestTransform.Configuration">
+            <summary>
+            The test configuration to use when rewriting unit tests.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Rewriting.MSTestTransform.Module">
+            <summary>
+            The current module being transformed.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.MSTestTransform.#ctor(Microsoft.Coyote.Configuration,Microsoft.Coyote.IO.ILogger)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Coyote.Rewriting.MSTestTransform" /> class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.MSTestTransform.VisitModule(Mono.Cecil.ModuleDefinition)">
+            <summary>
+            Visits the specified <see cref="T:Mono.Cecil.ModuleDefinition" /> inside the <see cref="T:Mono.Cecil.AssemblyDefinition" />
+            that was visited by the <see cref="T:Microsoft.Coyote.Rewriting.RewritingEngine" />.
+            </summary>
+            <param name="module">The module definition to visit.</param>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.MSTestTransform.VisitMethod(Mono.Cecil.MethodDefinition)">
+            <summary>
+            Visits the specified <see cref="T:Mono.Cecil.MethodDefinition" /> inside the <see cref="T:Mono.Cecil.TypeDefinition" /> that was visited
+            by the last <see cref="M:Microsoft.Coyote.Rewriting.AssemblyTransform.VisitType(Mono.Cecil.TypeDefinition)" />.
+            </summary>
+            <param name="method">The method definition to visit.</param>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.MSTestTransform.CloneMethod(Mono.Cecil.MethodDefinition)">
+            <summary>
+            Clones the test method.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.MSTestTransform.RewriteTestMethod(Mono.Cecil.MethodDefinition,Mono.Cecil.MethodDefinition)">
+            <summary>
+            Creates a new method for invoking the original test method from the testing engine.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Coyote.Rewriting.NotSupportedInvocationTransform">
+            <summary>
+            Rewriting pass that fails invocations of not supported types.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Rewriting.NotSupportedInvocationTransform.Method">
+            <summary>
+            The current method being transformed.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Rewriting.NotSupportedInvocationTransform.Processor">
+            <summary>
+            A helper class for editing method body.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.NotSupportedInvocationTransform.#ctor(Microsoft.Coyote.IO.ILogger)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Coyote.Rewriting.NotSupportedInvocationTransform" /> class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.NotSupportedInvocationTransform.VisitType(Mono.Cecil.TypeDefinition)">
+            <summary>
+            Visits the specified <see cref="T:Mono.Cecil.TypeDefinition" /> inside the <see cref="T:Mono.Cecil.ModuleDefinition" />
+            that was visited by the last <see cref="M:Microsoft.Coyote.Rewriting.AssemblyTransform.VisitModule(Mono.Cecil.ModuleDefinition)" />.
+            </summary>
+            <param name="type">The type definition to visit.</param>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.NotSupportedInvocationTransform.VisitMethod(Mono.Cecil.MethodDefinition)">
+            <summary>
+            Visits the specified <see cref="T:Mono.Cecil.MethodDefinition" /> inside the <see cref="T:Mono.Cecil.TypeDefinition" /> that was visited
+            by the last <see cref="M:Microsoft.Coyote.Rewriting.AssemblyTransform.VisitType(Mono.Cecil.TypeDefinition)" />.
+            </summary>
+            <param name="method">The method definition to visit.</param>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.NotSupportedInvocationTransform.VisitInstruction(Mono.Cecil.Cil.Instruction)">
+            <summary>
+            Visits the specified IL <see cref="T:Mono.Cecil.Cil.Instruction" /> inside the body of the <see cref="T:Mono.Cecil.MethodDefinition" />
+            that was visited by the last <see cref="M:Microsoft.Coyote.Rewriting.AssemblyTransform.VisitMethod(Mono.Cecil.MethodDefinition)" />.
+            </summary>
+            <param name="instruction">The instruction to visit.</param>
+            <returns>The last modified instruction, or the original if it was not changed.</returns>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.NotSupportedInvocationTransform.IsUnsupportedType(Mono.Cecil.TypeDefinition,Mono.Cecil.MethodReference)">
+            <summary>
+            Checks if the specified type is not supported. If the optional method is specified,
+            then it also checks if the method is not supported.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Coyote.Rewriting.TaskTransform" />
+        <member name="F:Microsoft.Coyote.Rewriting.TaskTransform.Module">
+            <summary>
+            The current module being transformed.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Rewriting.TaskTransform.TypeDef">
+            <summary>
+            The current type being transformed.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Rewriting.TaskTransform.Method">
+            <summary>
+            The current method being transformed.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Rewriting.TaskTransform.Processor">
+            <summary>
+            A helper class for editing method body.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.TaskTransform.#ctor(Microsoft.Coyote.IO.ILogger)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Coyote.Rewriting.TaskTransform" /> class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.TaskTransform.VisitModule(Mono.Cecil.ModuleDefinition)">
+            <summary>
+            Visits the specified <see cref="T:Mono.Cecil.ModuleDefinition" /> inside the <see cref="T:Mono.Cecil.AssemblyDefinition" />
+            that was visited by the <see cref="T:Microsoft.Coyote.Rewriting.RewritingEngine" />.
+            </summary>
+            <param name="module">The module definition to visit.</param>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.TaskTransform.VisitType(Mono.Cecil.TypeDefinition)">
+            <summary>
+            Visits the specified <see cref="T:Mono.Cecil.TypeDefinition" /> inside the <see cref="T:Mono.Cecil.ModuleDefinition" />
+            that was visited by the last <see cref="M:Microsoft.Coyote.Rewriting.AssemblyTransform.VisitModule(Mono.Cecil.ModuleDefinition)" />.
+            </summary>
+            <param name="type">The type definition to visit.</param>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.TaskTransform.VisitField(Mono.Cecil.FieldDefinition)">
+            <summary>
+            Visits the specified <see cref="T:Mono.Cecil.FieldDefinition" /> inside the <see cref="T:Mono.Cecil.TypeDefinition" /> that was visited
+            by the last <see cref="M:Microsoft.Coyote.Rewriting.AssemblyTransform.VisitType(Mono.Cecil.TypeDefinition)" />.
+            </summary>
+            <param name="field">The field definition to visit.</param>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.TaskTransform.VisitMethod(Mono.Cecil.MethodDefinition)">
+            <summary>
+            Visits the specified <see cref="T:Mono.Cecil.MethodDefinition" /> inside the <see cref="T:Mono.Cecil.TypeDefinition" /> that was visited
+            by the last <see cref="M:Microsoft.Coyote.Rewriting.AssemblyTransform.VisitType(Mono.Cecil.TypeDefinition)" />.
+            </summary>
+            <param name="method">The method definition to visit.</param>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.TaskTransform.VisitVariable(Mono.Cecil.Cil.VariableDefinition)">
+            <summary>
+            Visits the specified <see cref="T:Mono.Cecil.Cil.VariableDefinition" /> inside the <see cref="T:Mono.Cecil.MethodDefinition" /> that was visited
+            by the last <see cref="M:Microsoft.Coyote.Rewriting.AssemblyTransform.VisitMethod(Mono.Cecil.MethodDefinition)" />.
+            </summary>
+            <param name="variable">The variable definition to visit.</param>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.TaskTransform.VisitInstruction(Mono.Cecil.Cil.Instruction)">
+            <summary>
+            Visits the specified IL <see cref="T:Mono.Cecil.Cil.Instruction" /> inside the body of the <see cref="T:Mono.Cecil.MethodDefinition" />
+            that was visited by the last <see cref="M:Microsoft.Coyote.Rewriting.AssemblyTransform.VisitMethod(Mono.Cecil.MethodDefinition)" />.
+            </summary>
+            <param name="instruction">The instruction to visit.</param>
+            <returns>The last modified instruction, or the original if it was not changed.</returns>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.TaskTransform.VisitInitobjInstruction(Mono.Cecil.Cil.Instruction)">
+            <summary>
+            Transforms the specified <see cref="F:Mono.Cecil.Cil.OpCodes.Initobj" /> instruction.
+            </summary>
+            <returns>The unmodified instruction, or the newly replaced instruction.</returns>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.TaskTransform.VisitCallInstruction(Mono.Cecil.Cil.Instruction,Mono.Cecil.MethodReference)">
+            <summary>
+            Transforms the specified non-generic <see cref="F:Mono.Cecil.Cil.OpCodes.Call" /> or <see cref="F:Mono.Cecil.Cil.OpCodes.Callvirt" /> instruction.
+            </summary>
+            <returns>The unmodified instruction, or the newly replaced instruction.</returns>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.TaskTransform.RewriteParameterDefinition(Mono.Cecil.ParameterDefinition)">
+            <summary>
+            Rewrites the specified <see cref="T:Mono.Cecil.ParameterDefinition" />.
+            </summary>
+            <param name="parameter">The parameter definition to rewrite.</param>
+            <returns>The rewritten parameter definition, or the original if it was not changed.</returns>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.TaskTransform.RewriteDeclaringTypeReference(Mono.Cecil.MethodReference)">
+            <summary>
+            Rewrites the declaring <see cref="T:Mono.Cecil.TypeReference" /> of the specified <see cref="T:Mono.Cecil.MethodReference" />.
+            </summary>
+            <param name="method">The method with the declaring type to rewrite.</param>
+            <returns>The rewritten declaring type, or the original if it was not changed.</returns>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.TaskTransform.RewriteTypeReference(Mono.Cecil.TypeReference)">
+            <summary>
+            Rewrites the specified <see cref="T:Mono.Cecil.TypeReference" />.
+            </summary>
+            <param name="type">The type reference to rewrite.</param>
+            <returns>The rewritten type reference, or the original if it was not changed.</returns>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.TaskTransform.RewriteTaskType(Mono.Cecil.TypeReference,System.Boolean)">
+            <summary>
+            Returns the rewritten type for the specified <see cref="N:System.Threading.Tasks" /> type, or returns the original
+            if there is nothing to rewrite.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.TaskTransform.TryRewriteCompilerType(Mono.Cecil.TypeReference,Mono.Cecil.TypeReference@)">
+            <summary>
+            Tries to return the rewritten type for the specified <see cref="N:System.Runtime.CompilerServices" /> type, or returns
+            false if there is nothing to rewrite.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.TaskTransform.RewriteCompilerType(Mono.Cecil.TypeReference,System.Boolean)">
+            <summary>
+            Returns the rewritten type for the specified <see cref="N:System.Runtime.CompilerServices" /> type, or returns the original
+            if there is nothing to rewrite.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.TaskTransform.RewriteCompilerType(Mono.Cecil.GenericInstanceType,Mono.Cecil.TypeReference)">
+            <summary>
+            Returns the rewritten type for the specified generic <see cref="N:System.Runtime.CompilerServices" /> type, or returns
+            the original if there is nothing to rewrite.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.TaskTransform.IsSupportedTaskType(Mono.Cecil.TypeReference)">
+            <summary>
+            Checks if the specified type is a supported task type.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.TaskTransform.IsSupportedTaskMethod(System.String,System.String)">
+            <summary>
+            Checks if the <see cref="T:System.Threading.Tasks.Task" /> method with the specified name is supported.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Coyote.Rewriting.ThreadTransform" />
+        <member name="F:Microsoft.Coyote.Rewriting.ThreadTransform.Module">
+            <summary>
+            The current module being transformed.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Rewriting.ThreadTransform.Method">
+            <summary>
+            The current method being transformed.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Rewriting.ThreadTransform.Processor">
+            <summary>
+            A helper class for editing method body.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Rewriting.ThreadTransform.ControlledThread">
+            <summary>
+            The imported type.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.ThreadTransform.#ctor(Microsoft.Coyote.IO.ILogger)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Coyote.Rewriting.ThreadTransform" /> class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.ThreadTransform.VisitModule(Mono.Cecil.ModuleDefinition)">
+            <summary>
+            Visits the specified <see cref="T:Mono.Cecil.ModuleDefinition" /> inside the <see cref="T:Mono.Cecil.AssemblyDefinition" />
+            that was visited by the <see cref="T:Microsoft.Coyote.Rewriting.RewritingEngine" />.
+            </summary>
+            <param name="module">The module definition to visit.</param>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.ThreadTransform.VisitType(Mono.Cecil.TypeDefinition)">
+            <summary>
+            Visits the specified <see cref="T:Mono.Cecil.TypeDefinition" /> inside the <see cref="T:Mono.Cecil.ModuleDefinition" />
+            that was visited by the last <see cref="M:Microsoft.Coyote.Rewriting.AssemblyTransform.VisitModule(Mono.Cecil.ModuleDefinition)" />.
+            </summary>
+            <param name="type">The type definition to visit.</param>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.ThreadTransform.VisitMethod(Mono.Cecil.MethodDefinition)">
+            <summary>
+            Visits the specified <see cref="T:Mono.Cecil.MethodDefinition" /> inside the <see cref="T:Mono.Cecil.TypeDefinition" /> that was visited
+            by the last <see cref="M:Microsoft.Coyote.Rewriting.AssemblyTransform.VisitType(Mono.Cecil.TypeDefinition)" />.
+            </summary>
+            <param name="method">The method definition to visit.</param>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.ThreadTransform.VisitInstruction(Mono.Cecil.Cil.Instruction)">
+            <summary>
+            Visits the specified IL <see cref="T:Mono.Cecil.Cil.Instruction" /> inside the body of the <see cref="T:Mono.Cecil.MethodDefinition" />
+            that was visited by the last <see cref="M:Microsoft.Coyote.Rewriting.AssemblyTransform.VisitMethod(Mono.Cecil.MethodDefinition)" />.
+            </summary>
+            <param name="instruction">The instruction to visit.</param>
+            <returns>The last modified instruction, or the original if it was not changed.</returns>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.ThreadTransform.VisitNewobjInstruction(Mono.Cecil.Cil.Instruction)">
+            <summary>
+            Transforms the specified <see cref="F:Mono.Cecil.Cil.OpCodes.Initobj" /> instruction.
+            </summary>
+            <returns>The unmodified instruction, or the newly replaced instruction.</returns>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.ThreadTransform.VisitCallInstruction(Mono.Cecil.Cil.Instruction,Mono.Cecil.MethodReference)">
+            <summary>
+            Transforms the specified non-generic <see cref="F:Mono.Cecil.Cil.OpCodes.Call" /> or <see cref="F:Mono.Cecil.Cil.OpCodes.Callvirt" /> instruction.
+            </summary>
+            <returns>The unmodified instruction, or the newly replaced instruction.</returns>
+        </member>
+        <member name="M:Microsoft.Coyote.Rewriting.ThreadTransform.FindMatchingStaticMethod(Mono.Cecil.TypeDefinition,Mono.Cecil.MethodDefinition)">
+            <summary>
+            Find a static method that matches the instance method, where the first parameter to the static
+            is the instance parameter on the other method.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Coyote.SmartSockets.SmartSocketClient">
+            <summary>
+            This class wraps the Socket class providing some useful semantics like FindServerAsync
+            which looks for the UDP message broadcast by the SmartSocketServer. It also provides a
+            useful SendReceiveAsync message that synchronously waits for a response from the server.
+            It also supports serializing custom message objects via the DataContractSerializer using
+            known types provided in your SmartSocketTypeResolver.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SmartSockets.SmartSocketClient.FindServerAsync(System.String,System.String,Microsoft.Coyote.SmartSockets.SmartSocketTypeResolver,System.Threading.CancellationToken,System.String,System.Int32)">
+            <summary>
+            Find a SmartSocketServer on the local network using UDP broadcast. This will block
+            waiting for a server to respond or until you cancel using the CancellationToken.
+            </summary>
+            <returns>The connected client or null if task is cancelled.</returns>
+        </member>
+        <member name="M:Microsoft.Coyote.SmartSockets.SmartSocketClient.OpenBackChannel(System.EventHandler{Microsoft.Coyote.SmartSockets.SmartSocketClient})">
+            <summary>
+            Create another socket that will allow the server to send messages to the client any time.
+            It is expected you will start a ReceiveAsync loop on this server object to process
+            those messages.
+            </summary>
+            <param name="connectedHandler">An event handler to invoke when the server opens the back channel.</param>
+            <returns>New server object that will get one ClientConnected event when the remote server connects.</returns>
+        </member>
+        <member name="P:Microsoft.Coyote.SmartSockets.SmartSocketClient.BackChannel">
+            <summary>
+            If OpenBackChannel is called, and the server supports it then this property will
+            be defined when that channel is connected.
+            </summary>
+        </member>
+        <member name="E:Microsoft.Coyote.SmartSockets.SmartSocketClient.Error">
+            <summary>
+            This event is raised if a socket error is detected.
+            </summary>
+        </member>
+        <member name="E:Microsoft.Coyote.SmartSockets.SmartSocketClient.Disconnected">
+            <summary>
+            This even is raised if the socket is disconnected.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SmartSockets.SmartSocketClient.SendReceiveAsync(Microsoft.Coyote.SmartSockets.SocketMessage)">
+            <summary>
+            Send a message back to the client.
+            </summary>
+            <returns>The response message.</returns>
+        </member>
+        <member name="M:Microsoft.Coyote.SmartSockets.SmartSocketClient.SendAsync(Microsoft.Coyote.SmartSockets.SocketMessage)">
+            <summary>
+            Send a message and do not wait for a response.
+            </summary>
+            <returns>The response message.</returns>
+        </member>
+        <member name="M:Microsoft.Coyote.SmartSockets.SmartSocketClient.ReceiveAsync">
+            <summary>
+            Receive one message from the socket. This call blocks until a message has arrived.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Coyote.SmartSockets.SmartSocketServer">
+            <summary>
+            This class sets up a UDP broadcaster so clients on the same network can find the server by
+            a given string name, no fussing about with ip addresses and ports.It then listens for
+            new clients to connect and spins off ClientConnected messages so your app can process the
+            server side of each conversation.Your application server then can handle any number of
+            clients at the same time, each client will have their own SmartSocketClient on different ports.
+            If the client goes away, the ClientDisconnected event is raised so the server can cleanup.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Coyote.SmartSockets.SmartSocketServer.GroupAddress">
+            <summary>
+            Address for UDP group.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Coyote.SmartSockets.SmartSocketServer.GroupPort">
+            <summary>
+            Port used for UDP broadcasts.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Coyote.SmartSockets.SmartSocketServer.EndPoint">
+            <summary>
+            The end point we are listening on (valid after calling StartServer).
+            </summary>
+        </member>
+        <member name="E:Microsoft.Coyote.SmartSockets.SmartSocketServer.ClientConnected">
+            <summary>
+            Raised when a new client is connected
+            </summary>
+        </member>
+        <member name="E:Microsoft.Coyote.SmartSockets.SmartSocketServer.ClientDisconnected">
+            <summary>
+            Raised when the given client disconnects
+            </summary>
+        </member>
+        <member name="E:Microsoft.Coyote.SmartSockets.SmartSocketServer.BackChannelOpened">
+            <summary>
+            Raised when client requests a back channel for server to communicate independently with the client
+            The given SmartSocketClient will have a BackChannel property set to a new SmartSocketClient that
+            the server can use to send messages to the client.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SmartSockets.SmartSocketServer.#ctor(System.String,Microsoft.Coyote.SmartSockets.SmartSocketTypeResolver,System.String,System.String,System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Coyote.SmartSockets.SmartSocketServer" /> class.
+            Construct a new SmartSocketServer.
+            </summary>
+            <param name="name">The name the client will check in UDP broadcasts to make sure it is connecting to the right server.</param>
+            <param name="resolver">A way of providing custom Message types for serialization.</param>
+            <param name="ipAddress">An optional ipAddress so you can decide which network interface to use.</param>
+            <param name="udpGroupAddress">An optional UDP group address.</param>
+            <param name="udpGroupPort">An optional UDP group port.</param>
+        </member>
+        <member name="M:Microsoft.Coyote.SmartSockets.SmartSocketServer.StartServer(System.String,Microsoft.Coyote.SmartSockets.SmartSocketTypeResolver,System.String,System.String,System.Int32)">
+            <summary>
+            Start a new server that listens for connections from anyone.
+            </summary>
+            <param name="name">The unique name of the server.</param>
+            <param name="resolver">For resolving custom message types received from the client.</param>
+            <param name="ipAddress">Determines which local network interface to use.</param>
+            <param name="udpGroupAddress">Optional request to setup UDP listener, pass null if you don't want that.</param>
+            <param name="udpGroupPort">Optional port required if you provide udpGroupAddress.</param>
+            <returns>Returns the new server object.</returns>
+        </member>
+        <member name="M:Microsoft.Coyote.SmartSockets.SmartSocketServer.StartListening">
+            <summary>
+            Start listening for connections from anyone.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SmartSockets.SmartSocketServer.BroadcastAsync(Microsoft.Coyote.SmartSockets.SocketMessage)">
+            <summary>
+            Send a message to all connected clients.
+            </summary>
+            <param name="message">The message to send.</param>
+        </member>
+        <member name="M:Microsoft.Coyote.SmartSockets.SmartSocketServer.Run">
+            <summary>
+            Call this method on a background thread to listen to our port.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SmartSockets.SmartSocketServer.Stop">
+            <summary>
+            Call this method to stop the background thread, it is good to do this before your app shuts down.
+            This will also send a Disconnect message to all the clients so they know the server is gone.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Coyote.SmartSockets.SocketMessage">
+            <summary>
+            This is the base class for messages send over SmartSockets.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Coyote.SmartSockets.SocketMessage.Id">
+            <summary>
+            This is like a message type, class of message or are completely unique id.
+            It's up to you how you want to use it.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Coyote.SmartSockets.SocketMessage.Sender">
+            <summary>
+            This will be filled automatically by the SmartSocket class so you.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Coyote.SmartSockets.SocketMessage.Message">
+            <summary>
+            An optional string message.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Coyote.SystematicTesting.TestAttribute">
+            <summary>
+            Attribute for declaring the entry point to a Coyote test.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Coyote.SystematicTesting.TestInitAttribute">
+            <summary>
+            Attribute for declaring the initialization method to be called before testing starts.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Coyote.SystematicTesting.TestDisposeAttribute">
+            <summary>
+            Attribute for declaring a cleanup method to be called when all test iterations terminate.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Coyote.SystematicTesting.TestIterationDisposeAttribute">
+            <summary>
+            Attribute for declaring a cleanup method to be called when each test iteration terminates.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Coyote.SystematicTesting.TestingEngine">
+            <summary>
+            Testing engine that can run a controlled concurrency test using
+            a specified configuration.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.SystematicTesting.TestingEngine.LearnAboutTelemetryUrl">
+            <summary>
+            Url with information about the gathered telemetry.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.SystematicTesting.TestingEngine.Configuration">
+            <summary>
+            The project configuration.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.SystematicTesting.TestingEngine.TestMethodInfo">
+            <summary>
+            The method to test.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.SystematicTesting.TestingEngine.PerIterationCallbacks">
+            <summary>
+            Set of callbacks to invoke at the end
+            of each iteration.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.SystematicTesting.TestingEngine.Strategy">
+            <summary>
+            The program exploration strategy.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.SystematicTesting.TestingEngine.RandomValueGenerator">
+            <summary>
+            Random value generator used by the scheduling strategies.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.SystematicTesting.TestingEngine.Profiler">
+            <summary>
+            The profiler.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.SystematicTesting.TestingEngine.TelemetryClient">
+            <summary>
+            The client used to optionally send anonymized telemetry data.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.SystematicTesting.TestingEngine.CancellationTokenSource">
+            <summary>
+            The testing task cancellation token source.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Coyote.SystematicTesting.TestingEngine.TestReport">
+            <summary>
+            Data structure containing information
+            gathered during testing.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.SystematicTesting.TestingEngine.InstalledLogger">
+            <summary>
+            The installed logger.
+            </summary>
+            <remarks>
+            See <see href="/coyote/learn/core/logging">Logging</see> for more information.
+            </remarks>
+        </member>
+        <member name="F:Microsoft.Coyote.SystematicTesting.TestingEngine.DefaultLogger">
+            <summary>
+            The default logger that is used during testing.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Coyote.SystematicTesting.TestingEngine.Logger">
+            <summary>
+            Get or set the <see cref="T:Microsoft.Coyote.IO.ILogger" /> used to log messages during testing.
+            </summary>
+            <remarks>
+            See <see href="/coyote/learn/core/logging">Logging</see> for more information.
+            </remarks>
+        </member>
+        <member name="F:Microsoft.Coyote.SystematicTesting.TestingEngine.Graph">
+            <summary>
+            A graph of the actors, state machines and events of a single test iteration.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.SystematicTesting.TestingEngine.XmlLog">
+            <summary>
+            Contains a single iteration of XML log output in the case where the IsXmlLogEnabled
+            configuration is specified.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Coyote.SystematicTesting.TestingEngine.ReadableTrace">
+            <summary>
+            The readable trace, if any.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Coyote.SystematicTesting.TestingEngine.ReproducibleTrace">
+            <summary>
+            The reproducable trace, if any.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Coyote.SystematicTesting.TestingEngine.IsReplayModeEnabled">
+            <summary>
+            Checks if the systematic testing engine is running in replay mode.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.SystematicTesting.TestingEngine.PrintGuard">
+            <summary>
+            A guard for printing info.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestingEngine.Create(Microsoft.Coyote.Configuration)">
+            <summary>
+            Creates a new systematic testing engine.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestingEngine.Create(Microsoft.Coyote.Configuration,System.Action)">
+            <summary>
+            Creates a new systematic testing engine.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestingEngine.Create(Microsoft.Coyote.Configuration,System.Action{Microsoft.Coyote.Runtime.ICoyoteRuntime})">
+            <summary>
+            Creates a new systematic testing engine.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestingEngine.Create(Microsoft.Coyote.Configuration,System.Action{Microsoft.Coyote.Actors.IActorRuntime})">
+            <summary>
+            Creates a new systematic testing engine.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestingEngine.Create(Microsoft.Coyote.Configuration,System.Func{System.Threading.Tasks.Task})">
+            <summary>
+            Creates a new systematic testing engine.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestingEngine.Create(Microsoft.Coyote.Configuration,System.Func{Microsoft.Coyote.Runtime.ICoyoteRuntime,System.Threading.Tasks.Task})">
+            <summary>
+            Creates a new systematic testing engine.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestingEngine.Create(Microsoft.Coyote.Configuration,System.Func{Microsoft.Coyote.Actors.IActorRuntime,System.Threading.Tasks.Task})">
+            <summary>
+            Creates a new systematic testing engine.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestingEngine.Create(Microsoft.Coyote.Configuration,System.Func{Microsoft.Coyote.Tasks.Task})">
+            <summary>
+            Creates a new systematic testing engine.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestingEngine.Create(Microsoft.Coyote.Configuration,System.Func{Microsoft.Coyote.Runtime.ICoyoteRuntime,Microsoft.Coyote.Tasks.Task})">
+            <summary>
+            Creates a new systematic testing engine.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestingEngine.Create(Microsoft.Coyote.Configuration,System.Func{Microsoft.Coyote.Actors.IActorRuntime,Microsoft.Coyote.Tasks.Task})">
+            <summary>
+            Creates a new systematic testing engine.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestingEngine.#ctor(Microsoft.Coyote.Configuration,System.Delegate)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Coyote.SystematicTesting.TestingEngine" /> class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestingEngine.#ctor(Microsoft.Coyote.Configuration,Microsoft.Coyote.SystematicTesting.TestMethodInfo)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Coyote.SystematicTesting.TestingEngine" /> class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestingEngine.Run">
+            <summary>
+            Runs the testing engine.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestingEngine.CreateTestingTask">
+            <summary>
+            Creates a new testing task.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestingEngine.RunNextIteration(System.UInt32)">
+            <summary>
+            Runs the next testing iteration.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestingEngine.Stop">
+            <summary>
+            Stops the testing engine.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestingEngine.GetReport">
+            <summary>
+            Returns a report with the testing results.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestingEngine.ThrowIfBugFound">
+            <summary>
+            Throws either an <see cref="T:Microsoft.Coyote.AssertionFailureException" />, if a bug was found,
+            or an unhandled <see cref="T:System.Exception" />, if one was thrown.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestingEngine.TryEmitTraces(System.String,System.String)">
+            <summary>
+            Tries to emit the testing traces, if any.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestingEngine.RegisterPerIterationCallBack(System.Action{System.UInt32})">
+            <summary>
+            Registers a callback to invoke at the end of each iteration. The callback takes as
+            a parameter an integer representing the current iteration.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestingEngine.InitializeCustomActorLogging(Microsoft.Coyote.Actors.IActorRuntime)">
+            <summary>
+            Take care of handling the <see cref="F:Microsoft.Coyote.SystematicTesting.TestingEngine.Configuration" /> settings for <see cref="F:Microsoft.Coyote.Configuration.CustomActorRuntimeLogType" />,
+            <see cref="P:Microsoft.Coyote.Configuration.IsDgmlGraphEnabled" />, and <see cref="P:Microsoft.Coyote.Configuration.ReportActivityCoverage" /> by setting up the
+            LogWriters on the given <see cref="T:Microsoft.Coyote.Actors.IActorRuntime" /> object.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestingEngine.GatherTestingStatistics(Microsoft.Coyote.Runtime.CoyoteRuntime)">
+            <summary>
+            Gathers the exploration strategy statistics from the specified runtimne.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestingEngine.GetSchedulerReport(Microsoft.Coyote.SystematicTesting.OperationScheduler)">
+            <summary>
+            Returns a test report with the scheduling statistics.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestingEngine.ConstructReproducibleTrace(Microsoft.Coyote.Runtime.CoyoteRuntime)">
+            <summary>
+            Constructs a reproducable trace.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestingEngine.GetScheduleForReplay(System.Boolean@)">
+            <summary>
+            Returns the schedule to replay.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestingEngine.ShouldPrintIteration(System.UInt32)">
+            <summary>
+            Returns true if the engine should print the current iteration.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestingEngine.IsTestRewritten">
+            <summary>
+            Checks if the test executed by the testing engine has been rewritten.
+            </summary>
+            <returns>True if the test has been rewritten, else false.</returns>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestingEngine.SetLogger(System.IO.TextWriter)">
+            <summary>
+            Installs the specified TextWriter for logging.
+            </summary>
+            <remarks>
+            This writer will be wrapped in an object that implements the <see cref="T:Microsoft.Coyote.IO.ILogger" /> interface which
+            will have a minor performance overhead, so it is better to set the <see cref="P:Microsoft.Coyote.SystematicTesting.TestingEngine.Logger" /> property instead.
+            </remarks>
+            <param name="writer">The writer to use for logging.</param>
+            <returns>The previously installed logger.</returns>
+        </member>
+        <member name="T:Microsoft.Coyote.SystematicTesting.TestMethodInfo">
+            <summary>
+            Maintains information about a method to be tested.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.SystematicTesting.TestMethodInfo.Assembly">
+            <summary>
+            The assembly that contains the test method.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.SystematicTesting.TestMethodInfo.Method">
+            <summary>
+            The method to be tested.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.SystematicTesting.TestMethodInfo.Name">
+            <summary>
+            The name of the test method.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.SystematicTesting.TestMethodInfo.InitMethod">
+            <summary>
+            The test initialization method.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.SystematicTesting.TestMethodInfo.DisposeMethod">
+            <summary>
+            The test dispose method.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.SystematicTesting.TestMethodInfo.IterationDisposeMethod">
+            <summary>
+            The test dispose method per iteration.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestMethodInfo.#ctor(System.Reflection.Assembly,System.Delegate,System.String,System.Reflection.MethodInfo,System.Reflection.MethodInfo,System.Reflection.MethodInfo)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Coyote.SystematicTesting.TestMethodInfo" /> class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestMethodInfo.Create(System.Delegate)">
+            <summary>
+            Creates a <see cref="T:Microsoft.Coyote.SystematicTesting.TestMethodInfo" /> instance from the specified delegate.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestMethodInfo.Create(Microsoft.Coyote.Configuration)">
+            <summary>
+            Creates a <see cref="T:Microsoft.Coyote.SystematicTesting.TestMethodInfo" /> instance from assembly specified in the configuration.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestMethodInfo.InitializeAllIterations">
+            <summary>
+            Invokes the user-specified initialization method for all iterations executing this test.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestMethodInfo.DisposeCurrentIteration">
+            <summary>
+            Invokes the user-specified disposal method for the iteration currently executing this test.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestMethodInfo.DisposeAllIterations">
+            <summary>
+            Invokes the user-specified disposal method for all iterations executing this test.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestMethodInfo.GetTestMethod(System.Reflection.Assembly,System.String)">
+            <summary>
+            Returns the test method with the specified name. A test method must
+            be annotated with the <see cref="T:Microsoft.Coyote.SystematicTesting.TestAttribute" /> attribute.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestMethodInfo.GetTestSetupMethod(System.Reflection.Assembly,System.Type)">
+            <summary>
+            Returns the test method with the specified attribute.
+            Returns null if no such method is found.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestMethodInfo.FindTestMethodsWithAttribute(System.Type,System.Reflection.BindingFlags,System.Reflection.Assembly)">
+            <summary>
+            Finds the test methods with the specified attribute in the given assembly.
+            Returns an empty list if no such methods are found.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Coyote.SystematicTesting.TestReport">
+            <summary>
+            Class implementing the Coyote test report.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Coyote.SystematicTesting.TestReport.Configuration">
+            <summary>
+            Configuration of the program-under-test.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Coyote.SystematicTesting.TestReport.CoverageInfo">
+            <summary>
+            Information regarding code coverage.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Coyote.SystematicTesting.TestReport.NumOfExploredFairSchedules">
+            <summary>
+            Number of explored fair schedules.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Coyote.SystematicTesting.TestReport.NumOfExploredUnfairSchedules">
+            <summary>
+            Number of explored unfair schedules.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Coyote.SystematicTesting.TestReport.NumOfFoundBugs">
+            <summary>
+            Number of found bugs.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Coyote.SystematicTesting.TestReport.BugReports">
+            <summary>
+            Set of unique bug reports.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Coyote.SystematicTesting.TestReport.MinExploredFairSteps">
+            <summary>
+            The min explored scheduling steps in average,
+            in fair tests.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Coyote.SystematicTesting.TestReport.MaxExploredFairSteps">
+            <summary>
+            The max explored scheduling steps in average,
+            in fair tests.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Coyote.SystematicTesting.TestReport.TotalExploredFairSteps">
+            <summary>
+            The total explored scheduling steps (across
+            all testing iterations), in fair tests.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Coyote.SystematicTesting.TestReport.MaxFairStepsHitInFairTests">
+            <summary>
+            Number of times the fair max steps bound was hit,
+            in fair tests.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Coyote.SystematicTesting.TestReport.MaxUnfairStepsHitInFairTests">
+            <summary>
+            Number of times the unfair max steps bound was hit,
+            in fair tests.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Coyote.SystematicTesting.TestReport.MaxUnfairStepsHitInUnfairTests">
+            <summary>
+            Number of times the unfair max steps bound was hit,
+            in unfair tests.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Coyote.SystematicTesting.TestReport.InternalErrors">
+            <summary>
+            Set of internal errors. If no internal errors
+            occurred, then this set is empty.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.SystematicTesting.TestReport.Lock">
+            <summary>
+            Lock for the test report.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Coyote.SystematicTesting.TestReport.ThrownException">
+            <summary>
+            Unhandled exception caught by RunNextIteration.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestReport.#ctor(Microsoft.Coyote.Configuration)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Coyote.SystematicTesting.TestReport" /> class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestReport.Merge(Microsoft.Coyote.SystematicTesting.TestReport)">
+            <summary>
+            Merges the information from the specified test report.
+            </summary>
+            <returns>True if merged successfully.</returns>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestReport.GetText(Microsoft.Coyote.Configuration,System.String)">
+            <summary>
+            Returns the testing report as a string, given a configuration and an optional prefix.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestReport.Clone">
+            <summary>
+            Clones the test report.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Coyote.Telemetry.CoyoteTelemetryClient" />
+        <member name="M:Microsoft.Coyote.Telemetry.CoyoteTelemetryClient.ConnectToServer(System.String)">
+            <summary>
+            Starts a telemetry server in a separate coyote process.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Coyote.Telemetry.TelemetryEvent">
+            <summary>
+            A custom SocketMessage used to convey a telemetry event.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Coyote.Telemetry.TelemetryMetric">
+            <summary>
+            A custom SocketMessage used to convey a telemetry metric.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Coyote.Telemetry.CoyoteTelemetryServer">
+            <summary>
+            This is a SmartSocketServer designed for sending the coyote custom telemetry messages
+            to Azure.  The server runs in a separate process communicating for smart sockets.
+            It sticks around for 60 seconds then terminates, unless a heartbeat or telemetry
+            message is received from another coyote process.  You can debug this server easily
+            by running "coyote telemetry server" from the command line.
+            See <see href="https://github.com/microsoft/ApplicationInsights-dotnet" />.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Telemetry.CoyoteTelemetryServer.Server">
+            <summary>
+            The server socket that all the coyote apps will connect to.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Telemetry.CoyoteTelemetryServer.Telemetry">
+            <summary>
+            The App Insights client.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Telemetry.CoyoteTelemetryServer.RunServerAsync">
+            <summary>
+            Opens the local server for local coyote test processes to connect to.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Telemetry.CoyoteTelemetryServer.Flush">
+            <summary>
+            Flush events to Azure.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Telemetry.CoyoteTelemetryServer.OnClientDisconnected(System.Object,Microsoft.Coyote.SmartSockets.SmartSocketClient)">
+            <summary>
+            Called when a separate coyote test/replay process termiantes.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Telemetry.CoyoteTelemetryServer.OnClientConnected(System.Object,Microsoft.Coyote.SmartSockets.SmartSocketClient)">
+            <summary>
+            Called when a separate coyote test/replay process starts up and connects to
+            this server.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Telemetry.CoyoteTelemetryServer.HandleEvent(Microsoft.Coyote.Telemetry.TelemetryEvent)">
+            <summary>
+            Calls the App Insights TrackEvent method.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Telemetry.CoyoteTelemetryServer.HandleMetric(Microsoft.Coyote.Telemetry.TelemetryMetric)">
+            <summary>
+            Calls the App Insights TrackMetric method.
+            </summary>
+        </member>
+    </members>
+</doc>
