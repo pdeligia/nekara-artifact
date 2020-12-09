@@ -1,0 +1,1 @@
+/usr/bin/c++    -rdynamic CMakeFiles/mutual_exclusion.dir/mutual_exclusion.o  -o mutual_exclusion -lcoyote_static -lThreads::Threads 

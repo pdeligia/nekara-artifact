@@ -1,0 +1,5 @@
+# ninja log v5
+0	3679	1604836529	unit/CMakeFiles/operations.dir/operations.o	c1bc961dfc11dfd7
+17	3824	1604836529	unit/CMakeFiles/dfs_coverage.dir/dfs_coverage.o	dd11a812f0dde07a
+5	3866	1604836529	unit/CMakeFiles/dfs_next_integer.dir/dfs_next_integer.o	ca6535901b5ff267
+0	18	0	clean	a7c70eacb11a5051

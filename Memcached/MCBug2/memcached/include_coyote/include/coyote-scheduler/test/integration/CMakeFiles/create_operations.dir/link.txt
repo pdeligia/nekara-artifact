@@ -1,0 +1,1 @@
+/usr/bin/c++    -rdynamic CMakeFiles/create_operations.dir/create_operations.o  -o create_operations -lcoyote_static -lThreads::Threads 

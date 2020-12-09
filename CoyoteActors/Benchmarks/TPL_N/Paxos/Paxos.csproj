@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>Paxos</AssemblyName>
+    <TargetFrameworks>net5.0</TargetFrameworks>
+    <OutputPath>..\bin\</OutputPath>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Coyote.Actors">
+      <HintPath>..\..\..\Framework\TPL_N\bin\net5.0\Microsoft.Coyote.Actors.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Coyote">
+      <HintPath>..\..\..\Framework\TPL_N\Common\net5.0\Microsoft.Coyote.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Coyote.Test">
+      <HintPath>..\..\..\Framework\TPL_N\Common\net5.0\Microsoft.Coyote.Test.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>
