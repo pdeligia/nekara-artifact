@@ -1,0 +1,12 @@
+{
+  "testName": "Test_Triangular_2",
+  "assemblyPath" : "Benchmarks.Threading.dll",
+  "outputPath" : "..\\..\\out\\Triangular2\\default",
+  "numEpochs" : 3,
+  "numIterations" : 10000,
+  "maxSteps" : 1000,
+  "abstractionLevel" : "default",
+  "strategies" : [
+    "Random", "PCT-10"
+  ]
+}
