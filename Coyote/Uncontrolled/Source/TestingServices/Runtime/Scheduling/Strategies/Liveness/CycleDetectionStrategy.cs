@@ -55,7 +55,7 @@ namespace Microsoft.Coyote.TestingServices.Scheduling.Strategies
 
         /// <summary>
         /// A counter that increases in each step of the execution,
-        /// as long as the P# program remains in the same cycle,
+        /// as long as the Coyote program remains in the same cycle,
         /// with the liveness monitors at the hot state.
         /// </summary>
         private int LivenessTemperature;
@@ -139,7 +139,7 @@ namespace Microsoft.Coyote.TestingServices.Scheduling.Strategies
                 next = enabledOperations.FirstOrDefault(choice => choice.SourceId == nextStep.ScheduledOperationId);
                 if (next is null)
                 {
-                    Debug.WriteLine("<LivenessDebug> Trace is not reproducible: cannot detect machine with id '{0}'.", nextStep.ScheduledOperationId);
+                    Debug.WriteLine("<LivenessDebug> Trace is not reproducible: cannot detect actor with id '{0}'.", nextStep.ScheduledOperationId);
                     this.EscapeUnfairCycle();
                     return this.SchedulingStrategy.GetNext(current, ops, out next);
                 }
@@ -499,35 +499,35 @@ namespace Microsoft.Coyote.TestingServices.Scheduling.Strategies
         {
             var result = false;
 
-            var enabledMachines = new HashSet<ulong>();
-            var scheduledMachines = new HashSet<ulong>();
+            var enabledActors = new HashSet<ulong>();
+            var scheduledActors = new HashSet<ulong>();
 
             var schedulingChoiceSteps = cycle.Where(
                 val => val.Type == ScheduleStepType.SchedulingChoice);
             foreach (var step in schedulingChoiceSteps)
             {
-                scheduledMachines.Add(step.ScheduledOperationId);
+                scheduledActors.Add(step.ScheduledOperationId);
             }
 
             foreach (var step in cycle)
             {
-                enabledMachines.UnionWith(step.State.EnabledMachineIds);
+                enabledActors.UnionWith(step.State.EnabledActorIds);
             }
 
             if (Debug.IsEnabled)
             {
-                foreach (var m in enabledMachines)
+                foreach (var m in enabledActors)
                 {
-                    Debug.WriteLine("<LivenessDebug> Enabled machine {0}.", m);
+                    Debug.WriteLine("<LivenessDebug> Enabled actor {0}.", m);
                 }
 
-                foreach (var m in scheduledMachines)
+                foreach (var m in scheduledActors)
                 {
-                    Debug.WriteLine("<LivenessDebug> Scheduled machine {0}.", m);
+                    Debug.WriteLine("<LivenessDebug> Scheduled actor {0}.", m);
                 }
             }
 
-            if (enabledMachines.Count == scheduledMachines.Count)
+            if (enabledActors.Count == scheduledActors.Count)
             {
                 result = true;
             }

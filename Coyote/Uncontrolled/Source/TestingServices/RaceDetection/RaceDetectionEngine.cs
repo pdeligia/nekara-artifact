@@ -12,17 +12,17 @@ using Microsoft.Coyote.TestingServices.RaceDetection.InstrumentationState;
 using Microsoft.Coyote.TestingServices.RaceDetection.Util;
 using Microsoft.Coyote.TestingServices.Runtime;
 
-using InstrMachineState = Microsoft.Coyote.TestingServices.RaceDetection.InstrumentationState.MachineState;
+using InstrActorState = Microsoft.Coyote.TestingServices.RaceDetection.InstrumentationState.ActorState;
 
 namespace Microsoft.Coyote.TestingServices.RaceDetection
 {
     internal class RaceDetectionEngine : IRegisterRuntimeOperation
     {
         /// <summary>
-        /// The machine shadow state. M[mId] will get us the instrumentation
-        /// state for a machine with id mId.
+        /// The actor shadow state. M[mId] will get us the instrumentation
+        /// state for an actor with id mId.
         /// </summary>
-        private readonly Dictionary<ulong, InstrMachineState> MachineState;
+        private readonly Dictionary<ulong, InstrActorState> ActorState;
 
         /// <summary>
         /// The variable shadow state. V[(objHandle, offset)] will get us the instrumentation
@@ -35,12 +35,12 @@ namespace Microsoft.Coyote.TestingServices.RaceDetection
         /// At a deq, look up the vector clock snapshot captured at the corresponding enqueue
         /// as EventState[seq#], where the enqueue has global sequence number seq#
         /// We use the seq# to disambiguate multiple posts with the same source, target and event object
-        /// since in P#, the reuse of events is permitted.
+        /// since in Coyote, the reuse of events is permitted.
         /// </summary>
         private readonly Dictionary<ulong, VectorClock> EventState;
 
         /// <summary>
-        /// Track the names of machines. Used when we report races
+        /// Track the names of actors. Used when we report races
         /// </summary>
         private readonly Dictionary<ulong, string> DescriptiveName;
 
@@ -62,7 +62,7 @@ namespace Microsoft.Coyote.TestingServices.RaceDetection
 
         /// <summary>
         /// We need a reference to the runtime to query it for the currently
-        /// executing machine's Id at read/write operations.
+        /// executing actor's Id at read/write operations.
         /// </summary>
         private SystematicTestingRuntime Runtime;
 
@@ -87,7 +87,7 @@ namespace Microsoft.Coyote.TestingServices.RaceDetection
         private ulong WriteCount;
 
         /// <summary>
-        /// Counter to track the number of create machine operations.
+        /// Counter to track the number of create actor operations.
         /// </summary>
         private ulong CreateCount;
 
@@ -96,7 +96,7 @@ namespace Microsoft.Coyote.TestingServices.RaceDetection
         /// </summary>
         public RaceDetectionEngine(Configuration config, ILogger logger, TestReport testReport)
         {
-            this.MachineState = new Dictionary<ulong, InstrMachineState>();
+            this.ActorState = new Dictionary<ulong, InstrActorState>();
             this.VarState = new Dictionary<Tuple<UIntPtr, UIntPtr>, VarState>();
             this.EventState = new Dictionary<ulong, VectorClock>();
             this.DescriptiveName = new Dictionary<ulong, string>();
@@ -112,59 +112,59 @@ namespace Microsoft.Coyote.TestingServices.RaceDetection
 
         public long InMonitor { get; set; }
 
-        public bool TryGetCurrentMachineId(out ulong machineId)
+        public bool TryGetCurrentActorId(out ulong actorId)
         {
-            var mid = this.Runtime.GetCurrentMachineId();
+            var mid = this.Runtime.GetCurrentActorId();
             if (mid is null)
             {
-                machineId = 0;
+                actorId = 0;
                 return false;
             }
 
-            machineId = mid.Value;
+            actorId = mid.Value;
             return true;
         }
 
         /// <summary>
         /// Registers the testing runtime.
         /// </summary>
-        public void RegisterRuntime(IMachineRuntime runtime)
+        public void RegisterRuntime(IActorRuntime runtime)
         {
             runtime.Assert((runtime as SystematicTestingRuntime) != null,
-                "Requires passed runtime to support method GetCurrentMachineId");
+                "Requires passed runtime to support method GetCurrentActorId");
             this.Runtime = runtime as SystematicTestingRuntime;
         }
 
-        public void RegisterCreateMachine(MachineId source, MachineId target)
+        public void RegisterCreateActor(ActorId source, ActorId target)
         {
             this.LogCreate(source, target);
             this.CreateCount++;
 
-            // The id of the created machine should not conflict with an id seen earlier.
-            this.Runtime.Assert(this.MachineState.ContainsKey(target.Value) == false, $"New ID {target} conflicts with an already existing id");
+            // The id of the created actor should not conflict with an id seen earlier.
+            this.Runtime.Assert(this.ActorState.ContainsKey(target.Value) == false, $"New ID {target} conflicts with an already existing id");
 
             this.DescriptiveName[target.Value] = target.ToString();
 
-            // In case the runtime creates a machine, simply create a machine state
+            // In case the runtime creates an actor, simply create an actor state
             // for it, with a fresh VC where the appropriate component is incremented.
             // No hb rule needs to be triggered.
             if (source is null)
             {
-                var newState = new InstrMachineState(target.Value, this.Log, this.Config.EnableRaceDetectorLogging);
-                this.MachineState[target.Value] = newState;
+                var newState = new InstrActorState(target.Value, this.Log, this.Config.EnableRaceDetectorLogging);
+                this.ActorState[target.Value] = newState;
                 return;
             }
 
             this.DescriptiveName[source.Value] = source.ToString();
 
-            var sourceMachineState = this.GetCurrentState(source);
-            var targetState = new InstrMachineState(target.Value, this.Log, this.Config.EnableRaceDetectorLogging);
-            targetState.JoinEpochAndVC(sourceMachineState.VC);
-            this.MachineState[target.Value] = targetState;
-            sourceMachineState.IncrementEpochAndVC();
+            var sourceActorState = this.GetCurrentState(source);
+            var targetState = new InstrActorState(target.Value, this.Log, this.Config.EnableRaceDetectorLogging);
+            targetState.JoinEpochAndVC(sourceActorState.VC);
+            this.ActorState[target.Value] = targetState;
+            sourceActorState.IncrementEpochAndVC();
         }
 
-        public void RegisterDequeue(MachineId source, MachineId target, Event e, ulong sequenceNumber)
+        public void RegisterDequeue(ActorId source, ActorId target, Event e, ulong sequenceNumber)
         {
             this.LogDequeue(source, target, e, sequenceNumber);
             this.DequeueCount++;
@@ -182,7 +182,7 @@ namespace Microsoft.Coyote.TestingServices.RaceDetection
             currentState.JoinThenIncrement(this.EventState[sequenceNumber]);
         }
 
-        public void RegisterEnqueue(MachineId source, MachineId target, Event e, ulong sequenceNumber)
+        public void RegisterEnqueue(ActorId source, ActorId target, Event e, ulong sequenceNumber)
         {
             this.LogEnqueue(source, target, e, sequenceNumber);
             this.EnqueueCount++;
@@ -200,16 +200,16 @@ namespace Microsoft.Coyote.TestingServices.RaceDetection
             var key = new Tuple<UIntPtr, UIntPtr>(objHandle, offset);
 
             // For Raise actions and init actions, we might not have seen a dequeue
-            // of the action yet, so source \in MachineState is not guaranteed.
-            if (!this.MachineState.ContainsKey(source))
+            // of the action yet, so source \in ActorState is not guaranteed.
+            if (!this.ActorState.ContainsKey(source))
             {
                 // WriteToLog("Saw a read in an action without a corresponding deq");
-                this.MachineState[source] = new InstrMachineState(source, this.Log, this.Config.EnableRaceDetectorLogging);
+                this.ActorState[source] = new InstrActorState(source, this.Log, this.Config.EnableRaceDetectorLogging);
             }
 
             // Implementation of the FastTrack rules for read operations.
-            var machineState = this.MachineState[source];
-            var currentEpoch = machineState.Epoch;
+            var actorState = this.ActorState[source];
+            var currentEpoch = actorState.Epoch;
             if (this.VarState.ContainsKey(key))
             {
                 var varState = this.VarState[key];
@@ -225,13 +225,13 @@ namespace Microsoft.Coyote.TestingServices.RaceDetection
                     return;
                 }
 
-                VectorClock mVC = machineState.VC;
+                VectorClock mVC = actorState.VC;
                 long readEpoch = varState.ReadEpoch;
                 long writeEpoch = varState.WriteEpoch;
                 long writeMId = Epoch.MId(writeEpoch);
                 long currentMId = (long)source;
 
-                // The lastest write was from a diff machine, and no HB.
+                // The lastest write was from a diff actor, and no HB.
                 if (writeMId != currentMId && !Epoch.Leq(writeEpoch, mVC.GetComponent(writeMId)) &&
                     !InSameMonitor(varState.InMonitorWrite, this.InMonitor))
                 {
@@ -288,19 +288,19 @@ namespace Microsoft.Coyote.TestingServices.RaceDetection
             var key = new Tuple<UIntPtr, UIntPtr>(objHandle, offset);
 
             // For Raise actions and init actions, we might not have seen a dequeue
-            // of the action yet, so source \in MachineState is not guaranteed.
-            if (!this.MachineState.ContainsKey(source))
+            // of the action yet, so source \in ActorState is not guaranteed.
+            if (!this.ActorState.ContainsKey(source))
             {
                 // WriteToLog("Saw a write in an action without a corresponding deq");
-                var newState = new InstrMachineState(source, this.Log, this.Config.EnableRaceDetectorLogging);
-                this.MachineState[source] = newState;
+                var newState = new InstrActorState(source, this.Log, this.Config.EnableRaceDetectorLogging);
+                this.ActorState[source] = newState;
             }
 
             // Implementation of the FastTrack rules for write operations.
-            var machineState = this.MachineState[source];
-            var currentEpoch = machineState.Epoch;
-            var currentMId = Epoch.MId(machineState.Epoch);
-            var currentVC = machineState.VC;
+            var actorState = this.ActorState[source];
+            var currentEpoch = actorState.Epoch;
+            var currentMId = Epoch.MId(actorState.Epoch);
+            var currentVC = actorState.VC;
 
             this.Runtime.Assert(currentMId == (long)source, "Inconsistent Epoch");
 
@@ -368,7 +368,7 @@ namespace Microsoft.Coyote.TestingServices.RaceDetection
 
         public void ClearAll()
         {
-            this.MachineState.Clear();
+            this.ActorState.Clear();
             this.EventState.Clear();
             this.VarState.Clear();
             this.InAction.Clear();
@@ -492,21 +492,21 @@ namespace Microsoft.Coyote.TestingServices.RaceDetection
             return firstMonitor == secondMonitor;
         }
 
-        private InstrMachineState GetCurrentState(MachineId machineId)
+        private InstrActorState GetCurrentState(ActorId actorId)
         {
-            if (this.MachineState.ContainsKey(machineId.Value))
+            if (this.ActorState.ContainsKey(actorId.Value))
             {
-                return this.MachineState[machineId.Value];
+                return this.ActorState[actorId.Value];
             }
 
-            // WriteToLog("Saw first operation for " + machineId);
-            var newState = new InstrMachineState(machineId.Value, this.Log, this.Config.EnableRaceDetectorLogging);
-            this.MachineState[machineId.Value] = newState;
+            // WriteToLog("Saw first operation for " + actorId);
+            var newState = new InstrActorState(actorId.Value, this.Log, this.Config.EnableRaceDetectorLogging);
+            this.ActorState[actorId.Value] = newState;
             return newState;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void LogCreate(MachineId source, MachineId target)
+        private void LogCreate(ActorId source, ActorId target)
         {
             if (this.Config.EnableRaceDetectorLogging)
             {
@@ -515,7 +515,7 @@ namespace Microsoft.Coyote.TestingServices.RaceDetection
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void LogDequeue(MachineId source, MachineId target, Event e, ulong sequenceNumber)
+        private void LogDequeue(ActorId source, ActorId target, Event e, ulong sequenceNumber)
         {
             if (this.Config.EnableRaceDetectorLogging)
             {
@@ -524,7 +524,7 @@ namespace Microsoft.Coyote.TestingServices.RaceDetection
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void LogEnqueue(MachineId source, MachineId target, Event e, ulong sequenceNumber)
+        private void LogEnqueue(ActorId source, ActorId target, Event e, ulong sequenceNumber)
         {
             if (this.Config.EnableRaceDetectorLogging)
             {

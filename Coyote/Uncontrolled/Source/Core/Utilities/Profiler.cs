@@ -8,7 +8,7 @@ using System.Diagnostics;
 namespace Microsoft.Coyote.Utilities
 {
     /// <summary>
-    /// The P# profiler.
+    /// The Coyote profiler.
     /// </summary>
     public sealed class Profiler
     {

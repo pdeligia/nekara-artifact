@@ -13,11 +13,11 @@ using Microsoft.Coyote.Runtime;
 namespace Microsoft.Coyote
 {
     /// <summary>
-    /// Interface of the P# runtime. It provides methods for creating and executing machines,
+    /// Interface of the Coyote runtime. It provides methods for creating and executing actors,
     /// sending events, checking specifications, generating nondeterministic values that are
     /// controlled during testing, as well as various other runtime utilities.
     /// </summary>
-    public interface IMachineRuntime : IDisposable
+    public interface IActorRuntime : IDisposable
     {
         /// <summary>
         /// The installed logger.
@@ -35,173 +35,173 @@ namespace Microsoft.Coyote
         event OnEventDroppedHandler OnEventDropped;
 
         /// <summary>
-        /// Creates a fresh machine id that has not yet been bound to any machine.
+        /// Creates a fresh actor id that has not yet been bound to any actor.
         /// </summary>
-        /// <param name="type">Type of the machine.</param>
-        /// <param name="machineName">Optional machine name used for logging.</param>
-        /// <returns>The result is the machine id.</returns>
-        MachineId CreateMachineId(Type type, string machineName = null);
+        /// <param name="type">Type of the actor.</param>
+        /// <param name="actorName">Optional actor name used for logging.</param>
+        /// <returns>The result is the actor id.</returns>
+        ActorId CreateActorId(Type type, string actorName = null);
 
         /// <summary>
-        /// Creates a machine id that is uniquely tied to the specified unique name. The
-        /// returned machine id can either be a fresh id (not yet bound to any machine),
-        /// or it can be bound to a previously created machine. In the second case, this
-        /// machine id can be directly used to communicate with the corresponding machine.
+        /// Creates an actor id that is uniquely tied to the specified unique name. The
+        /// returned actor id can either be a fresh id (not yet bound to any actor),
+        /// or it can be bound to a previously created actor. In the second case, this
+        /// actor id can be directly used to communicate with the corresponding actor.
         /// </summary>
-        /// <param name="type">Type of the machine.</param>
-        /// <param name="machineName">Unique name used to create or get the machine id.</param>
-        /// <returns>The result is the machine id.</returns>
-        MachineId CreateMachineIdFromName(Type type, string machineName);
+        /// <param name="type">Type of the actor.</param>
+        /// <param name="actorName">Unique name used to create or get the actor id.</param>
+        /// <returns>The result is the actor id.</returns>
+        ActorId CreateActorIdFromName(Type type, string actorName);
 
         /// <summary>
-        /// Creates a new machine of the specified <see cref="Type"/> and with
+        /// Creates a new actor of the specified <see cref="Type"/> and with
         /// the specified optional <see cref="Event"/>. This event can only be
         /// used to access its payload, and cannot be handled.
         /// </summary>
-        /// <param name="type">Type of the machine.</param>
+        /// <param name="type">Type of the actor.</param>
         /// <param name="e">Optional event used during initialization.</param>
         /// <param name="opGroupId">Optional id that can be used to identify this operation.</param>
-        /// <returns>The result is the machine id.</returns>
-        MachineId CreateMachine(Type type, Event e = null, Guid opGroupId = default);
+        /// <returns>The result is the actor id.</returns>
+        ActorId CreateActor(Type type, Event e = null, Guid opGroupId = default);
 
         /// <summary>
-        /// Creates a new machine of the specified <see cref="Type"/> and name, and
+        /// Creates a new actor of the specified <see cref="Type"/> and name, and
         /// with the specified optional <see cref="Event"/>. This event can only be
         /// used to access its payload, and cannot be handled.
         /// </summary>
-        /// <param name="type">Type of the machine.</param>
-        /// <param name="machineName">Optional machine name used for logging.</param>
+        /// <param name="type">Type of the actor.</param>
+        /// <param name="actorName">Optional actor name used for logging.</param>
         /// <param name="e">Optional event used during initialization.</param>
         /// <param name="opGroupId">Optional id that can be used to identify this operation.</param>
-        /// <returns>The result is the machine id.</returns>
-        MachineId CreateMachine(Type type, string machineName, Event e = null, Guid opGroupId = default);
+        /// <returns>The result is the actor id.</returns>
+        ActorId CreateActor(Type type, string actorName, Event e = null, Guid opGroupId = default);
 
         /// <summary>
-        /// Creates a new machine of the specified type, using the specified <see cref="MachineId"/>.
-        /// This method optionally passes an <see cref="Event"/> to the new machine, which can only
+        /// Creates a new actor of the specified type, using the specified <see cref="ActorId"/>.
+        /// This method optionally passes an <see cref="Event"/> to the new actor, which can only
         /// be used to access its payload, and cannot be handled.
         /// </summary>
-        /// <param name="mid">Unbound machine id.</param>
-        /// <param name="type">Type of the machine.</param>
+        /// <param name="mid">Unbound actor id.</param>
+        /// <param name="type">Type of the actor.</param>
         /// <param name="e">Optional event used during initialization.</param>
         /// <param name="opGroupId">Optional id that can be used to identify this operation.</param>
-        /// <returns>The result is the machine id.</returns>
-        MachineId CreateMachine(MachineId mid, Type type, Event e = null, Guid opGroupId = default);
+        /// <returns>The result is the actor id.</returns>
+        ActorId CreateActor(ActorId mid, Type type, Event e = null, Guid opGroupId = default);
 
         /// <summary>
-        /// Creates a new machine of the specified <see cref="Type"/> and with the
+        /// Creates a new actor of the specified <see cref="Type"/> and with the
         /// specified optional <see cref="Event"/>. This event can only be used to
         /// access its payload, and cannot be handled. The method returns only when
-        /// the machine is initialized and the <see cref="Event"/> (if any) is handled.
+        /// the actor is initialized and the <see cref="Event"/> (if any) is handled.
         /// </summary>
-        /// <param name="type">Type of the machine.</param>
+        /// <param name="type">Type of the actor.</param>
         /// <param name="e">Optional event used during initialization.</param>
         /// <param name="opGroupId">Optional id that can be used to identify this operation.</param>
-        /// <returns>Task that represents the asynchronous operation. The task result is the machine id.</returns>
-        Task<MachineId> CreateMachineAndExecuteAsync(Type type, Event e = null, Guid opGroupId = default);
+        /// <returns>Task that represents the asynchronous operation. The task result is the actor id.</returns>
+        Task<ActorId> CreateActorAndExecuteAsync(Type type, Event e = null, Guid opGroupId = default);
 
         /// <summary>
-        /// Creates a new machine of the specified <see cref="Type"/> and name, and with
+        /// Creates a new actor of the specified <see cref="Type"/> and name, and with
         /// the specified optional <see cref="Event"/>. This event can only be used to
         /// access its payload, and cannot be handled. The method returns only when the
-        /// machine is initialized and the <see cref="Event"/> (if any) is handled.
+        /// actor is initialized and the <see cref="Event"/> (if any) is handled.
         /// </summary>
-        /// <param name="type">Type of the machine.</param>
-        /// <param name="machineName">Optional machine name used for logging.</param>
+        /// <param name="type">Type of the actor.</param>
+        /// <param name="actorName">Optional actor name used for logging.</param>
         /// <param name="e">Optional event used during initialization.</param>
         /// <param name="opGroupId">Optional id that can be used to identify this operation.</param>
-        /// <returns>Task that represents the asynchronous operation. The task result is the machine id.</returns>
-        Task<MachineId> CreateMachineAndExecuteAsync(Type type, string machineName, Event e = null, Guid opGroupId = default);
+        /// <returns>Task that represents the asynchronous operation. The task result is the actor id.</returns>
+        Task<ActorId> CreateActorAndExecuteAsync(Type type, string actorName, Event e = null, Guid opGroupId = default);
 
         /// <summary>
-        /// Creates a new machine of the specified <see cref="Type"/>, using the specified
-        /// unbound machine id, and passes the specified optional <see cref="Event"/>. This
+        /// Creates a new actor of the specified <see cref="Type"/>, using the specified
+        /// unbound actor id, and passes the specified optional <see cref="Event"/>. This
         /// event can only be used to access its payload, and cannot be handled. The method
-        /// returns only when the machine is initialized and the <see cref="Event"/> (if any)
+        /// returns only when the actor is initialized and the <see cref="Event"/> (if any)
         /// is handled.
         /// </summary>
-        /// <param name="mid">Unbound machine id.</param>
-        /// <param name="type">Type of the machine.</param>
+        /// <param name="mid">Unbound actor id.</param>
+        /// <param name="type">Type of the actor.</param>
         /// <param name="e">Optional event used during initialization.</param>
         /// <param name="opGroupId">Optional id that can be used to identify this operation.</param>
-        /// <returns>Task that represents the asynchronous operation. The task result is the machine id.</returns>
-        Task<MachineId> CreateMachineAndExecuteAsync(MachineId mid, Type type, Event e = null, Guid opGroupId = default);
+        /// <returns>Task that represents the asynchronous operation. The task result is the actor id.</returns>
+        Task<ActorId> CreateActorAndExecuteAsync(ActorId mid, Type type, Event e = null, Guid opGroupId = default);
 
         /// <summary>
-        /// Creates a new machine of the specified <see cref="Type"/> and with the
+        /// Creates a new actor of the specified <see cref="Type"/> and with the
         /// specified optional <see cref="Event"/>. This event can only be used to
         /// access its payload, and cannot be handled. The method returns only when
-        /// the machine is initialized and the <see cref="Event"/> (if any) is handled.
+        /// the actor is initialized and the <see cref="Event"/> (if any) is handled.
         /// </summary>
-        /// <param name="type">Type of the machine.</param>
+        /// <param name="type">Type of the actor.</param>
         /// <param name="e">Optional event used during initialization.</param>
         /// <param name="opGroupId">Optional id that can be used to identify this operation.</param>
-        /// <returns>Task that represents the asynchronous operation. The task result is the machine id.</returns>
-        [Obsolete("Please use IMachineRuntime.CreateMachineAndExecuteAsync(...) instead.")]
-        Task<MachineId> CreateMachineAndExecute(Type type, Event e = null, Guid opGroupId = default);
+        /// <returns>Task that represents the asynchronous operation. The task result is the actor id.</returns>
+        [Obsolete("Please use IActorRuntime.CreateActorAndExecuteAsync(...) instead.")]
+        Task<ActorId> CreateActorAndExecute(Type type, Event e = null, Guid opGroupId = default);
 
         /// <summary>
-        /// Creates a new machine of the specified <see cref="Type"/> and name, and with
+        /// Creates a new actor of the specified <see cref="Type"/> and name, and with
         /// the specified optional <see cref="Event"/>. This event can only be used to
         /// access its payload, and cannot be handled. The method returns only when the
-        /// machine is initialized and the <see cref="Event"/> (if any) is handled.
+        /// actor is initialized and the <see cref="Event"/> (if any) is handled.
         /// </summary>
-        /// <param name="type">Type of the machine.</param>
-        /// <param name="machineName">Optional machine name used for logging.</param>
+        /// <param name="type">Type of the actor.</param>
+        /// <param name="actorName">Optional actor name used for logging.</param>
         /// <param name="e">Optional event used during initialization.</param>
         /// <param name="opGroupId">Optional id that can be used to identify this operation.</param>
-        /// <returns>Task that represents the asynchronous operation. The task result is the machine id.</returns>
-        [Obsolete("Please use IMachineRuntime.CreateMachineAndExecuteAsync(...) instead.")]
-        Task<MachineId> CreateMachineAndExecute(Type type, string machineName, Event e = null, Guid opGroupId = default);
+        /// <returns>Task that represents the asynchronous operation. The task result is the actor id.</returns>
+        [Obsolete("Please use IActorRuntime.CreateActorAndExecuteAsync(...) instead.")]
+        Task<ActorId> CreateActorAndExecute(Type type, string actorName, Event e = null, Guid opGroupId = default);
 
         /// <summary>
-        /// Creates a new machine of the specified <see cref="Type"/>, using the specified
-        /// unbound machine id, and passes the specified optional <see cref="Event"/>. This
+        /// Creates a new actor of the specified <see cref="Type"/>, using the specified
+        /// unbound actor id, and passes the specified optional <see cref="Event"/>. This
         /// event can only be used to access its payload, and cannot be handled. The method
-        /// returns only when the machine is initialized and the <see cref="Event"/> (if any)
+        /// returns only when the actor is initialized and the <see cref="Event"/> (if any)
         /// is handled.
         /// </summary>
-        /// <param name="mid">Unbound machine id.</param>
-        /// <param name="type">Type of the machine.</param>
+        /// <param name="mid">Unbound actor id.</param>
+        /// <param name="type">Type of the actor.</param>
         /// <param name="e">Optional event used during initialization.</param>
         /// <param name="opGroupId">Optional id that can be used to identify this operation.</param>
-        /// <returns>Task that represents the asynchronous operation. The task result is the machine id.</returns>
-        [Obsolete("Please use IMachineRuntime.CreateMachineAndExecuteAsync(...) instead.")]
-        Task<MachineId> CreateMachineAndExecute(MachineId mid, Type type, Event e = null, Guid opGroupId = default);
+        /// <returns>Task that represents the asynchronous operation. The task result is the actor id.</returns>
+        [Obsolete("Please use IActorRuntime.CreateActorAndExecuteAsync(...) instead.")]
+        Task<ActorId> CreateActorAndExecute(ActorId mid, Type type, Event e = null, Guid opGroupId = default);
 
         /// <summary>
-        /// Sends an asynchronous <see cref="Event"/> to a machine.
+        /// Sends an asynchronous <see cref="Event"/> to an actor.
         /// </summary>
-        /// <param name="target">The id of the target machine.</param>
+        /// <param name="target">The id of the target actor.</param>
         /// <param name="e">The event to send.</param>
         /// <param name="opGroupId">Optional id that can be used to identify this operation.</param>
         /// <param name="options">Optional configuration of a send operation.</param>
-        void SendEvent(MachineId target, Event e, Guid opGroupId = default, SendOptions options = null);
+        void SendEvent(ActorId target, Event e, Guid opGroupId = default, SendOptions options = null);
 
         /// <summary>
-        /// Sends an <see cref="Event"/> to a machine. Returns immediately if the target machine was already
-        /// running. Otherwise blocks until the machine handles the event and reaches quiescense.
+        /// Sends an <see cref="Event"/> to an actor. Returns immediately if the target actor was already
+        /// running. Otherwise blocks until the actor handles the event and reaches quiescense.
         /// </summary>
-        /// <param name="target">The id of the target machine.</param>
+        /// <param name="target">The id of the target actor.</param>
         /// <param name="e">The event to send.</param>
         /// <param name="opGroupId">Optional id that can be used to identify this operation.</param>
         /// <param name="options">Optional configuration of a send operation.</param>
         /// <returns>Task that represents the asynchronous operation. The task result is true if
         /// the event was handled, false if the event was only enqueued.</returns>
-        Task<bool> SendEventAndExecuteAsync(MachineId target, Event e, Guid opGroupId = default, SendOptions options = null);
+        Task<bool> SendEventAndExecuteAsync(ActorId target, Event e, Guid opGroupId = default, SendOptions options = null);
 
         /// <summary>
-        /// Sends an <see cref="Event"/> to a machine. Returns immediately if the target machine was already
-        /// running. Otherwise blocks until the machine handles the event and reaches quiescense.
+        /// Sends an <see cref="Event"/> to an actor. Returns immediately if the target actor was already
+        /// running. Otherwise blocks until the actor handles the event and reaches quiescense.
         /// </summary>
-        /// <param name="target">The id of the target machine.</param>
+        /// <param name="target">The id of the target actor.</param>
         /// <param name="e">The event to send.</param>
         /// <param name="opGroupId">Optional id that can be used to identify this operation.</param>
         /// <param name="options">Optional configuration of a send operation.</param>
         /// <returns>Task that represents the asynchronous operation. The task result is true if
         /// the event was handled, false if the event was only enqueued.</returns>
-        [Obsolete("Please use IMachineRuntime.SendEventAndExecuteAsync(...) instead.")]
-        Task<bool> SendEventAndExecute(MachineId target, Event e, Guid opGroupId = default, SendOptions options = null);
+        [Obsolete("Please use IActorRuntime.SendEventAndExecuteAsync(...) instead.")]
+        Task<bool> SendEventAndExecute(ActorId target, Event e, Guid opGroupId = default, SendOptions options = null);
 
         /// <summary>
         /// Registers a new specification monitor of the specified <see cref="Type"/>.
@@ -303,13 +303,13 @@ namespace Microsoft.Coyote
         void Assert(bool predicate, string s, params object[] args);
 
         /// <summary>
-        /// Returns the operation group id of the specified machine id. Returns <see cref="Guid.Empty"/>
-        /// if the id is not set, or if the <see cref="MachineId"/> is not associated with this runtime.
-        /// During testing, the runtime asserts that the specified machine is currently executing.
+        /// Returns the operation group id of the specified actor id. Returns <see cref="Guid.Empty"/>
+        /// if the id is not set, or if the <see cref="ActorId"/> is not associated with this runtime.
+        /// During testing, the runtime asserts that the specified actor is currently executing.
         /// </summary>
-        /// <param name="currentMachineId">The id of the currently executing machine.</param>
+        /// <param name="currentActorId">The id of the currently executing actor.</param>
         /// <returns>The unique identifier.</returns>
-        Guid GetCurrentOperationGroupId(MachineId currentMachineId);
+        Guid GetCurrentOperationGroupId(ActorId currentActorId);
 
         /// <summary>
         /// Use this method to override the default <see cref="RuntimeLogWriter"/>
@@ -327,7 +327,7 @@ namespace Microsoft.Coyote
         ILogger SetLogger(ILogger logger);
 
         /// <summary>
-        /// Terminates the runtime and notifies each active machine to halt execution.
+        /// Terminates the runtime and notifies each active actor to halt execution.
         /// </summary>
         void Stop();
     }

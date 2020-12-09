@@ -2,16 +2,16 @@
   <Import Project="..\..\Common\build.props" />
   <Import Project="..\..\Common\key.props" />
   <PropertyGroup>
-    <Description>The P# framework testing services.</Description>
+    <Description>The Coyote framework testing services.</Description>
     <AssemblyName>Microsoft.Coyote.TestingServices</AssemblyName>
     <RootNamespace>Microsoft.Coyote.TestingServices</RootNamespace>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <PackageTags>coyote;state-machines;testing</PackageTags>
+    <PackageTags>coyote;state-actors;testing</PackageTags>
     <CodeAnalysisRuleSet>.\Properties\codeanalysis.ruleset</CodeAnalysisRuleSet>
     <OutputPath>..\..\bin\</OutputPath>
   </PropertyGroup>
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.1</TargetFrameworks>
+    <TargetFrameworks>net5.0</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj" />

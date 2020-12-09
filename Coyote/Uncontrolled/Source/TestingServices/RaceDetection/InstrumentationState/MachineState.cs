@@ -9,7 +9,7 @@ using static System.Diagnostics.Debug;
 
 namespace Microsoft.Coyote.TestingServices.RaceDetection.InstrumentationState
 {
-    internal class MachineState
+    internal class ActorState
     {
         private long Mid;
 
@@ -21,7 +21,7 @@ namespace Microsoft.Coyote.TestingServices.RaceDetection.InstrumentationState
 
         private bool EnableLogging;
 
-        public MachineState(MachineState other)
+        public ActorState(ActorState other)
         {
             this.Mid = other.Mid;
             this.VC = new VectorClock(other.VC);
@@ -31,7 +31,7 @@ namespace Microsoft.Coyote.TestingServices.RaceDetection.InstrumentationState
             this.Logger = other.Logger;
         }
 
-        public MachineState(ulong id, ILogger logger, bool enableLogging)
+        public ActorState(ulong id, ILogger logger, bool enableLogging)
         {
             this.VC = new VectorClock(0);
             this.Mid = (long)id;

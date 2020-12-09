@@ -15,9 +15,9 @@ namespace Microsoft.Coyote.Threading
 {
     /// <summary>
     /// A mutual exclusion lock that can be acquired asynchronously
-    /// by a <see cref="Machine"/> or <see cref="MachineTask"/>.
+    /// by a <see cref="Actor"/> or <see cref="ActorTask"/>.
     /// </summary>
-    public class MachineLock
+    public class ActorLock
     {
         /// <summary>
         /// Unique id of the lock.
@@ -35,9 +35,9 @@ namespace Microsoft.Coyote.Threading
         protected internal bool IsAcquired;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="MachineLock"/> class.
+        /// Initializes a new instance of the <see cref="ActorLock"/> class.
         /// </summary>
-        internal MachineLock(ulong id)
+        internal ActorLock(ulong id)
         {
             this.Id = id;
             this.Awaiters = new Queue<TaskCompletionSource<object>>();
@@ -49,29 +49,29 @@ namespace Microsoft.Coyote.Threading
         /// </summary>
         /// <returns>The mutual exclusion lock.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static MachineLock Create() => MachineRuntime.CurrentScheduler.CreateLock();
+        public static ActorLock Create() => ActorRuntime.CurrentScheduler.CreateLock();
 
         /// <summary>
         /// Tries to acquire the lock asynchronously, and returns a task that completes
         /// when the lock has been acquired. The returned task contains a releaser that
         /// releases the lock when disposed.
         /// </summary>
-        public virtual MachineTask<Releaser> AcquireAsync()
+        public virtual ActorTask<Releaser> AcquireAsync()
         {
             lock (this.Awaiters)
             {
                 if (!this.IsAcquired)
                 {
                     this.IsAcquired = true;
-                    return MachineTask.FromResult(new Releaser(this));
+                    return ActorTask.FromResult(new Releaser(this));
                 }
                 else
                 {
                     var waiter = new TaskCompletionSource<object>();
                     this.Awaiters.Enqueue(waiter);
-                    return waiter.Task.ContinueWith((_, state) => new Releaser((MachineLock)state), this,
+                    return waiter.Task.ContinueWith((_, state) => new Releaser((ActorLock)state), this,
                         CancellationToken.None, TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default).
-                        ToMachineTask();
+                        ToActorTask();
                 }
             }
         }
@@ -101,19 +101,19 @@ namespace Microsoft.Coyote.Threading
         }
 
         /// <summary>
-        /// Releases the acquired <see cref="MachineLock"/> when disposed.
+        /// Releases the acquired <see cref="ActorLock"/> when disposed.
         /// </summary>
         public struct Releaser : IDisposable
         {
             /// <summary>
             /// The acquired lock.
             /// </summary>
-            private readonly MachineLock Lock;
+            private readonly ActorLock Lock;
 
             /// <summary>
             /// Initializes a new instance of the <see cref="Releaser"/> struct.
             /// </summary>
-            internal Releaser(MachineLock taskLock)
+            internal Releaser(ActorLock taskLock)
             {
                 this.Lock = taskLock;
             }

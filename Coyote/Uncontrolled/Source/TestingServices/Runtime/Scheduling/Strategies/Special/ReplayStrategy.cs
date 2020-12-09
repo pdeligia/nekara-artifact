@@ -23,7 +23,7 @@ namespace Microsoft.Coyote.TestingServices.Scheduling.Strategies
         private readonly Configuration Configuration;
 
         /// <summary>
-        /// The P# program schedule trace.
+        /// The Coyote program schedule trace.
         /// </summary>
         private readonly ScheduleTrace ScheduleTrace;
 

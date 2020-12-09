@@ -6,9 +6,9 @@
 namespace Microsoft.Coyote.SharedObjects
 {
     /// <summary>
-    /// A shared counter modeled using a state-machine for testing.
+    /// A shared counter modeled using a state-actor for testing.
     /// </summary>
-    internal sealed class SharedCounterMachine : Machine
+    internal sealed class SharedCounterActor : Actor
     {
         /// <summary>
         /// The value of the shared counter.
@@ -16,17 +16,17 @@ namespace Microsoft.Coyote.SharedObjects
         private int Counter;
 
         /// <summary>
-        /// The start state of this machine.
+        /// The start state of this actor.
         /// </summary>
         [Start]
         [OnEntry(nameof(Initialize))]
         [OnEventDoAction(typeof(SharedCounterEvent), nameof(ProcessEvent))]
-        private class Init : MachineState
+        private class Init : ActorState
         {
         }
 
         /// <summary>
-        /// Initializes the machine.
+        /// Initializes the actor.
         /// </summary>
         private void Initialize()
         {

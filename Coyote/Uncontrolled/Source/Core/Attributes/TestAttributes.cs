@@ -10,7 +10,7 @@ namespace Microsoft.Coyote
 #pragma warning disable SA1402 // FileMayOnlyContainASingleType
     /// <summary>
     /// Attribute for declaring the entry point to
-    /// a P# program test.
+    /// a Coyote program test.
     /// </summary>
     [AttributeUsage(AttributeTargets.Method)]
     public sealed class TestAttribute : Attribute
@@ -46,8 +46,8 @@ namespace Microsoft.Coyote
 
     /// <summary>
     /// Attribute for declaring the factory method that creates
-    /// the P# testing runtime. This is an advanced feature,
-    /// only to be used for replacing the original P# testing
+    /// the Coyote testing runtime. This is an advanced feature,
+    /// only to be used for replacing the original Coyote testing
     /// runtime with an alternative implementation.
     /// </summary>
     [AttributeUsage(AttributeTargets.Method)]

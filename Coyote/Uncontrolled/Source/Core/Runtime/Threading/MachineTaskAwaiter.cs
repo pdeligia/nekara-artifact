@@ -10,17 +10,17 @@ using System.Threading.Tasks;
 namespace Microsoft.Coyote.Threading
 {
     /// <summary>
-    /// Implements a <see cref="MachineTask"/> awaiter.
+    /// Implements a <see cref="ActorTask"/> awaiter.
     /// </summary>
-    public readonly struct MachineTaskAwaiter : ICriticalNotifyCompletion, INotifyCompletion
+    public readonly struct ActorTaskAwaiter : ICriticalNotifyCompletion, INotifyCompletion
     {
         // WARNING: The layout must remain the same, as the struct is used to access
-        // the generic MachineTaskAwaiter<> as MachineTaskAwaiter.
+        // the generic ActorTaskAwaiter<> as ActorTaskAwaiter.
 
         /// <summary>
-        /// The machine task being awaited.
+        /// The actor task being awaited.
         /// </summary>
-        private readonly MachineTask MachineTask;
+        private readonly ActorTask ActorTask;
 
         /// <summary>
         /// The task awaiter.
@@ -30,14 +30,14 @@ namespace Microsoft.Coyote.Threading
         /// <summary>
         /// Gets a value that indicates whether the asynchronous task has completed.
         /// </summary>
-        public bool IsCompleted => this.MachineTask.IsCompleted;
+        public bool IsCompleted => this.ActorTask.IsCompleted;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="MachineTaskAwaiter"/> struct.
+        /// Initializes a new instance of the <see cref="ActorTaskAwaiter"/> struct.
         /// </summary>
-        internal MachineTaskAwaiter(MachineTask task, Task awaiterTask)
+        internal ActorTaskAwaiter(ActorTask task, Task awaiterTask)
         {
-            this.MachineTask = task;
+            this.ActorTask = task;
             this.Awaiter = awaiterTask.GetAwaiter();
         }
 
@@ -46,7 +46,7 @@ namespace Microsoft.Coyote.Threading
         /// </summary>
         public void GetResult()
         {
-            this.MachineTask.GetResult(this.Awaiter);
+            this.ActorTask.GetResult(this.Awaiter);
         }
 
         /// <summary>
@@ -54,7 +54,7 @@ namespace Microsoft.Coyote.Threading
         /// </summary>
         public void OnCompleted(Action continuation)
         {
-            this.MachineTask.OnCompleted(continuation, this.Awaiter);
+            this.ActorTask.OnCompleted(continuation, this.Awaiter);
         }
 
         /// <summary>
@@ -62,23 +62,23 @@ namespace Microsoft.Coyote.Threading
         /// </summary>
         public void UnsafeOnCompleted(Action continuation)
         {
-            this.MachineTask.UnsafeOnCompleted(continuation, this.Awaiter);
+            this.ActorTask.UnsafeOnCompleted(continuation, this.Awaiter);
         }
     }
 
     /// <summary>
-    /// Implements a <see cref="MachineTask"/> awaiter.
+    /// Implements a <see cref="ActorTask"/> awaiter.
     /// </summary>
     /// <typeparam name="TResult">The type of the produced result.</typeparam>
-    public readonly struct MachineTaskAwaiter<TResult> : ICriticalNotifyCompletion, INotifyCompletion
+    public readonly struct ActorTaskAwaiter<TResult> : ICriticalNotifyCompletion, INotifyCompletion
     {
         // WARNING: The layout must remain the same, as the struct is used to access
-        // the generic MachineTaskAwaiter<> as MachineTaskAwaiter.
+        // the generic ActorTaskAwaiter<> as ActorTaskAwaiter.
 
         /// <summary>
-        /// The machine task being awaited.
+        /// The actor task being awaited.
         /// </summary>
-        private readonly MachineTask<TResult> MachineTask;
+        private readonly ActorTask<TResult> ActorTask;
 
         /// <summary>
         /// The task awaiter.
@@ -88,14 +88,14 @@ namespace Microsoft.Coyote.Threading
         /// <summary>
         /// Gets a value that indicates whether the asynchronous task has completed.
         /// </summary>
-        public bool IsCompleted => this.MachineTask.IsCompleted;
+        public bool IsCompleted => this.ActorTask.IsCompleted;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="MachineTaskAwaiter{TResult}"/> struct.
+        /// Initializes a new instance of the <see cref="ActorTaskAwaiter{TResult}"/> struct.
         /// </summary>
-        internal MachineTaskAwaiter(MachineTask<TResult> task, Task<TResult> awaiterTask)
+        internal ActorTaskAwaiter(ActorTask<TResult> task, Task<TResult> awaiterTask)
         {
-            this.MachineTask = task;
+            this.ActorTask = task;
             this.Awaiter = awaiterTask.GetAwaiter();
         }
 
@@ -104,7 +104,7 @@ namespace Microsoft.Coyote.Threading
         /// </summary>
         public TResult GetResult()
         {
-            return this.MachineTask.GetResult(this.Awaiter);
+            return this.ActorTask.GetResult(this.Awaiter);
         }
 
         /// <summary>
@@ -112,7 +112,7 @@ namespace Microsoft.Coyote.Threading
         /// </summary>
         public void OnCompleted(Action continuation)
         {
-            this.MachineTask.OnCompleted(continuation, this.Awaiter);
+            this.ActorTask.OnCompleted(continuation, this.Awaiter);
         }
 
         /// <summary>
@@ -120,7 +120,7 @@ namespace Microsoft.Coyote.Threading
         /// </summary>
         public void UnsafeOnCompleted(Action continuation)
         {
-            this.MachineTask.UnsafeOnCompleted(continuation, this.Awaiter);
+            this.ActorTask.UnsafeOnCompleted(continuation, this.Awaiter);
         }
     }
 }

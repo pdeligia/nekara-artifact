@@ -10,7 +10,7 @@ using Microsoft.Coyote.IO;
 namespace Microsoft.Coyote.Utilities
 {
     /// <summary>
-    /// The P# base command line options.
+    /// The Coyote base command line options.
     /// </summary>
     public abstract class BaseCommandLineOptions
     {

@@ -12,7 +12,7 @@ using Microsoft.Coyote.Runtime;
 namespace Microsoft.Coyote
 {
     /// <summary>
-    /// Abstract class representing a state of a P# monitor.
+    /// Abstract class representing a state of a Coyote monitor.
     /// </summary>
     public abstract class MonitorState
     {

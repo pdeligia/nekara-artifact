@@ -9,7 +9,7 @@ using System.Runtime.Serialization;
 namespace Microsoft.Coyote.Runtime
 {
     /// <summary>
-    /// An exception that is thrown by the P# runtime.
+    /// An exception that is thrown by the Coyote runtime.
     /// </summary>
     [Serializable]
     public class RuntimeException : Exception

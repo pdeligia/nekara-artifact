@@ -8,14 +8,14 @@ using Microsoft.Coyote.TestingServices.Runtime;
 namespace Microsoft.Coyote.SharedObjects
 {
     /// <summary>
-    /// A wrapper for a shared counter modeled using a state-machine for testing.
+    /// A wrapper for a shared counter modeled using a state-actor for testing.
     /// </summary>
     internal sealed class MockSharedCounter : ISharedCounter
     {
         /// <summary>
-        /// Machine modeling the shared counter.
+        /// Actor modeling the shared counter.
         /// </summary>
-        private readonly MachineId CounterMachine;
+        private readonly ActorId CounterActor;
 
         /// <summary>
         /// The testing runtime hosting this shared counter.
@@ -28,10 +28,10 @@ namespace Microsoft.Coyote.SharedObjects
         public MockSharedCounter(int value, SystematicTestingRuntime runtime)
         {
             this.Runtime = runtime;
-            this.CounterMachine = this.Runtime.CreateMachine(typeof(SharedCounterMachine));
-            var currentMachine = this.Runtime.GetExecutingMachine<Machine>();
-            this.Runtime.SendEvent(this.CounterMachine, SharedCounterEvent.SetEvent(currentMachine.Id, value));
-            currentMachine.Receive(typeof(SharedCounterResponseEvent)).Wait();
+            this.CounterActor = this.Runtime.CreateActor(typeof(SharedCounterActor));
+            var currentActor = this.Runtime.GetExecutingActor<Actor>();
+            this.Runtime.SendEvent(this.CounterActor, SharedCounterEvent.SetEvent(currentActor.Id, value));
+            currentActor.Receive(typeof(SharedCounterResponseEvent)).Wait();
         }
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace Microsoft.Coyote.SharedObjects
         /// </summary>
         public void Increment()
         {
-            this.Runtime.SendEvent(this.CounterMachine, SharedCounterEvent.IncrementEvent());
+            this.Runtime.SendEvent(this.CounterActor, SharedCounterEvent.IncrementEvent());
         }
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace Microsoft.Coyote.SharedObjects
         /// </summary>
         public void Decrement()
         {
-            this.Runtime.SendEvent(this.CounterMachine, SharedCounterEvent.DecrementEvent());
+            this.Runtime.SendEvent(this.CounterActor, SharedCounterEvent.DecrementEvent());
         }
 
         /// <summary>
@@ -55,9 +55,9 @@ namespace Microsoft.Coyote.SharedObjects
         /// </summary>
         public int GetValue()
         {
-            var currentMachine = this.Runtime.GetExecutingMachine<Machine>();
-            this.Runtime.SendEvent(this.CounterMachine, SharedCounterEvent.GetEvent(currentMachine.Id));
-            var response = currentMachine.Receive(typeof(SharedCounterResponseEvent)).Result;
+            var currentActor = this.Runtime.GetExecutingActor<Actor>();
+            this.Runtime.SendEvent(this.CounterActor, SharedCounterEvent.GetEvent(currentActor.Id));
+            var response = currentActor.Receive(typeof(SharedCounterResponseEvent)).Result;
             return (response as SharedCounterResponseEvent).Value;
         }
 
@@ -66,9 +66,9 @@ namespace Microsoft.Coyote.SharedObjects
         /// </summary>
         public int Add(int value)
         {
-            var currentMachine = this.Runtime.GetExecutingMachine<Machine>();
-            this.Runtime.SendEvent(this.CounterMachine, SharedCounterEvent.AddEvent(currentMachine.Id, value));
-            var response = currentMachine.Receive(typeof(SharedCounterResponseEvent)).Result;
+            var currentActor = this.Runtime.GetExecutingActor<Actor>();
+            this.Runtime.SendEvent(this.CounterActor, SharedCounterEvent.AddEvent(currentActor.Id, value));
+            var response = currentActor.Receive(typeof(SharedCounterResponseEvent)).Result;
             return (response as SharedCounterResponseEvent).Value;
         }
 
@@ -77,9 +77,9 @@ namespace Microsoft.Coyote.SharedObjects
         /// </summary>
         public int Exchange(int value)
         {
-            var currentMachine = this.Runtime.GetExecutingMachine<Machine>();
-            this.Runtime.SendEvent(this.CounterMachine, SharedCounterEvent.SetEvent(currentMachine.Id, value));
-            var response = currentMachine.Receive(typeof(SharedCounterResponseEvent)).Result;
+            var currentActor = this.Runtime.GetExecutingActor<Actor>();
+            this.Runtime.SendEvent(this.CounterActor, SharedCounterEvent.SetEvent(currentActor.Id, value));
+            var response = currentActor.Receive(typeof(SharedCounterResponseEvent)).Result;
             return (response as SharedCounterResponseEvent).Value;
         }
 
@@ -88,9 +88,9 @@ namespace Microsoft.Coyote.SharedObjects
         /// </summary>
         public int CompareExchange(int value, int comparand)
         {
-            var currentMachine = this.Runtime.GetExecutingMachine<Machine>();
-            this.Runtime.SendEvent(this.CounterMachine, SharedCounterEvent.CasEvent(currentMachine.Id, value, comparand));
-            var response = currentMachine.Receive(typeof(SharedCounterResponseEvent)).Result;
+            var currentActor = this.Runtime.GetExecutingActor<Actor>();
+            this.Runtime.SendEvent(this.CounterActor, SharedCounterEvent.CasEvent(currentActor.Id, value, comparand));
+            var response = currentActor.Receive(typeof(SharedCounterResponseEvent)).Result;
             return (response as SharedCounterResponseEvent).Value;
         }
     }

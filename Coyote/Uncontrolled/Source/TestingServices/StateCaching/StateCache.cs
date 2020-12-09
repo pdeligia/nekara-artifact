@@ -43,8 +43,8 @@ namespace Microsoft.Coyote.TestingServices.StateCaching
             ScheduleStep scheduleStep, List<Monitor> monitors)
         {
             fingerprint = this.Runtime.GetHashedExecutionState(AbstractionLevel.Default);
-            var enabledMachineIds = this.Runtime.Scheduler.GetEnabledSchedulableIds();
-            state = new State(fingerprint, enabledMachineIds, GetMonitorStatus(monitors));
+            var enabledActorIds = this.Runtime.Scheduler.GetEnabledSchedulableIds();
+            state = new State(fingerprint, enabledActorIds, GetMonitorStatus(monitors));
 
             if (Debug.IsEnabled)
             {

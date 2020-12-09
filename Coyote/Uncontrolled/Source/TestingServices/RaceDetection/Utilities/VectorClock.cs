@@ -14,11 +14,11 @@ namespace Microsoft.Coyote.TestingServices.RaceDetection.Util
     /// Adapted from the roadrunner tool:
     /// "The ROADRUNNER Dynamic Analysis Framework for Concurrent Programs" by Flanagan and Freund in PASTE '10.
     /// (See: https://github.com/stephenfreund/RoadRunner/blob/master/src/tools/util/VectorClock.java)
-    /// Maps each machine(Id) to its clock. The clock is represented as an Epoch c@t.
-    /// Here, c is the clock value and t the identifier for the machine
+    /// Maps each actor(Id) to its clock. The clock is represented as an Epoch c@t.
+    /// Here, c is the clock value and t the identifier for the actor
     /// We re-encode the mId into the value so that comparisons between epochs and VCs
     /// are direct. Currently used by the SystematicTestingRuntime which does not
-    /// run machines concurrently. Future (multi-threaded) clients will need to call the APIs with
+    /// run actors concurrently. Future (multi-threaded) clients will need to call the APIs with
     /// exclusive access to certain parameters/this (as indicated in the comments)
     /// </summary>
     internal class VectorClock

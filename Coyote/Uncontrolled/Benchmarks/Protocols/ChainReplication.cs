@@ -5,21 +5,21 @@ namespace Benchmarks.Protocols
 {
     internal class ChainReplication
     {
-        public static void Execute(IMachineRuntime runtime)
+        public static void Execute(IActorRuntime runtime)
         {
             runtime.RegisterMonitor(typeof(InvariantMonitor));
             runtime.RegisterMonitor(typeof(ServerResponseSeqMonitor));
-            runtime.CreateMachine(typeof(Environment));
+            runtime.CreateActor(typeof(Environment));
         }
 
         private class SentLog
         {
             public int NextSeqId;
-            public MachineId Client;
+            public ActorId Client;
             public int Key;
             public int Value;
 
-            public SentLog(int nextSeqId, MachineId client, int key, int val)
+            public SentLog(int nextSeqId, ActorId client, int key, int val)
             {
                 this.NextSeqId = nextSeqId;
                 this.Client = client;
@@ -28,44 +28,44 @@ namespace Benchmarks.Protocols
             }
         }
 
-        private class Environment : Machine
+        private class Environment : Actor
         {
-            private List<MachineId> Servers;
-            private List<MachineId> Clients;
+            private List<ActorId> Servers;
+            private List<ActorId> Clients;
             private int NumOfServers;
 
             [Start]
             [OnEntry(nameof(InitOnEntry))]
-            private class Init : MachineState
+            private class Init : ActorState
             {
             }
 
             private void InitOnEntry()
             {
-                this.Servers = new List<MachineId>();
-                this.Clients = new List<MachineId>();
+                this.Servers = new List<ActorId>();
+                this.Clients = new List<ActorId>();
 
                 this.NumOfServers = 3;
 
                 for (int i = 0; i < this.NumOfServers; i++)
                 {
-                    MachineId server;
+                    ActorId server;
 
                     if (i is 0)
                     {
-                        server = this.CreateMachine(
+                        server = this.CreateActor(
                             typeof(ChainReplicationServer),
                             new ChainReplicationServer.SetupEvent(i, true, false));
                     }
                     else if (i == this.NumOfServers - 1)
                     {
-                        server = this.CreateMachine(
+                        server = this.CreateActor(
                             typeof(ChainReplicationServer),
                             new ChainReplicationServer.SetupEvent(i, false, true));
                     }
                     else
                     {
-                        server = this.CreateMachine(
+                        server = this.CreateActor(
                             typeof(ChainReplicationServer),
                             new ChainReplicationServer.SetupEvent(i, false, false));
                     }
@@ -80,8 +80,8 @@ namespace Benchmarks.Protocols
 
                 for (int i = 0; i < this.NumOfServers; i++)
                 {
-                    MachineId pred;
-                    MachineId succ;
+                    ActorId pred;
+                    ActorId succ;
 
                     if (i > 0)
                     {
@@ -104,27 +104,27 @@ namespace Benchmarks.Protocols
                     this.Send(this.Servers[i], new ChainReplicationServer.PredSucc(pred, succ));
                 }
 
-                this.Clients.Add(this.CreateMachine(typeof(Client),
+                this.Clients.Add(this.CreateActor(typeof(Client),
                     new Client.SetupEvent(0, this.Servers[0], this.Servers[this.NumOfServers - 1], 1)));
 
-                this.Clients.Add(this.CreateMachine(typeof(Client),
+                this.Clients.Add(this.CreateActor(typeof(Client),
                     new Client.SetupEvent(1, this.Servers[0], this.Servers[this.NumOfServers - 1], 100)));
 
-                this.CreateMachine(typeof(ChainReplicationMaster),
+                this.CreateActor(typeof(ChainReplicationMaster),
                     new ChainReplicationMaster.SetupEvent(this.Servers, this.Clients));
 
                 this.Send(this.Id, new Halt());
             }
         }
 
-        private class FailureDetector : Machine
+        private class FailureDetector : Actor
         {
             internal class SetupEvent : Event
             {
-                public MachineId Main;
-                public List<MachineId> Servers;
+                public ActorId Main;
+                public List<ActorId> Servers;
 
-                public SetupEvent(MachineId main, List<MachineId> servers)
+                public SetupEvent(ActorId main, List<ActorId> servers)
                     : base()
                 {
                     this.Main = main;
@@ -134,9 +134,9 @@ namespace Benchmarks.Protocols
 
             internal class FailureDetected : Event
             {
-                public MachineId Server;
+                public ActorId Server;
 
-                public FailureDetected(MachineId server)
+                public FailureDetected(ActorId server)
                     : base()
                 {
                     this.Server = server;
@@ -145,9 +145,9 @@ namespace Benchmarks.Protocols
 
             internal class FailureCorrected : Event
             {
-                public List<MachineId> Servers;
+                public List<ActorId> Servers;
 
-                public FailureCorrected(List<MachineId> servers)
+                public FailureCorrected(List<ActorId> servers)
                     : base()
                 {
                     this.Servers = servers;
@@ -156,9 +156,9 @@ namespace Benchmarks.Protocols
 
             internal class Ping : Event
             {
-                public MachineId Target;
+                public ActorId Target;
 
-                public Ping(MachineId target)
+                public Ping(ActorId target)
                     : base()
                 {
                     this.Target = target;
@@ -177,8 +177,8 @@ namespace Benchmarks.Protocols
             {
             }
 
-            private MachineId Main;
-            private List<MachineId> Servers;
+            private ActorId Main;
+            private List<ActorId> Servers;
 
             private int CheckNodeIdx;
             private int Failures;
@@ -186,7 +186,7 @@ namespace Benchmarks.Protocols
             [Start]
             [OnEntry(nameof(InitOnEntry))]
             [OnEventGotoState(typeof(Local), typeof(StartMonitoring))]
-            private class Init : MachineState
+            private class Init : ActorState
             {
             }
 
@@ -205,7 +205,7 @@ namespace Benchmarks.Protocols
             [OnEntry(nameof(StartMonitoringOnEntry))]
             [OnEventGotoState(typeof(Pong), typeof(StartMonitoring), nameof(HandlePong))]
             [OnEventGotoState(typeof(InjectFailure), typeof(HandleFailure))]
-            private class StartMonitoring : MachineState
+            private class StartMonitoring : ActorState
             {
             }
 
@@ -251,7 +251,7 @@ namespace Benchmarks.Protocols
             [OnEntry(nameof(HandleFailureOnEntry))]
             [OnEventGotoState(typeof(FailureCorrected), typeof(StartMonitoring), nameof(ProcessFailureCorrected))]
             [IgnoreEvents(typeof(Pong), typeof(InjectFailure))]
-            private class HandleFailure : MachineState
+            private class HandleFailure : ActorState
             {
             }
 
@@ -268,14 +268,14 @@ namespace Benchmarks.Protocols
             }
         }
 
-        private class ChainReplicationMaster : Machine
+        private class ChainReplicationMaster : Actor
         {
             internal class SetupEvent : Event
             {
-                public List<MachineId> Servers;
-                public List<MachineId> Clients;
+                public List<ActorId> Servers;
+                public List<ActorId> Clients;
 
-                public SetupEvent(List<MachineId> servers, List<MachineId> clients)
+                public SetupEvent(List<ActorId> servers, List<ActorId> clients)
                     : base()
                 {
                     this.Servers = servers;
@@ -285,9 +285,9 @@ namespace Benchmarks.Protocols
 
             internal class BecomeHead : Event
             {
-                public MachineId Target;
+                public ActorId Target;
 
-                public BecomeHead(MachineId target)
+                public BecomeHead(ActorId target)
                     : base()
                 {
                     this.Target = target;
@@ -296,9 +296,9 @@ namespace Benchmarks.Protocols
 
             internal class BecomeTail : Event
             {
-                public MachineId Target;
+                public ActorId Target;
 
-                public BecomeTail(MachineId target)
+                public BecomeTail(ActorId target)
                     : base()
                 {
                     this.Target = target;
@@ -345,13 +345,13 @@ namespace Benchmarks.Protocols
             {
             }
 
-            private List<MachineId> Servers;
-            private List<MachineId> Clients;
+            private List<ActorId> Servers;
+            private List<ActorId> Clients;
 
-            private MachineId FailureDetector;
+            private ActorId FailureDetector;
 
-            private MachineId Head;
-            private MachineId Tail;
+            private ActorId Head;
+            private ActorId Tail;
 
             private int FaultyNodeIndex;
             private int LastUpdateReceivedSucc;
@@ -360,7 +360,7 @@ namespace Benchmarks.Protocols
             [Start]
             [OnEntry(nameof(InitOnEntry))]
             [OnEventGotoState(typeof(Local), typeof(WaitForFailure))]
-            private class Init : MachineState
+            private class Init : ActorState
             {
             }
 
@@ -370,7 +370,7 @@ namespace Benchmarks.Protocols
                 this.Servers = (e as SetupEvent).Servers;
                 this.Clients = (e as SetupEvent).Clients;
 
-                this.FailureDetector = this.CreateMachine(
+                this.FailureDetector = this.CreateActor(
                     typeof(FailureDetector),
                     new FailureDetector.SetupEvent(this.Id, this.Servers));
 
@@ -384,7 +384,7 @@ namespace Benchmarks.Protocols
             [OnEventGotoState(typeof(TailFailed), typeof(CorrectTailFailure))]
             [OnEventGotoState(typeof(ServerFailed), typeof(CorrectServerFailure))]
             [OnEventDoAction(typeof(FailureDetector.FailureDetected), nameof(CheckWhichNodeFailed))]
-            private class WaitForFailure : MachineState
+            private class WaitForFailure : ActorState
             {
             }
 
@@ -420,7 +420,7 @@ namespace Benchmarks.Protocols
             [OnEntry(nameof(CorrectHeadFailureOnEntry))]
             [OnEventGotoState(typeof(Done), typeof(WaitForFailure), nameof(UpdateFailureDetector))]
             [OnEventDoAction(typeof(HeadChanged), nameof(UpdateClients))]
-            private class CorrectHeadFailure : MachineState
+            private class CorrectHeadFailure : ActorState
             {
             }
 
@@ -456,7 +456,7 @@ namespace Benchmarks.Protocols
             [OnEntry(nameof(CorrectTailFailureOnEntry))]
             [OnEventGotoState(typeof(Done), typeof(WaitForFailure), nameof(UpdateFailureDetector))]
             [OnEventDoAction(typeof(TailChanged), nameof(UpdateClients))]
-            private class CorrectTailFailure : MachineState
+            private class CorrectTailFailure : ActorState
             {
             }
 
@@ -480,7 +480,7 @@ namespace Benchmarks.Protocols
             [OnEventDoAction(typeof(FixPredecessor), nameof(ProcessFixPredecessor))]
             [OnEventDoAction(typeof(ChainReplicationServer.NewSuccInfo), nameof(SetLastUpdate))]
             [OnEventDoAction(typeof(Success), nameof(ProcessSuccess))]
-            private class CorrectServerFailure : MachineState
+            private class CorrectServerFailure : ActorState
             {
             }
 
@@ -515,7 +515,7 @@ namespace Benchmarks.Protocols
             private void ProcessSuccess() => this.Raise(new Done());
         }
 
-        private class ChainReplicationServer : Machine
+        private class ChainReplicationServer : Actor
         {
             internal class SetupEvent : Event
             {
@@ -534,10 +534,10 @@ namespace Benchmarks.Protocols
 
             internal class PredSucc : Event
             {
-                public MachineId Predecessor;
-                public MachineId Successor;
+                public ActorId Predecessor;
+                public ActorId Successor;
 
-                public PredSucc(MachineId pred, MachineId succ)
+                public PredSucc(ActorId pred, ActorId succ)
                     : base()
                 {
                     this.Predecessor = pred;
@@ -547,13 +547,13 @@ namespace Benchmarks.Protocols
 
             internal class ForwardUpdate : Event
             {
-                public MachineId Predecessor;
+                public ActorId Predecessor;
                 public int NextSeqId;
-                public MachineId Client;
+                public ActorId Client;
                 public int Key;
                 public int Value;
 
-                public ForwardUpdate(MachineId pred, int nextSeqId, MachineId client, int key, int val)
+                public ForwardUpdate(ActorId pred, int nextSeqId, ActorId client, int key, int val)
                     : base()
                 {
                     this.Predecessor = pred;
@@ -577,10 +577,10 @@ namespace Benchmarks.Protocols
 
             internal class NewPredecessor : Event
             {
-                public MachineId Main;
-                public MachineId Predecessor;
+                public ActorId Main;
+                public ActorId Predecessor;
 
-                public NewPredecessor(MachineId main, MachineId pred)
+                public NewPredecessor(ActorId main, ActorId pred)
                     : base()
                 {
                     this.Main = main;
@@ -590,12 +590,12 @@ namespace Benchmarks.Protocols
 
             internal class NewSuccessor : Event
             {
-                public MachineId Main;
-                public MachineId Successor;
+                public ActorId Main;
+                public ActorId Successor;
                 public int LastUpdateReceivedSucc;
                 public int LastAckSent;
 
-                public NewSuccessor(MachineId main, MachineId succ,
+                public NewSuccessor(ActorId main, ActorId succ,
                     int lastUpdateReceivedSucc, int lastAckSent)
                     : base()
                 {
@@ -642,8 +642,8 @@ namespace Benchmarks.Protocols
             private bool IsHead;
             private bool IsTail;
 
-            private MachineId Predecessor;
-            private MachineId Successor;
+            private ActorId Predecessor;
+            private ActorId Successor;
 
             private Dictionary<int, int> KeyValueStore;
             private List<int> History;
@@ -692,7 +692,7 @@ namespace Benchmarks.Protocols
             [OnEventDoAction(typeof(PredSucc), nameof(SetupPredSucc))]
             [DeferEvents(typeof(Client.Update), typeof(Client.Query),
                 typeof(BackwardAck), typeof(ForwardUpdate))]
-            private class Init : MachineState
+            private class Init : ActorState
             {
             }
 
@@ -727,7 +727,7 @@ namespace Benchmarks.Protocols
             [OnEventDoAction(typeof(ChainReplicationMaster.BecomeHead), nameof(ProcessBecomeHead))]
             [OnEventDoAction(typeof(ChainReplicationMaster.BecomeTail), nameof(ProcessBecomeTail))]
             [OnEventDoAction(typeof(FailureDetector.Ping), nameof(SendPong))]
-            private class WaitForRequest : MachineState
+            private class WaitForRequest : ActorState
             {
             }
 
@@ -857,7 +857,7 @@ namespace Benchmarks.Protocols
 
             [OnEntry(nameof(ProcessUpdateOnEntry))]
             [OnEventGotoState(typeof(Local), typeof(WaitForRequest))]
-            private class ProcessUpdate : MachineState
+            private class ProcessUpdate : ActorState
             {
             }
 
@@ -893,7 +893,7 @@ namespace Benchmarks.Protocols
 
             [OnEntry(nameof(ProcessFwdUpdateOnEntry))]
             [OnEventGotoState(typeof(Local), typeof(WaitForRequest))]
-            private class ProcessFwdUpdate : MachineState
+            private class ProcessFwdUpdate : ActorState
             {
             }
 
@@ -952,7 +952,7 @@ namespace Benchmarks.Protocols
 
             [OnEntry(nameof(ProcessBckAckOnEntry))]
             [OnEventGotoState(typeof(Local), typeof(WaitForRequest))]
-            private class ProcessBckAck : MachineState
+            private class ProcessBckAck : ActorState
             {
             }
 
@@ -990,16 +990,16 @@ namespace Benchmarks.Protocols
             }
         }
 
-        private class Client : Machine
+        private class Client : Actor
         {
             internal class SetupEvent : Event
             {
                 public int Id;
-                public MachineId HeadNode;
-                public MachineId TailNode;
+                public ActorId HeadNode;
+                public ActorId TailNode;
                 public int Value;
 
-                public SetupEvent(int id, MachineId head, MachineId tail, int val)
+                public SetupEvent(int id, ActorId head, ActorId tail, int val)
                     : base()
                 {
                     this.Id = id;
@@ -1011,10 +1011,10 @@ namespace Benchmarks.Protocols
 
             internal class UpdateHeadTail : Event
             {
-                public MachineId Head;
-                public MachineId Tail;
+                public ActorId Head;
+                public ActorId Tail;
 
-                public UpdateHeadTail(MachineId head, MachineId tail)
+                public UpdateHeadTail(ActorId head, ActorId tail)
                     : base()
                 {
                     this.Head = head;
@@ -1024,11 +1024,11 @@ namespace Benchmarks.Protocols
 
             internal class Update : Event
             {
-                public MachineId Client;
+                public ActorId Client;
                 public int Key;
                 public int Value;
 
-                public Update(MachineId client, int key, int value)
+                public Update(ActorId client, int key, int value)
                     : base()
                 {
                     this.Client = client;
@@ -1039,10 +1039,10 @@ namespace Benchmarks.Protocols
 
             internal class Query : Event
             {
-                public MachineId Client;
+                public ActorId Client;
                 public int Key;
 
-                public Query(MachineId client, int key)
+                public Query(ActorId client, int key)
                     : base()
                 {
                     this.Client = client;
@@ -1058,8 +1058,8 @@ namespace Benchmarks.Protocols
             {
             }
 
-            private MachineId HeadNode;
-            private MachineId TailNode;
+            private ActorId HeadNode;
+            private ActorId TailNode;
 
             private int StartIn;
             private int Next;
@@ -1069,7 +1069,7 @@ namespace Benchmarks.Protocols
             [Start]
             [OnEntry(nameof(InitOnEntry))]
             [OnEventGotoState(typeof(Local), typeof(PumpUpdateRequests))]
-            private class Init : MachineState
+            private class Init : ActorState
             {
             }
 
@@ -1097,7 +1097,7 @@ namespace Benchmarks.Protocols
             [OnEventGotoState(typeof(Local), typeof(PumpUpdateRequests), nameof(PumpRequestsLocalAction))]
             [OnEventGotoState(typeof(Done), typeof(PumpQueryRequests), nameof(PumpRequestsDoneAction))]
             [IgnoreEvents(typeof(ChainReplicationServer.ResponseToUpdate), typeof(ChainReplicationServer.ResponseToQuery))]
-            private class PumpUpdateRequests : MachineState
+            private class PumpUpdateRequests : ActorState
             {
             }
 
@@ -1119,7 +1119,7 @@ namespace Benchmarks.Protocols
             [OnEntry(nameof(PumpQueryRequestsOnEntry))]
             [OnEventGotoState(typeof(Local), typeof(PumpQueryRequests), nameof(PumpRequestsLocalAction))]
             [IgnoreEvents(typeof(ChainReplicationServer.ResponseToUpdate), typeof(ChainReplicationServer.ResponseToQuery))]
-            private class PumpQueryRequests : MachineState
+            private class PumpQueryRequests : ActorState
             {
             }
 
@@ -1152,9 +1152,9 @@ namespace Benchmarks.Protocols
         {
             internal class SetupEvent : Event
             {
-                public List<MachineId> Servers;
+                public List<ActorId> Servers;
 
-                public SetupEvent(List<MachineId> servers)
+                public SetupEvent(List<ActorId> servers)
                     : base()
                 {
                     this.Servers = servers;
@@ -1163,9 +1163,9 @@ namespace Benchmarks.Protocols
 
             internal class UpdateServers : Event
             {
-                public List<MachineId> Servers;
+                public List<ActorId> Servers;
 
-                public UpdateServers(List<MachineId> servers)
+                public UpdateServers(List<ActorId> servers)
                     : base()
                 {
                     this.Servers = servers;
@@ -1174,10 +1174,10 @@ namespace Benchmarks.Protocols
 
             internal class HistoryUpdate : Event
             {
-                public MachineId Server;
+                public ActorId Server;
                 public List<int> History;
 
-                public HistoryUpdate(MachineId server, List<int> history)
+                public HistoryUpdate(ActorId server, List<int> history)
                     : base()
                 {
                     this.Server = server;
@@ -1187,10 +1187,10 @@ namespace Benchmarks.Protocols
 
             internal class SentUpdate : Event
             {
-                public MachineId Server;
+                public ActorId Server;
                 public List<SentLog> SentHistory;
 
-                public SentUpdate(MachineId server, List<SentLog> sentHistory)
+                public SentUpdate(ActorId server, List<SentLog> sentHistory)
                     : base()
                 {
                     this.Server = server;
@@ -1202,14 +1202,14 @@ namespace Benchmarks.Protocols
             {
             }
 
-            private List<MachineId> Servers;
+            private List<ActorId> Servers;
 
-            private Dictionary<MachineId, List<int>> History;
-            private Dictionary<MachineId, List<int>> SentHistory;
+            private Dictionary<ActorId, List<int>> History;
+            private Dictionary<ActorId, List<int>> SentHistory;
             private List<int> TempSeq;
 
-            private MachineId Next;
-            private MachineId Prev;
+            private ActorId Next;
+            private ActorId Prev;
 
             [Start]
             [OnEventGotoState(typeof(Local), typeof(WaitForUpdateMessage))]
@@ -1222,8 +1222,8 @@ namespace Benchmarks.Protocols
             {
                 Event e = this.ReceivedEvent;
                 this.Servers = (e as SetupEvent).Servers;
-                this.History = new Dictionary<MachineId, List<int>>();
-                this.SentHistory = new Dictionary<MachineId, List<int>>();
+                this.History = new Dictionary<ActorId, List<int>>();
+                this.SentHistory = new Dictionary<ActorId, List<int>>();
                 this.TempSeq = new List<int>();
                 this.Raise(new Local());
             }
@@ -1309,7 +1309,7 @@ namespace Benchmarks.Protocols
                 this.ClearTempSeq();
             }
 
-            private void GetNext(MachineId curr)
+            private void GetNext(ActorId curr)
             {
                 this.Next = null;
 
@@ -1322,7 +1322,7 @@ namespace Benchmarks.Protocols
                 }
             }
 
-            private void GetPrev(MachineId curr)
+            private void GetPrev(ActorId curr)
             {
                 this.Prev = null;
 
@@ -1444,9 +1444,9 @@ namespace Benchmarks.Protocols
         {
             internal class SetupEvent : Event
             {
-                public List<MachineId> Servers;
+                public List<ActorId> Servers;
 
-                public SetupEvent(List<MachineId> servers)
+                public SetupEvent(List<ActorId> servers)
                     : base()
                 {
                     this.Servers = servers;
@@ -1455,9 +1455,9 @@ namespace Benchmarks.Protocols
 
             internal class UpdateServers : Event
             {
-                public List<MachineId> Servers;
+                public List<ActorId> Servers;
 
-                public UpdateServers(List<MachineId> servers)
+                public UpdateServers(List<ActorId> servers)
                     : base()
                 {
                     this.Servers = servers;
@@ -1466,11 +1466,11 @@ namespace Benchmarks.Protocols
 
             internal class ResponseToUpdate : Event
             {
-                public MachineId Tail;
+                public ActorId Tail;
                 public int Key;
                 public int Value;
 
-                public ResponseToUpdate(MachineId tail, int key, int val)
+                public ResponseToUpdate(ActorId tail, int key, int val)
                     : base()
                 {
                     this.Tail = tail;
@@ -1481,11 +1481,11 @@ namespace Benchmarks.Protocols
 
             internal class ResponseToQuery : Event
             {
-                public MachineId Tail;
+                public ActorId Tail;
                 public int Key;
                 public int Value;
 
-                public ResponseToQuery(MachineId tail, int key, int val)
+                public ResponseToQuery(ActorId tail, int key, int val)
                     : base()
                 {
                     this.Tail = tail;
@@ -1498,7 +1498,7 @@ namespace Benchmarks.Protocols
             {
             }
 
-            private List<MachineId> Servers;
+            private List<ActorId> Servers;
             private Dictionary<int, int> LastUpdateResponse;
 
             [Start]

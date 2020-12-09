@@ -9,7 +9,7 @@ using System.Runtime.Serialization;
 namespace Microsoft.Coyote.TestingServices.Tracing.Error
 {
     /// <summary>
-    /// Class implementing a P# bug trace step.
+    /// Class implementing a Coyote bug trace step.
     /// </summary>
     [DataContract(IsReference = true)]
     internal sealed class BugTraceStep
@@ -26,16 +26,16 @@ namespace Microsoft.Coyote.TestingServices.Tracing.Error
         internal BugTraceStepType Type { get; private set; }
 
         /// <summary>
-        /// The machine initiating the action.
+        /// The actor initiating the action.
         /// </summary>
         [DataMember]
-        internal MachineId Machine;
+        internal ActorId Actor;
 
         /// <summary>
-        /// The machine state.
+        /// The actor state.
         /// </summary>
         [DataMember]
-        internal string MachineState;
+        internal string ActorState;
 
         /// <summary>
         /// Information about the event being sent.
@@ -50,10 +50,10 @@ namespace Microsoft.Coyote.TestingServices.Tracing.Error
         internal string InvokedAction;
 
         /// <summary>
-        /// The target machine.
+        /// The target actor.
         /// </summary>
         [DataMember]
-        internal MachineId TargetMachine;
+        internal ActorId TargetActor;
 
         /// <summary>
         /// The taken nondeterministic boolean choice.
@@ -87,8 +87,8 @@ namespace Microsoft.Coyote.TestingServices.Tracing.Error
         /// <summary>
         /// Creates a bug trace step.
         /// </summary>
-        internal static BugTraceStep Create(int index, BugTraceStepType type, MachineId machine,
-            string machineState, EventInfo eventInfo, MethodInfo action, MachineId targetMachine,
+        internal static BugTraceStep Create(int index, BugTraceStepType type, ActorId actor,
+            string actorState, EventInfo eventInfo, MethodInfo action, ActorId targetActor,
             bool? boolChoice, int? intChoice, string extraInfo)
         {
             var traceStep = new BugTraceStep();
@@ -96,8 +96,8 @@ namespace Microsoft.Coyote.TestingServices.Tracing.Error
             traceStep.Index = index;
             traceStep.Type = type;
 
-            traceStep.Machine = machine;
-            traceStep.MachineState = machineState;
+            traceStep.Actor = actor;
+            traceStep.ActorState = actorState;
 
             traceStep.EventInfo = eventInfo;
 
@@ -106,7 +106,7 @@ namespace Microsoft.Coyote.TestingServices.Tracing.Error
                 traceStep.InvokedAction = action.Name;
             }
 
-            traceStep.TargetMachine = targetMachine;
+            traceStep.TargetActor = targetActor;
             traceStep.RandomBooleanChoice = boolChoice;
             traceStep.RandomIntegerChoice = intChoice;
             traceStep.ExtraInfo = extraInfo;

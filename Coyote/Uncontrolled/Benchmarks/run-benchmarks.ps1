@@ -6,7 +6,7 @@ param(
 
 Import-Module $PSScriptRoot\..\Scripts\powershell\common.psm1
 
-Write-Comment -prefix "." -text "Running the P# reinforcement-learning benchmarks" -color "yellow"
+Write-Comment -prefix "." -text "Running the Coyote reinforcement-learning benchmarks" -color "yellow"
 
 $experiments = "$PSScriptRoot\Experiments"
 Get-ChildItem $experiments -Filter *.test.json |
@@ -16,4 +16,4 @@ Foreach-Object {
     & $PSScriptRoot\bin\netcoreapp3.1\EvaluationDriver.exe $experiments\$_
 }
 
-Write-Comment -prefix "." -text "Successfully run the P# reinforcement-learning benchmarks" -color "green"
+Write-Comment -prefix "." -text "Successfully run the Coyote reinforcement-learning benchmarks" -color "green"

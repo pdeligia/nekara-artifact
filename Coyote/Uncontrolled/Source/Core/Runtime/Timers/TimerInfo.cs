@@ -8,7 +8,7 @@ using System;
 namespace Microsoft.Coyote.Timers
 {
     /// <summary>
-    /// Stores information about a timer that can send timeout events to its owner machine.
+    /// Stores information about a timer that can send timeout events to its owner actor.
     /// </summary>
     public class TimerInfo : IEquatable<TimerInfo>
     {
@@ -18,9 +18,9 @@ namespace Microsoft.Coyote.Timers
         private readonly Guid Id;
 
         /// <summary>
-        /// The id of the machine that owns the timer.
+        /// The id of the actor that owns the timer.
         /// </summary>
-        public readonly MachineId OwnerId;
+        public readonly ActorId OwnerId;
 
         /// <summary>
         /// The amount of time to wait before sending the first timeout event.
@@ -40,11 +40,11 @@ namespace Microsoft.Coyote.Timers
         /// <summary>
         /// Initializes a new instance of the <see cref="TimerInfo"/> class.
         /// </summary>
-        /// <param name="ownerId">The id of the machine that owns this timer.</param>
+        /// <param name="ownerId">The id of the actor that owns this timer.</param>
         /// <param name="dueTime">The amount of time to wait before sending the first timeout event.</param>
         /// <param name="period">The time interval between timeout events.</param>
         /// <param name="payload">Optional payload of the timeout event.</param>
-        internal TimerInfo(MachineId ownerId, TimeSpan dueTime, TimeSpan period, object payload)
+        internal TimerInfo(ActorId ownerId, TimeSpan dueTime, TimeSpan period, object payload)
         {
             this.Id = Guid.NewGuid();
             this.OwnerId = ownerId;

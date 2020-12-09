@@ -28,9 +28,9 @@ using Microsoft.Coyote.Utilities;
 namespace Microsoft.Coyote.TestingServices.Runtime
 {
     /// <summary>
-    /// Runtime for systematically testing machines by controlling the scheduler.
+    /// Runtime for systematically testing actors by controlling the scheduler.
     /// </summary>
-    internal sealed class SystematicTestingRuntime : MachineRuntime
+    internal sealed class SystematicTestingRuntime : ActorRuntime
     {
         /// <summary>
         /// Stores the runtime that executes each operation in a given asynchronous context.
@@ -65,7 +65,7 @@ namespace Microsoft.Coyote.TestingServices.Runtime
         internal IRegisterRuntimeOperation Reporter;
 
         /// <summary>
-        /// The P# program state cache.
+        /// The Coyote program state cache.
         /// </summary>
         internal StateCache StateCache;
 
@@ -77,17 +77,17 @@ namespace Microsoft.Coyote.TestingServices.Runtime
         /// <summary>
         /// Map from unique ids to operations.
         /// </summary>
-        private readonly ConcurrentDictionary<ulong, MachineOperation> MachineOperations;
+        private readonly ConcurrentDictionary<ulong, ActorOperation> ActorOperations;
 
         /// <summary>
-        /// Map that stores all unique names and their corresponding machine ids.
+        /// Map that stores all unique names and their corresponding actor ids.
         /// </summary>
-        internal readonly ConcurrentDictionary<string, MachineId> NameValueToMachineId;
+        internal readonly ConcurrentDictionary<string, ActorId> NameValueToActorId;
 
         /// <summary>
-        /// Set of all machine Ids created by this runtime.
+        /// Set of all actor Ids created by this runtime.
         /// </summary>
-        internal HashSet<MachineId> CreatedMachineIds;
+        internal HashSet<ActorId> CreatedActorIds;
 
         /// <summary>
         /// The root task id.
@@ -102,10 +102,10 @@ namespace Microsoft.Coyote.TestingServices.Runtime
             : base(configuration)
         {
             this.Monitors = new List<Monitor>();
-            this.MachineOperations = new ConcurrentDictionary<ulong, MachineOperation>();
+            this.ActorOperations = new ConcurrentDictionary<ulong, ActorOperation>();
             this.RootTaskId = Task.CurrentId;
-            this.CreatedMachineIds = new HashSet<MachineId>();
-            this.NameValueToMachineId = new ConcurrentDictionary<string, MachineId>();
+            this.CreatedActorIds = new HashSet<ActorId>();
+            this.NameValueToActorId = new ConcurrentDictionary<string, ActorId>();
 
             this.BugTrace = new BugTrace();
             this.StateCache = new StateCache(this);
@@ -129,234 +129,234 @@ namespace Microsoft.Coyote.TestingServices.Runtime
         }
 
         /// <summary>
-        /// Creates a machine id that is uniquely tied to the specified unique name. The
-        /// returned machine id can either be a fresh id (not yet bound to any machine),
-        /// or it can be bound to a previously created machine. In the second case, this
-        /// machine id can be directly used to communicate with the corresponding machine.
+        /// Creates an actor id that is uniquely tied to the specified unique name. The
+        /// returned actor id can either be a fresh id (not yet bound to any actor),
+        /// or it can be bound to a previously created actor. In the second case, this
+        /// actor id can be directly used to communicate with the corresponding actor.
         /// </summary>
-        public override MachineId CreateMachineIdFromName(Type type, string machineName)
+        public override ActorId CreateActorIdFromName(Type type, string actorName)
         {
-            // It is important that all machine ids use the monotonically incrementing
+            // It is important that all actor ids use the monotonically incrementing
             // value as the id during testing, and not the unique name.
-            var mid = new MachineId(type, machineName, this);
-            return this.NameValueToMachineId.GetOrAdd(machineName, mid);
+            var mid = new ActorId(type, actorName, this);
+            return this.NameValueToActorId.GetOrAdd(actorName, mid);
         }
 
         /// <summary>
-        /// Creates a new machine of the specified <see cref="Type"/> and with
+        /// Creates a new actor of the specified <see cref="Type"/> and with
         /// the specified optional <see cref="Event"/>. This event can only be
         /// used to access its payload, and cannot be handled.
         /// </summary>
-        public override MachineId CreateMachine(Type type, Event e = null, Guid opGroupId = default) =>
-            this.CreateMachine(null, type, null, e, opGroupId);
+        public override ActorId CreateActor(Type type, Event e = null, Guid opGroupId = default) =>
+            this.CreateActor(null, type, null, e, opGroupId);
 
         /// <summary>
-        /// Creates a new machine of the specified <see cref="Type"/> and name, and
+        /// Creates a new actor of the specified <see cref="Type"/> and name, and
         /// with the specified optional <see cref="Event"/>. This event can only be
         /// used to access its payload, and cannot be handled.
         /// </summary>
-        public override MachineId CreateMachine(Type type, string machineName, Event e = null, Guid opGroupId = default) =>
-            this.CreateMachine(null, type, machineName, e, opGroupId);
+        public override ActorId CreateActor(Type type, string actorName, Event e = null, Guid opGroupId = default) =>
+            this.CreateActor(null, type, actorName, e, opGroupId);
 
         /// <summary>
-        /// Creates a new machine of the specified type, using the specified <see cref="MachineId"/>.
-        /// This method optionally passes an <see cref="Event"/> to the new machine, which can only
+        /// Creates a new actor of the specified type, using the specified <see cref="ActorId"/>.
+        /// This method optionally passes an <see cref="Event"/> to the new actor, which can only
         /// be used to access its payload, and cannot be handled.
         /// </summary>
-        public override MachineId CreateMachine(MachineId mid, Type type, Event e = null, Guid opGroupId = default)
+        public override ActorId CreateActor(ActorId mid, Type type, Event e = null, Guid opGroupId = default)
         {
-            this.Assert(mid != null, "Cannot create a machine using a null machine id.");
-            return this.CreateMachine(mid, type, null, e, opGroupId);
+            this.Assert(mid != null, "Cannot create an actor using a null actor id.");
+            return this.CreateActor(mid, type, null, e, opGroupId);
         }
 
         /// <summary>
-        /// Creates a new machine of the specified <see cref="Type"/> and with the
+        /// Creates a new actor of the specified <see cref="Type"/> and with the
         /// specified optional <see cref="Event"/>. This event can only be used to
         /// access its payload, and cannot be handled. The method returns only when
-        /// the machine is initialized and the <see cref="Event"/> (if any) is handled.
+        /// the actor is initialized and the <see cref="Event"/> (if any) is handled.
         /// </summary>
-        public override Task<MachineId> CreateMachineAndExecuteAsync(Type type, Event e = null, Guid opGroupId = default) =>
-            this.CreateMachineAndExecuteAsync(null, type, null, e, opGroupId);
+        public override Task<ActorId> CreateActorAndExecuteAsync(Type type, Event e = null, Guid opGroupId = default) =>
+            this.CreateActorAndExecuteAsync(null, type, null, e, opGroupId);
 
         /// <summary>
-        /// Creates a new machine of the specified <see cref="Type"/> and name, and with
+        /// Creates a new actor of the specified <see cref="Type"/> and name, and with
         /// the specified optional <see cref="Event"/>. This event can only be used to
         /// access its payload, and cannot be handled. The method returns only when the
-        /// machine is initialized and the <see cref="Event"/> (if any) is handled.
+        /// actor is initialized and the <see cref="Event"/> (if any) is handled.
         /// </summary>
-        public override Task<MachineId> CreateMachineAndExecuteAsync(Type type, string machineName, Event e = null, Guid opGroupId = default) =>
-            this.CreateMachineAndExecuteAsync(null, type, machineName, e, opGroupId);
+        public override Task<ActorId> CreateActorAndExecuteAsync(Type type, string actorName, Event e = null, Guid opGroupId = default) =>
+            this.CreateActorAndExecuteAsync(null, type, actorName, e, opGroupId);
 
         /// <summary>
-        /// Creates a new machine of the specified <see cref="Type"/>, using the specified
-        /// unbound machine id, and passes the specified optional <see cref="Event"/>. This
+        /// Creates a new actor of the specified <see cref="Type"/>, using the specified
+        /// unbound actor id, and passes the specified optional <see cref="Event"/>. This
         /// event can only be used to access its payload, and cannot be handled. The method
-        /// returns only when the machine is initialized and the <see cref="Event"/> (if any)
+        /// returns only when the actor is initialized and the <see cref="Event"/> (if any)
         /// is handled.
         /// </summary>
-        public override Task<MachineId> CreateMachineAndExecuteAsync(MachineId mid, Type type, Event e = null, Guid opGroupId = default)
+        public override Task<ActorId> CreateActorAndExecuteAsync(ActorId mid, Type type, Event e = null, Guid opGroupId = default)
         {
-            this.Assert(mid != null, "Cannot create a machine using a null machine id.");
-            return this.CreateMachineAndExecuteAsync(mid, type, null, e, opGroupId);
+            this.Assert(mid != null, "Cannot create an actor using a null actor id.");
+            return this.CreateActorAndExecuteAsync(mid, type, null, e, opGroupId);
         }
 
         /// <summary>
-        /// Creates a new machine of the specified <see cref="Type"/> and with the
+        /// Creates a new actor of the specified <see cref="Type"/> and with the
         /// specified optional <see cref="Event"/>. This event can only be used to
         /// access its payload, and cannot be handled. The method returns only when
-        /// the machine is initialized and the <see cref="Event"/> (if any) is handled.
+        /// the actor is initialized and the <see cref="Event"/> (if any) is handled.
         /// </summary>
-        public override Task<MachineId> CreateMachineAndExecute(Type type, Event e = null, Guid opGroupId = default) =>
-            this.CreateMachineAndExecuteAsync(null, type, null, e, opGroupId);
+        public override Task<ActorId> CreateActorAndExecute(Type type, Event e = null, Guid opGroupId = default) =>
+            this.CreateActorAndExecuteAsync(null, type, null, e, opGroupId);
 
         /// <summary>
-        /// Creates a new machine of the specified <see cref="Type"/> and name, and with
+        /// Creates a new actor of the specified <see cref="Type"/> and name, and with
         /// the specified optional <see cref="Event"/>. This event can only be used to
         /// access its payload, and cannot be handled. The method returns only when the
-        /// machine is initialized and the <see cref="Event"/> (if any) is handled.
+        /// actor is initialized and the <see cref="Event"/> (if any) is handled.
         /// </summary>
-        public override Task<MachineId> CreateMachineAndExecute(Type type, string machineName, Event e = null, Guid opGroupId = default) =>
-            this.CreateMachineAndExecuteAsync(null, type, machineName, e, opGroupId);
+        public override Task<ActorId> CreateActorAndExecute(Type type, string actorName, Event e = null, Guid opGroupId = default) =>
+            this.CreateActorAndExecuteAsync(null, type, actorName, e, opGroupId);
 
         /// <summary>
-        /// Creates a new machine of the specified <see cref="Type"/>, using the specified
-        /// unbound machine id, and passes the specified optional <see cref="Event"/>. This
+        /// Creates a new actor of the specified <see cref="Type"/>, using the specified
+        /// unbound actor id, and passes the specified optional <see cref="Event"/>. This
         /// event can only be used to access its payload, and cannot be handled. The method
-        /// returns only when the machine is initialized and the <see cref="Event"/> (if any)
+        /// returns only when the actor is initialized and the <see cref="Event"/> (if any)
         /// is handled.
         /// </summary>
-        public override Task<MachineId> CreateMachineAndExecute(MachineId mid, Type type, Event e = null, Guid opGroupId = default)
+        public override Task<ActorId> CreateActorAndExecute(ActorId mid, Type type, Event e = null, Guid opGroupId = default)
         {
-            this.Assert(mid != null, "Cannot create a machine using a null machine id.");
-            return this.CreateMachineAndExecuteAsync(mid, type, null, e, opGroupId);
+            this.Assert(mid != null, "Cannot create an actor using a null actor id.");
+            return this.CreateActorAndExecuteAsync(mid, type, null, e, opGroupId);
         }
 
         /// <summary>
-        /// Sends an asynchronous <see cref="Event"/> to a machine.
+        /// Sends an asynchronous <see cref="Event"/> to an actor.
         /// </summary>
-        public override void SendEvent(MachineId target, Event e, Guid opGroupId = default, SendOptions options = null)
+        public override void SendEvent(ActorId target, Event e, Guid opGroupId = default, SendOptions options = null)
         {
-            this.SendEvent(target, e, this.GetExecutingMachine<Machine>(), opGroupId, options);
+            this.SendEvent(target, e, this.GetExecutingActor<Actor>(), opGroupId, options);
         }
 
         /// <summary>
-        /// Sends an <see cref="Event"/> to a machine. Returns immediately if the target machine was already
-        /// running. Otherwise blocks until the machine handles the event and reaches quiescense.
+        /// Sends an <see cref="Event"/> to an actor. Returns immediately if the target actor was already
+        /// running. Otherwise blocks until the actor handles the event and reaches quiescense.
         /// </summary>
-        public override Task<bool> SendEventAndExecuteAsync(MachineId target, Event e, Guid opGroupId = default, SendOptions options = null) =>
-            this.SendEventAndExecuteAsync(target, e, this.GetExecutingMachine<Machine>(), opGroupId, options);
+        public override Task<bool> SendEventAndExecuteAsync(ActorId target, Event e, Guid opGroupId = default, SendOptions options = null) =>
+            this.SendEventAndExecuteAsync(target, e, this.GetExecutingActor<Actor>(), opGroupId, options);
 
         /// <summary>
-        /// Sends an <see cref="Event"/> to a machine. Returns immediately if the target machine was already
-        /// running. Otherwise blocks until the machine handles the event and reaches quiescense.
+        /// Sends an <see cref="Event"/> to an actor. Returns immediately if the target actor was already
+        /// running. Otherwise blocks until the actor handles the event and reaches quiescense.
         /// </summary>
-        public override Task<bool> SendEventAndExecute(MachineId target, Event e, Guid opGroupId = default, SendOptions options = null) =>
+        public override Task<bool> SendEventAndExecute(ActorId target, Event e, Guid opGroupId = default, SendOptions options = null) =>
             this.SendEventAndExecuteAsync(target, e, opGroupId, options);
 
         /// <summary>
-        /// Returns the operation group id of the specified machine. Returns <see cref="Guid.Empty"/>
-        /// if the id is not set, or if the <see cref="MachineId"/> is not associated with this runtime.
-        /// During testing, the runtime asserts that the specified machine is currently executing.
+        /// Returns the operation group id of the specified actor. Returns <see cref="Guid.Empty"/>
+        /// if the id is not set, or if the <see cref="ActorId"/> is not associated with this runtime.
+        /// During testing, the runtime asserts that the specified actor is currently executing.
         /// </summary>
-        public override Guid GetCurrentOperationGroupId(MachineId currentMachine)
+        public override Guid GetCurrentOperationGroupId(ActorId currentActor)
         {
-            this.Assert(currentMachine == this.GetCurrentMachineId(),
-                "Trying to access the operation group id of '{0}', which is not the currently executing machine.",
-                currentMachine);
+            this.Assert(currentActor == this.GetCurrentActorId(),
+                "Trying to access the operation group id of '{0}', which is not the currently executing actor.",
+                currentActor);
 
-            Machine machine = this.GetMachineFromId<Machine>(currentMachine);
-            return machine is null ? Guid.Empty : machine.OperationGroupId;
+            Actor actor = this.GetActorFromId<Actor>(currentActor);
+            return actor is null ? Guid.Empty : actor.OperationGroupId;
         }
 
         /// <summary>
-        /// Runs the specified test inside a synchronous test harness machine.
+        /// Runs the specified test inside a synchronous test harness actor.
         /// </summary>
         internal void RunTestHarness(Delegate test, string testName)
         {
-            this.Assert(Task.CurrentId != null, "The test harness machine must execute inside a task.");
-            this.Assert(test != null, "The test harness machine cannot execute a null test.");
+            this.Assert(Task.CurrentId != null, "The test harness actor must execute inside a task.");
+            this.Assert(test != null, "The test harness actor cannot execute a null test.");
 
             testName = string.IsNullOrEmpty(testName) ? "anonymous" : testName;
             this.Logger.WriteLine($"<TestLog> Running test '{testName}'.");
 
-            var machine = new TestEntryPointWorkMachine(this, test);
-            this.DispatchWork(machine, null);
+            var actor = new TestEntryPointWorkActor(this, test);
+            this.DispatchWork(actor, null);
         }
 
         /// <summary>
-        /// Creates a new machine of the specified <see cref="Type"/> and name, using the specified
-        /// unbound machine id, and passes the specified optional <see cref="Event"/>. This event
+        /// Creates a new actor of the specified <see cref="Type"/> and name, using the specified
+        /// unbound actor id, and passes the specified optional <see cref="Event"/>. This event
         /// can only be used to access its payload, and cannot be handled.
         /// </summary>
-        internal MachineId CreateMachine(MachineId mid, Type type, string machineName, Event e = null, Guid opGroupId = default)
+        internal ActorId CreateActor(ActorId mid, Type type, string actorName, Event e = null, Guid opGroupId = default)
         {
-            Machine creator = this.GetExecutingMachine<Machine>();
-            return this.CreateMachine(mid, type, machineName, e, creator, opGroupId);
+            Actor creator = this.GetExecutingActor<Actor>();
+            return this.CreateActor(mid, type, actorName, e, creator, opGroupId);
         }
 
         /// <summary>
-        /// Creates a new <see cref="Machine"/> of the specified <see cref="Type"/>.
+        /// Creates a new <see cref="Actor"/> of the specified <see cref="Type"/>.
         /// </summary>
-        internal override MachineId CreateMachine(MachineId mid, Type type, string machineName, Event e,
-            Machine creator, Guid opGroupId)
+        internal override ActorId CreateActor(ActorId mid, Type type, string actorName, Event e,
+            Actor creator, Guid opGroupId)
         {
-            this.AssertCorrectCallerMachine(creator, "CreateMachine");
+            this.AssertCorrectCallerActor(creator, "CreateActor");
             if (creator != null)
             {
-                this.AssertNoPendingTransitionStatement(creator, "create a machine");
+                this.AssertNoPendingTransitionStatement(creator, "create an actor");
             }
 
-            Machine machine = this.CreateMachine(mid, type, machineName, creator, opGroupId);
+            Actor actor = this.CreateActor(mid, type, actorName, creator, opGroupId);
 
-            this.BugTrace.AddCreateMachineStep(creator, machine.Id, e is null ? null : new EventInfo(e));
-            this.RunMachineEventHandler(machine, e, true, null, null);
+            this.BugTrace.AddCreateActorStep(creator, actor.Id, e is null ? null : new EventInfo(e));
+            this.RunActorEventHandler(actor, e, true, null, null);
 
-            return machine.Id;
+            return actor.Id;
         }
 
         /// <summary>
-        /// Creates a new machine of the specified <see cref="Type"/> and name, using the specified
-        /// unbound machine id, and passes the specified optional <see cref="Event"/>. This event
+        /// Creates a new actor of the specified <see cref="Type"/> and name, using the specified
+        /// unbound actor id, and passes the specified optional <see cref="Event"/>. This event
         /// can only be used to access its payload, and cannot be handled. The method returns only
-        /// when the machine is initialized and the <see cref="Event"/> (if any) is handled.
+        /// when the actor is initialized and the <see cref="Event"/> (if any) is handled.
         /// </summary>
-        internal Task<MachineId> CreateMachineAndExecuteAsync(MachineId mid, Type type, string machineName, Event e = null,
+        internal Task<ActorId> CreateActorAndExecuteAsync(ActorId mid, Type type, string actorName, Event e = null,
             Guid opGroupId = default)
         {
-            Machine creator = this.GetExecutingMachine<Machine>();
-            return this.CreateMachineAndExecuteAsync(mid, type, machineName, e, creator, opGroupId);
+            Actor creator = this.GetExecutingActor<Actor>();
+            return this.CreateActorAndExecuteAsync(mid, type, actorName, e, creator, opGroupId);
         }
 
         /// <summary>
-        /// Creates a new <see cref="Machine"/> of the specified <see cref="Type"/>. The
-        /// method returns only when the machine is initialized and the <see cref="Event"/>
+        /// Creates a new <see cref="Actor"/> of the specified <see cref="Type"/>. The
+        /// method returns only when the actor is initialized and the <see cref="Event"/>
         /// (if any) is handled.
         /// </summary>
-        internal override async Task<MachineId> CreateMachineAndExecuteAsync(MachineId mid, Type type, string machineName, Event e,
-            Machine creator, Guid opGroupId)
+        internal override async Task<ActorId> CreateActorAndExecuteAsync(ActorId mid, Type type, string actorName, Event e,
+            Actor creator, Guid opGroupId)
         {
-            this.AssertCorrectCallerMachine(creator, "CreateMachineAndExecute");
+            this.AssertCorrectCallerActor(creator, "CreateActorAndExecute");
             this.Assert(creator != null,
-                "Only a machine can call 'CreateMachineAndExecute': avoid calling it directly from the 'Test' method; instead call it through a 'harness' machine.");
-            this.AssertNoPendingTransitionStatement(creator, "create a machine");
+                "Only an actor can call 'CreateActorAndExecute': avoid calling it directly from the 'Test' method; instead call it through a 'harness' actor.");
+            this.AssertNoPendingTransitionStatement(creator, "create an actor");
 
-            Machine machine = this.CreateMachine(mid, type, machineName, creator, opGroupId);
+            Actor actor = this.CreateActor(mid, type, actorName, creator, opGroupId);
 
-            this.BugTrace.AddCreateMachineStep(creator, machine.Id, e is null ? null : new EventInfo(e));
-            this.RunMachineEventHandler(machine, e, true, creator, null);
+            this.BugTrace.AddCreateActorStep(creator, actor.Id, e is null ? null : new EventInfo(e));
+            this.RunActorEventHandler(actor, e, true, creator, null);
 
-            // Wait until the machine reaches quiescence.
-            await creator.Receive(typeof(QuiescentEvent), rev => (rev as QuiescentEvent).MachineId == machine.Id);
+            // Wait until the actor reaches quiescence.
+            await creator.Receive(typeof(QuiescentEvent), rev => (rev as QuiescentEvent).ActorId == actor.Id);
 
-            return await Task.FromResult(machine.Id);
+            return await Task.FromResult(actor.Id);
         }
 
         /// <summary>
-        /// Creates a new <see cref="Machine"/> of the specified <see cref="Type"/>.
+        /// Creates a new <see cref="Actor"/> of the specified <see cref="Type"/>.
         /// </summary>
-        private Machine CreateMachine(MachineId mid, Type type, string machineName, Machine creator, Guid opGroupId)
+        private Actor CreateActor(ActorId mid, Type type, string actorName, Actor creator, Guid opGroupId)
         {
-            this.Assert(type.IsSubclassOf(typeof(Machine)), "Type '{0}' is not a machine.", type.FullName);
+            this.Assert(type.IsSubclassOf(typeof(Actor)), "Type '{0}' is not an actor.", type.FullName);
 
             // Using ulong.MaxValue because a 'Create' operation cannot specify
             // the id of its target, because the id does not exist yet.
@@ -365,119 +365,119 @@ namespace Microsoft.Coyote.TestingServices.Runtime
 
             if (mid is null)
             {
-                mid = new MachineId(type, machineName, this);
+                mid = new ActorId(type, actorName, this);
             }
             else
             {
-                this.Assert(mid.Runtime is null || mid.Runtime == this, "Unbound machine id '{0}' was created by another runtime.", mid.Value);
-                this.Assert(mid.Type == type.FullName, "Cannot bind machine id '{0}' of type '{1}' to a machine of type '{2}'.",
+                this.Assert(mid.Runtime is null || mid.Runtime == this, "Unbound actor id '{0}' was created by another runtime.", mid.Value);
+                this.Assert(mid.Type == type.FullName, "Cannot bind actor id '{0}' of type '{1}' to an actor of type '{2}'.",
                     mid.Value, mid.Type, type.FullName);
                 mid.Bind(this);
             }
 
-            // The operation group id of the machine is set using the following precedence:
-            // (1) To the specified machine creation operation group id, if it is non-empty.
-            // (2) To the operation group id of the creator machine, if it exists and is non-empty.
+            // The operation group id of the actor is set using the following precedence:
+            // (1) To the specified actor creation operation group id, if it is non-empty.
+            // (2) To the operation group id of the creator actor, if it exists and is non-empty.
             // (3) To the empty operation group id.
             if (opGroupId == Guid.Empty && creator != null)
             {
                 opGroupId = creator.OperationGroupId;
             }
 
-            Machine machine = MachineFactory.Create(type);
-            IMachineStateManager stateManager = new SerializedMachineStateManager(this, machine, opGroupId);
-            IEventQueue eventQueue = new SerializedMachineEventQueue(stateManager, machine);
-            machine.Initialize(this, mid, stateManager, eventQueue);
-            machine.InitializeStateInformation();
+            Actor actor = ActorFactory.Create(type);
+            IActorStateManager stateManager = new SerializedActorStateManager(this, actor, opGroupId);
+            IEventQueue eventQueue = new SerializedActorEventQueue(stateManager, actor);
+            actor.Initialize(this, mid, stateManager, eventQueue);
+            actor.InitializeStateInformation();
 
             if (this.Configuration.ReportActivityCoverage)
             {
-                this.ReportActivityCoverageOfMachine(machine);
+                this.ReportActivityCoverageOfActor(actor);
             }
 
-            bool result = this.MachineMap.TryAdd(mid, machine);
-            this.Assert(result, "Machine id '{0}' is used by an existing machine.", mid.Value);
+            bool result = this.ActorMap.TryAdd(mid, actor);
+            this.Assert(result, "Actor id '{0}' is used by an existing actor.", mid.Value);
 
-            this.Assert(!this.CreatedMachineIds.Contains(mid),
-                "Machine id '{0}' of a previously halted machine cannot be reused to create a new machine of type '{1}'",
+            this.Assert(!this.CreatedActorIds.Contains(mid),
+                "Actor id '{0}' of a previously halted actor cannot be reused to create a new actor of type '{1}'",
                 mid.Value, type.FullName);
-            this.CreatedMachineIds.Add(mid);
-            this.MachineOperations.GetOrAdd(mid.Value, new MachineOperation(machine));
+            this.CreatedActorIds.Add(mid);
+            this.ActorOperations.GetOrAdd(mid.Value, new ActorOperation(actor));
 
-            this.LogWriter.OnCreateMachine(mid, creator?.Id);
+            this.LogWriter.OnCreateActor(mid, creator?.Id);
 
             if (this.Configuration.EnableDataRaceDetection)
             {
-                this.Reporter.RegisterCreateMachine(creator?.Id, mid);
+                this.Reporter.RegisterCreateActor(creator?.Id, mid);
             }
 
-            return machine;
+            return actor;
         }
 
         /// <summary>
-        /// Sends an asynchronous <see cref="Event"/> to a machine.
+        /// Sends an asynchronous <see cref="Event"/> to an actor.
         /// </summary>
-        internal override void SendEvent(MachineId target, Event e, AsyncMachine sender, Guid opGroupId, SendOptions options)
+        internal override void SendEvent(ActorId target, Event e, AsyncActor sender, Guid opGroupId, SendOptions options)
         {
             if (sender != null)
             {
-                this.Assert(target != null, "Machine '{0}' is sending to a null machine.", sender.Id);
-                this.Assert(e != null, "Machine '{0}' is sending a null event.", sender.Id);
+                this.Assert(target != null, "Actor '{0}' is sending to a null actor.", sender.Id);
+                this.Assert(e != null, "Actor '{0}' is sending a null event.", sender.Id);
             }
             else
             {
-                this.Assert(target != null, "Cannot send to a null machine.");
+                this.Assert(target != null, "Cannot send to a null actor.");
                 this.Assert(e != null, "Cannot send a null event.");
             }
 
-            this.AssertCorrectCallerMachine(sender as Machine, "SendEvent");
+            this.AssertCorrectCallerActor(sender as Actor, "SendEvent");
 
             EnqueueStatus enqueueStatus = this.EnqueueEvent(target, e, sender, opGroupId, options,
-                out Machine targetMachine, out EventInfo eventInfo);
+                out Actor targetActor, out EventInfo eventInfo);
             if (enqueueStatus is EnqueueStatus.EventHandlerNotRunning)
             {
-                this.RunMachineEventHandler(targetMachine, null, false, null, eventInfo);
+                this.RunActorEventHandler(targetActor, null, false, null, eventInfo);
             }
         }
 
         /// <summary>
-        /// Sends an asynchronous <see cref="Event"/> to a machine. Returns immediately if the target machine was
-        /// already running. Otherwise blocks until the machine handles the event and reaches quiescense.
+        /// Sends an asynchronous <see cref="Event"/> to an actor. Returns immediately if the target actor was
+        /// already running. Otherwise blocks until the actor handles the event and reaches quiescense.
         /// </summary>
-        internal override async Task<bool> SendEventAndExecuteAsync(MachineId target, Event e, AsyncMachine sender,
+        internal override async Task<bool> SendEventAndExecuteAsync(ActorId target, Event e, AsyncActor sender,
             Guid opGroupId, SendOptions options)
         {
-            this.Assert(sender is Machine,
-                "Only a machine can call 'SendEventAndExecute': avoid calling it directly from the 'Test' method; instead call it through a 'harness' machine.");
-            this.Assert(target != null, "Machine '{0}' is sending to a null machine.", sender.Id);
-            this.Assert(e != null, "Machine '{0}' is sending a null event.", sender.Id);
-            this.AssertCorrectCallerMachine(sender as Machine, "SendEventAndExecute");
+            this.Assert(sender is Actor,
+                "Only an actor can call 'SendEventAndExecute': avoid calling it directly from the 'Test' method; instead call it through a 'harness' actor.");
+            this.Assert(target != null, "Actor '{0}' is sending to a null actor.", sender.Id);
+            this.Assert(e != null, "Actor '{0}' is sending a null event.", sender.Id);
+            this.AssertCorrectCallerActor(sender as Actor, "SendEventAndExecute");
 
             EnqueueStatus enqueueStatus = this.EnqueueEvent(target, e, sender, opGroupId, options,
-                out Machine targetMachine, out EventInfo eventInfo);
+                out Actor targetActor, out EventInfo eventInfo);
             if (enqueueStatus is EnqueueStatus.EventHandlerNotRunning)
             {
-                this.RunMachineEventHandler(targetMachine, null, false, sender as Machine, eventInfo);
+                this.RunActorEventHandler(targetActor, null, false, sender as Actor, eventInfo);
 
-                // Wait until the machine reaches quiescence.
-                await (sender as Machine).Receive(typeof(QuiescentEvent), rev => (rev as QuiescentEvent).MachineId == target);
+                // Wait until the actor reaches quiescence.
+                await (sender as Actor).Receive(typeof(QuiescentEvent), rev => (rev as QuiescentEvent).ActorId == target);
                 return true;
             }
 
             // 'EnqueueStatus.EventHandlerNotRunning' is not returned by 'EnqueueEvent' (even when
-            // the machine was previously inactive) when the event 'e' requires no action by the
-            // machine (i.e., it implicitly handles the event).
+            // the actor was previously inactive) when the event 'e' requires no action by the
+            // actor (i.e., it implicitly handles the event).
             return enqueueStatus is EnqueueStatus.Dropped || enqueueStatus is EnqueueStatus.NextEventUnavailable;
         }
 
         /// <summary>
-        /// Enqueues an event to the machine with the specified id.
+        /// Enqueues an event to the actor with the specified id.
         /// </summary>
-        private EnqueueStatus EnqueueEvent(MachineId target, Event e, AsyncMachine sender, Guid opGroupId,
-            SendOptions options, out Machine targetMachine, out EventInfo eventInfo)
+        private EnqueueStatus EnqueueEvent(ActorId target, Event e, AsyncActor sender, Guid opGroupId,
+            SendOptions options, out Actor targetActor, out EventInfo eventInfo)
         {
-            this.Assert(this.CreatedMachineIds.Contains(target),
-                "Cannot send event '{0}' to machine id '{1}' that was never previously bound to a machine of type '{2}'",
+            this.Assert(this.CreatedActorIds.Contains(target),
+                "Cannot send event '{0}' to actor id '{1}' that was never previously bound to an actor of type '{2}'",
                 e.GetType().FullName, target.Value, target.Type);
 
             AsyncOperationType opType = AsyncOperationType.Send;
@@ -497,35 +497,35 @@ namespace Microsoft.Coyote.TestingServices.Runtime
             }
 
             this.Scheduler.ScheduleNextOperation(opType, AsyncOperationTarget.Inbox, target.Value);
-            ResetProgramCounter(sender as Machine);
+            ResetProgramCounter(sender as Actor);
 
             // The operation group id of this operation is set using the following precedence:
             // (1) To the specified send operation group id, if it is non-empty.
-            // (2) To the operation group id of the sender machine, if it exists and is non-empty.
+            // (2) To the operation group id of the sender actor, if it exists and is non-empty.
             // (3) To the empty operation group id.
             if (opGroupId == Guid.Empty && sender != null)
             {
                 opGroupId = sender.OperationGroupId;
             }
 
-            targetMachine = this.GetMachineFromId<Machine>(target);
-            if (targetMachine is null)
+            targetActor = this.GetActorFromId<Actor>(target);
+            if (targetActor is null)
             {
-                this.LogWriter.OnSend(target, sender?.Id, (sender as Machine)?.CurrentStateName ?? string.Empty,
+                this.LogWriter.OnSend(target, sender?.Id, (sender as Actor)?.CurrentStateName ?? string.Empty,
                     e.GetType().FullName, opGroupId, isTargetHalted: true);
                 this.Assert(options is null || !options.MustHandle,
-                    "A must-handle event '{0}' was sent to the halted machine '{1}'.", e.GetType().FullName, target);
+                    "A must-handle event '{0}' was sent to the halted actor '{1}'.", e.GetType().FullName, target);
                 this.TryHandleDroppedEvent(e, target);
                 eventInfo = null;
                 return EnqueueStatus.Dropped;
             }
 
-            if (sender is Machine)
+            if (sender is Actor)
             {
-                this.AssertNoPendingTransitionStatement(sender as Machine, "send an event");
+                this.AssertNoPendingTransitionStatement(sender as Actor, "send an event");
             }
 
-            EnqueueStatus enqueueStatus = this.EnqueueEvent(targetMachine, e, sender, opGroupId, options, out eventInfo);
+            EnqueueStatus enqueueStatus = this.EnqueueEvent(targetActor, e, sender, opGroupId, options, out eventInfo);
             if (enqueueStatus == EnqueueStatus.Dropped)
             {
                 this.TryHandleDroppedEvent(e, target);
@@ -535,16 +535,16 @@ namespace Microsoft.Coyote.TestingServices.Runtime
         }
 
         /// <summary>
-        /// Enqueues an event to the machine with the specified id.
+        /// Enqueues an event to the actor with the specified id.
         /// </summary>
-        private EnqueueStatus EnqueueEvent(Machine machine, Event e, AsyncMachine sender, Guid opGroupId,
+        private EnqueueStatus EnqueueEvent(Actor actor, Event e, AsyncActor sender, Guid opGroupId,
             SendOptions options, out EventInfo eventInfo)
         {
             EventOriginInfo originInfo;
-            if (sender is Machine senderMachine)
+            if (sender is Actor senderActor)
             {
-                originInfo = new EventOriginInfo(sender.Id, senderMachine.GetType().FullName,
-                    NameResolver.GetStateNameForLogging(senderMachine.CurrentState));
+                originInfo = new EventOriginInfo(sender.Id, senderActor.GetType().FullName,
+                    NameResolver.GetStateNameForLogging(senderActor.CurrentState));
             }
             else
             {
@@ -560,34 +560,34 @@ namespace Microsoft.Coyote.TestingServices.Runtime
                 SendStep = this.Scheduler.ScheduledSteps
             };
 
-            this.LogWriter.OnSend(machine.Id, sender?.Id, (sender as Machine)?.CurrentStateName ?? string.Empty,
+            this.LogWriter.OnSend(actor.Id, sender?.Id, (sender as Actor)?.CurrentStateName ?? string.Empty,
                 e.GetType().FullName, opGroupId, isTargetHalted: false);
 
             if (sender != null)
             {
-                var stateName = sender is Machine ? (sender as Machine).CurrentStateName : string.Empty;
-                this.BugTrace.AddSendEventStep(sender.Id, stateName, eventInfo, machine.Id);
+                var stateName = sender is Actor ? (sender as Actor).CurrentStateName : string.Empty;
+                this.BugTrace.AddSendEventStep(sender.Id, stateName, eventInfo, actor.Id);
                 if (this.Configuration.EnableDataRaceDetection)
                 {
-                    this.Reporter.RegisterEnqueue(sender.Id, machine.Id, e, (ulong)this.Scheduler.ScheduledSteps);
+                    this.Reporter.RegisterEnqueue(sender.Id, actor.Id, e, (ulong)this.Scheduler.ScheduledSteps);
                 }
             }
 
-            return machine.Enqueue(e, opGroupId, eventInfo);
+            return actor.Enqueue(e, opGroupId, eventInfo);
         }
 
         /// <summary>
-        /// Runs a new asynchronous event handler for the specified machine.
+        /// Runs a new asynchronous event handler for the specified actor.
         /// This is a fire and forget invocation.
         /// </summary>
-        /// <param name="machine">Machine that executes this event handler.</param>
-        /// <param name="initialEvent">Event for initializing the machine.</param>
-        /// <param name="isFresh">If true, then this is a new machine.</param>
-        /// <param name="syncCaller">Caller machine that is blocked for quiscence.</param>
+        /// <param name="actor">Actor that executes this event handler.</param>
+        /// <param name="initialEvent">Event for initializing the actor.</param>
+        /// <param name="isFresh">If true, then this is a new actor.</param>
+        /// <param name="syncCaller">Caller actor that is blocked for quiscence.</param>
         /// <param name="enablingEvent">If non-null, the event info of the sent event that caused the event handler to be restarted.</param>
-        private void RunMachineEventHandler(Machine machine, Event initialEvent, bool isFresh, Machine syncCaller, EventInfo enablingEvent)
+        private void RunActorEventHandler(Actor actor, Event initialEvent, bool isFresh, Actor syncCaller, EventInfo enablingEvent)
         {
-            MachineOperation op = this.GetAsynchronousOperation(machine.Id.Value);
+            ActorOperation op = this.GetAsynchronousOperation(actor.Id.Value);
 
             Task task = new Task(async () =>
             {
@@ -601,30 +601,30 @@ namespace Microsoft.Coyote.TestingServices.Runtime
 
                     if (isFresh)
                     {
-                        await machine.GotoStartState(initialEvent);
+                        await actor.GotoStartState(initialEvent);
                     }
 
-                    await machine.RunEventHandlerAsync();
+                    await actor.RunEventHandlerAsync();
 
                     if (syncCaller != null)
                     {
-                        this.EnqueueEvent(syncCaller, new QuiescentEvent(machine.Id), machine, machine.OperationGroupId, null, out EventInfo _);
+                        this.EnqueueEvent(syncCaller, new QuiescentEvent(actor.Id), actor, actor.OperationGroupId, null, out EventInfo _);
                     }
 
-                    IO.Debug.WriteLine($"<ScheduleDebug> Completed event handler of '{machine.Id}' on task '{Task.CurrentId}'.");
+                    IO.Debug.WriteLine($"<ScheduleDebug> Completed event handler of '{actor.Id}' on task '{Task.CurrentId}'.");
                     op.OnCompleted();
 
-                    if (machine.IsHalted)
+                    if (actor.IsHalted)
                     {
-                        this.Scheduler.ScheduleNextOperation(AsyncOperationType.Stop, AsyncOperationTarget.Task, machine.Id.Value);
+                        this.Scheduler.ScheduleNextOperation(AsyncOperationType.Stop, AsyncOperationTarget.Task, actor.Id.Value);
                     }
                     else
                     {
-                        this.Scheduler.ScheduleNextOperation(AsyncOperationType.Receive, AsyncOperationTarget.Inbox, machine.Id.Value);
+                        this.Scheduler.ScheduleNextOperation(AsyncOperationType.Receive, AsyncOperationTarget.Inbox, actor.Id.Value);
                     }
 
-                    IO.Debug.WriteLine($"<ScheduleDebug> Terminated event handler of '{machine.Id}' on task '{Task.CurrentId}'.");
-                    ResetProgramCounter(machine);
+                    IO.Debug.WriteLine($"<ScheduleDebug> Terminated event handler of '{actor.Id}' on task '{Task.CurrentId}'.");
+                    ResetProgramCounter(actor);
                 }
                 catch (Exception ex)
                 {
@@ -641,21 +641,21 @@ namespace Microsoft.Coyote.TestingServices.Runtime
 
                     if (innerException is ExecutionCanceledException)
                     {
-                        IO.Debug.WriteLine($"<Exception> ExecutionCanceledException was thrown from machine '{machine.Id}'.");
+                        IO.Debug.WriteLine($"<Exception> ExecutionCanceledException was thrown from actor '{actor.Id}'.");
                     }
                     else if (innerException is TaskSchedulerException)
                     {
-                        IO.Debug.WriteLine($"<Exception> TaskSchedulerException was thrown from machine '{machine.Id}'.");
+                        IO.Debug.WriteLine($"<Exception> TaskSchedulerException was thrown from actor '{actor.Id}'.");
                     }
                     else if (innerException is ObjectDisposedException)
                     {
-                        IO.Debug.WriteLine($"<Exception> ObjectDisposedException was thrown from machine '{machine.Id}' with reason '{ex.Message}'.");
+                        IO.Debug.WriteLine($"<Exception> ObjectDisposedException was thrown from actor '{actor.Id}' with reason '{ex.Message}'.");
                     }
                     else
                     {
                         // Reports the unhandled exception.
                         string message = string.Format(CultureInfo.InvariantCulture,
-                            $"Exception '{ex.GetType()}' was thrown in machine '{machine.Id}', " +
+                            $"Exception '{ex.GetType()}' was thrown in actor '{actor.Id}', " +
                             $"'{ex.Source}':\n" +
                             $"   {ex.Message}\n" +
                             $"The stack trace is:\n{ex.StackTrace}");
@@ -664,9 +664,9 @@ namespace Microsoft.Coyote.TestingServices.Runtime
                 }
                 finally
                 {
-                    if (machine.IsHalted)
+                    if (actor.IsHalted)
                     {
-                        this.MachineMap.TryRemove(machine.Id, out AsyncMachine _);
+                        this.ActorMap.TryRemove(actor.Id, out AsyncActor _);
                     }
                 }
             });
@@ -679,71 +679,71 @@ namespace Microsoft.Coyote.TestingServices.Runtime
         }
 
         /// <summary>
-        /// Creates a new <see cref="MachineTask"/> to execute the specified asynchronous work.
+        /// Creates a new <see cref="ActorTask"/> to execute the specified asynchronous work.
         /// </summary>
-        internal override MachineTask CreateMachineTask(Action action, CancellationToken cancellationToken)
+        internal override ActorTask CreateActorTask(Action action, CancellationToken cancellationToken)
         {
             this.Assert(action != null, "The task cannot execute a null action.");
-            var machine = new ActionWorkMachine(this, action);
-            this.DispatchWork(machine, null);
-            return new ControlledMachineTask(this, machine.AwaiterTask, MachineTaskType.ExplicitTask);
+            var actor = new ActionWorkActor(this, action);
+            this.DispatchWork(actor, null);
+            return new ControlledActorTask(this, actor.AwaiterTask, ActorTaskType.ExplicitTask);
         }
 
         /// <summary>
-        /// Creates a new <see cref="MachineTask"/> to execute the specified asynchronous work.
+        /// Creates a new <see cref="ActorTask"/> to execute the specified asynchronous work.
         /// </summary>
-        internal override MachineTask CreateMachineTask(Func<Task> function, CancellationToken cancellationToken)
+        internal override ActorTask CreateActorTask(Func<Task> function, CancellationToken cancellationToken)
         {
             this.Assert(function != null, "The task cannot execute a null function.");
-            var machine = new FuncWorkMachine(this, function);
-            this.DispatchWork(machine, null);
-            return new ControlledMachineTask(this, machine.AwaiterTask, MachineTaskType.ExplicitTask);
+            var actor = new FuncWorkActor(this, function);
+            this.DispatchWork(actor, null);
+            return new ControlledActorTask(this, actor.AwaiterTask, ActorTaskType.ExplicitTask);
         }
 
         /// <summary>
-        /// Creates a new <see cref="MachineTask{TResult}"/> to execute the specified asynchronous work.
+        /// Creates a new <see cref="ActorTask{TResult}"/> to execute the specified asynchronous work.
         /// </summary>
-        internal override MachineTask<TResult> CreateMachineTask<TResult>(Func<TResult> function,
+        internal override ActorTask<TResult> CreateActorTask<TResult>(Func<TResult> function,
             CancellationToken cancellationToken)
         {
             this.Assert(function != null, "The task cannot execute a null function.");
-            var machine = new FuncWorkMachine<TResult>(this, function);
-            this.DispatchWork(machine, null);
-            return new ControlledMachineTask<TResult>(this, machine.AwaiterTask, MachineTaskType.ExplicitTask);
+            var actor = new FuncWorkActor<TResult>(this, function);
+            this.DispatchWork(actor, null);
+            return new ControlledActorTask<TResult>(this, actor.AwaiterTask, ActorTaskType.ExplicitTask);
         }
 
         /// <summary>
-        /// Creates a new <see cref="MachineTask{TResult}"/> to execute the specified asynchronous work.
+        /// Creates a new <see cref="ActorTask{TResult}"/> to execute the specified asynchronous work.
         /// </summary>
-        internal override MachineTask<TResult> CreateMachineTask<TResult>(Func<Task<TResult>> function,
+        internal override ActorTask<TResult> CreateActorTask<TResult>(Func<Task<TResult>> function,
             CancellationToken cancellationToken)
         {
             this.Assert(function != null, "The task cannot execute a null function.");
-            var machine = new FuncTaskWorkMachine<TResult>(this, function);
-            this.DispatchWork(machine, null);
-            return new ControlledMachineTask<TResult>(this, machine.AwaiterTask, MachineTaskType.ExplicitTask);
+            var actor = new FuncTaskWorkActor<TResult>(this, function);
+            this.DispatchWork(actor, null);
+            return new ControlledActorTask<TResult>(this, actor.AwaiterTask, ActorTaskType.ExplicitTask);
         }
 
         /// <summary>
-        /// Creates a new <see cref="MachineTask"/> to execute the specified asynchronous delay.
+        /// Creates a new <see cref="ActorTask"/> to execute the specified asynchronous delay.
         /// </summary>
-        internal override MachineTask CreateMachineTask(int millisecondsDelay, CancellationToken cancellationToken)
+        internal override ActorTask CreateActorTask(int millisecondsDelay, CancellationToken cancellationToken)
         {
             if (millisecondsDelay == 0)
             {
                 // If the delay is 0, then complete synchronously.
-                return MachineTask.CompletedTask;
+                return ActorTask.CompletedTask;
             }
 
-            var machine = new DelayWorkMachine(this);
-            this.DispatchWork(machine, null);
-            return new ControlledMachineTask(this, machine.AwaiterTask, MachineTaskType.ExplicitTask);
+            var actor = new DelayWorkActor(this);
+            this.DispatchWork(actor, null);
+            return new ControlledActorTask(this, actor.AwaiterTask, ActorTaskType.ExplicitTask);
         }
 
         /// <summary>
-        /// Creates a new <see cref="MachineTask"/> to complete with the specified task.
+        /// Creates a new <see cref="ActorTask"/> to complete with the specified task.
         /// </summary>
-        internal override MachineTask CreateCompletionMachineTask(Task task)
+        internal override ActorTask CreateCompletionActorTask(Task task)
         {
             if (AsyncLocalRuntime.Value != this)
             {
@@ -751,15 +751,15 @@ namespace Microsoft.Coyote.TestingServices.Runtime
             }
 
             this.Scheduler.CheckNoExternalConcurrencyUsed();
-            // var machine = new TaskCompletionWorkMachine(this, task);
-            // this.DispatchWork(machine, task);
-            return new ControlledMachineTask(this, task, MachineTaskType.CompletionSourceTask);
+            // var actor = new TaskCompletionWorkActor(this, task);
+            // this.DispatchWork(actor, task);
+            return new ControlledActorTask(this, task, ActorTaskType.CompletionSourceTask);
         }
 
         /// <summary>
-        /// Creates a new <see cref="MachineTask"/> to complete with the specified task.
+        /// Creates a new <see cref="ActorTask"/> to complete with the specified task.
         /// </summary>
-        internal override MachineTask<TResult> CreateCompletionMachineTask<TResult>(Task<TResult> task)
+        internal override ActorTask<TResult> CreateCompletionActorTask<TResult>(Task<TResult> task)
         {
             if (AsyncLocalRuntime.Value != this)
             {
@@ -767,28 +767,28 @@ namespace Microsoft.Coyote.TestingServices.Runtime
             }
 
             this.Scheduler.CheckNoExternalConcurrencyUsed();
-            // var machine = new TaskCompletionWorkMachine<TResult>(this, task);
-            // this.DispatchWork(machine, task);
-            return new ControlledMachineTask<TResult>(this, /*machine.AwaiterTask*/task,
-                MachineTaskType.CompletionSourceTask);
+            // var actor = new TaskCompletionWorkActor<TResult>(this, task);
+            // this.DispatchWork(actor, task);
+            return new ControlledActorTask<TResult>(this, /*actor.AwaiterTask*/task,
+                ActorTaskType.CompletionSourceTask);
         }
 
         /// <summary>
         /// Asynchronously waits for the specified tasks to complete.
         /// </summary>
-        internal override MachineTask WaitAllTasksAsync(IEnumerable<Task> tasks)
+        internal override ActorTask WaitAllTasksAsync(IEnumerable<Task> tasks)
         {
             this.Assert(tasks != null, "Cannot wait for a null array of tasks to complete.");
             this.Assert(tasks.Count() > 0, "Cannot wait for zero tasks to complete.");
 
-            AsyncMachine caller = this.GetExecutingMachine<AsyncMachine>();
+            AsyncActor caller = this.GetExecutingActor<AsyncActor>();
             if (caller is null)
             {
                 // TODO: throw an error, as a non-controlled task is awaiting?
-                return new MachineTask(Task.WhenAll(tasks));
+                return new ActorTask(Task.WhenAll(tasks));
             }
 
-            MachineOperation callerOp = this.GetAsynchronousOperation(caller.Id.Value);
+            ActorOperation callerOp = this.GetAsynchronousOperation(caller.Id.Value);
             foreach (var task in tasks)
             {
                 if (!task.IsCompleted)
@@ -803,26 +803,26 @@ namespace Microsoft.Coyote.TestingServices.Runtime
                 this.Scheduler.ScheduleNextOperation(AsyncOperationType.Join, AsyncOperationTarget.Task, caller.Id.Value);
             }
 
-            return MachineTask.CompletedTask;
+            return ActorTask.CompletedTask;
         }
 
         /// <summary>
         /// Asynchronously waits for all specified tasks to complete.
         /// </summary>
-        internal override MachineTask<TResult[]> WaitAllTasksAsync<TResult>(IEnumerable<Task<TResult>> tasks)
+        internal override ActorTask<TResult[]> WaitAllTasksAsync<TResult>(IEnumerable<Task<TResult>> tasks)
         {
             this.Assert(tasks != null, "Cannot wait for a null array of tasks to complete.");
             this.Assert(tasks.Count() > 0, "Cannot wait for zero tasks to complete.");
 
-            AsyncMachine caller = this.GetExecutingMachine<AsyncMachine>();
+            AsyncActor caller = this.GetExecutingActor<AsyncActor>();
             if (caller is null)
             {
                 // TODO: throw an error, as a non-controlled task is awaiting?
-                return new MachineTask<TResult[]>(Task.WhenAll(tasks));
+                return new ActorTask<TResult[]>(Task.WhenAll(tasks));
             }
 
             int size = 0;
-            MachineOperation callerOp = this.GetAsynchronousOperation(caller.Id.Value);
+            ActorOperation callerOp = this.GetAsynchronousOperation(caller.Id.Value);
             foreach (var task in tasks)
             {
                 size++;
@@ -846,25 +846,25 @@ namespace Microsoft.Coyote.TestingServices.Runtime
                 idx++;
             }
 
-            return MachineTask.FromResult(result);
+            return ActorTask.FromResult(result);
         }
 
         /// <summary>
         /// Asynchronously waits for any of the specified tasks to complete.
         /// </summary>
-        internal override MachineTask<Task> WaitAnyTaskAsync(IEnumerable<Task> tasks)
+        internal override ActorTask<Task> WaitAnyTaskAsync(IEnumerable<Task> tasks)
         {
             this.Assert(tasks != null, "Cannot wait for a null array of tasks to complete.");
             this.Assert(tasks.Count() > 0, "Cannot wait for zero tasks to complete.");
 
-            AsyncMachine caller = this.GetExecutingMachine<AsyncMachine>();
+            AsyncActor caller = this.GetExecutingActor<AsyncActor>();
             if (caller is null)
             {
                 // TODO: throw an error, as a non-controlled task is awaiting?
-                return new MachineTask<Task>(Task.WhenAny(tasks));
+                return new ActorTask<Task>(Task.WhenAny(tasks));
             }
 
-            MachineOperation callerOp = this.GetAsynchronousOperation(caller.Id.Value);
+            ActorOperation callerOp = this.GetAsynchronousOperation(caller.Id.Value);
             foreach (var task in tasks)
             {
                 if (!task.IsCompleted)
@@ -889,26 +889,26 @@ namespace Microsoft.Coyote.TestingServices.Runtime
                 }
             }
 
-            return MachineTask.FromResult(result);
+            return ActorTask.FromResult(result);
         }
 
         /// <summary>
         /// Asynchronously waits for any of the specified tasks to complete.
         /// </summary>
-        internal override MachineTask<Task<TResult>> WaitAnyTaskAsync<TResult>(IEnumerable<Task<TResult>> tasks)
+        internal override ActorTask<Task<TResult>> WaitAnyTaskAsync<TResult>(IEnumerable<Task<TResult>> tasks)
         {
             this.Assert(tasks != null, "Cannot wait for a null array of tasks to complete.");
             this.Assert(tasks.Count() > 0, "Cannot wait for zero tasks to complete.");
 
-            AsyncMachine caller = this.GetExecutingMachine<AsyncMachine>();
+            AsyncActor caller = this.GetExecutingActor<AsyncActor>();
             if (caller is null)
             {
                 // TODO: throw an error, as a non-controlled task is awaiting?
-                return new MachineTask<Task<TResult>>(Task.WhenAny(tasks));
+                return new ActorTask<Task<TResult>>(Task.WhenAny(tasks));
             }
 
             int size = 0;
-            MachineOperation callerOp = this.GetAsynchronousOperation(caller.Id.Value);
+            ActorOperation callerOp = this.GetAsynchronousOperation(caller.Id.Value);
             foreach (var task in tasks)
             {
                 size++;
@@ -934,25 +934,25 @@ namespace Microsoft.Coyote.TestingServices.Runtime
                 }
             }
 
-            return MachineTask.FromResult(result);
+            return ActorTask.FromResult(result);
         }
 
         /// <summary>
-        /// Schedules the specified work machine to be executed asynchronously.
+        /// Schedules the specified work actor to be executed asynchronously.
         /// This is a fire and forget invocation.
         /// </summary>
-        internal void DispatchWork(WorkMachine machine, Task parentTask)
+        internal void DispatchWork(WorkActor actor, Task parentTask)
         {
             // this.Scheduler.ScheduleNextOperation(AsyncOperationType.Create, AsyncOperationTarget.Task, ulong.MaxValue);
 
-            MachineOperation op = new MachineOperation(machine);
+            ActorOperation op = new ActorOperation(actor);
 
-            this.MachineOperations.GetOrAdd(machine.Id.Value, op);
-            this.MachineMap.TryAdd(machine.Id, machine);
-            this.CreatedMachineIds.Add(machine.Id);
+            this.ActorOperations.GetOrAdd(actor.Id.Value, op);
+            this.ActorMap.TryAdd(actor.Id, actor);
+            this.CreatedActorIds.Add(actor.Id);
 
             // TODO: change to custom log.
-            this.LogWriter.OnCreateMachine(machine.Id, null);
+            this.LogWriter.OnCreateActor(actor.Id, null);
 
             Task task = new Task(async () =>
             {
@@ -966,14 +966,14 @@ namespace Microsoft.Coyote.TestingServices.Runtime
                 {
                     OperationScheduler.NotifyOperationStarted(op);
 
-                    await machine.ExecuteAsync();
+                    await actor.ExecuteAsync();
 
-                    IO.Debug.WriteLine($"<ScheduleDebug> Completed '{machine.Id}' on task '{Task.CurrentId}'.");
+                    IO.Debug.WriteLine($"<ScheduleDebug> Completed '{actor.Id}' on task '{Task.CurrentId}'.");
                     op.OnCompleted();
 
-                    this.Scheduler.ScheduleNextOperation(AsyncOperationType.Stop, AsyncOperationTarget.Task, machine.Id.Value);
+                    this.Scheduler.ScheduleNextOperation(AsyncOperationType.Stop, AsyncOperationTarget.Task, actor.Id.Value);
 
-                    IO.Debug.WriteLine($"<ScheduleDebug> Terminated '{machine.Id}' on task '{Task.CurrentId}'.");
+                    IO.Debug.WriteLine($"<ScheduleDebug> Terminated '{actor.Id}' on task '{Task.CurrentId}'.");
                 }
                 catch (Exception ex)
                 {
@@ -990,17 +990,17 @@ namespace Microsoft.Coyote.TestingServices.Runtime
 
                     if (innerException is ExecutionCanceledException)
                     {
-                        IO.Debug.WriteLine($"<Exception> ExecutionCanceledException was thrown from machine '{machine.Id}'.");
+                        IO.Debug.WriteLine($"<Exception> ExecutionCanceledException was thrown from actor '{actor.Id}'.");
                     }
                     else if (innerException is TaskSchedulerException)
                     {
-                        IO.Debug.WriteLine($"<Exception> TaskSchedulerException was thrown from machine '{machine.Id}'.");
+                        IO.Debug.WriteLine($"<Exception> TaskSchedulerException was thrown from actor '{actor.Id}'.");
                     }
                     else
                     {
                         // Reports the unhandled exception.
                         string message = string.Format(CultureInfo.InvariantCulture,
-                            $"Exception '{ex.GetType()}' was thrown in machine {machine.Id}, " +
+                            $"Exception '{ex.GetType()}' was thrown in actor {actor.Id}, " +
                             $"'{ex.Source}':\n" +
                             $"   {ex.Message}\n" +
                             $"The stack trace is:\n{ex.StackTrace}");
@@ -1009,8 +1009,8 @@ namespace Microsoft.Coyote.TestingServices.Runtime
                 }
                 finally
                 {
-                    // TODO: properly cleanup machine tasks.
-                    this.MachineMap.TryRemove(machine.Id, out AsyncMachine _);
+                    // TODO: properly cleanup actor tasks.
+                    this.ActorMap.TryRemove(actor.Id, out AsyncActor _);
                 }
             });
 
@@ -1026,11 +1026,11 @@ namespace Microsoft.Coyote.TestingServices.Runtime
             // task.Start(this.TaskScheduler);
             this.Scheduler.WaitForOperationToStart(op);
 
-            this.Scheduler.ScheduleNextOperation(AsyncOperationType.Yield, AsyncOperationTarget.Task, machine.Id.Value);
+            this.Scheduler.ScheduleNextOperation(AsyncOperationType.Yield, AsyncOperationTarget.Task, actor.Id.Value);
         }
 
         /// <summary>
-        /// Waits until all machines have finished execution.
+        /// Waits until all actors have finished execution.
         /// </summary>
         internal async Task WaitAsync()
         {
@@ -1039,13 +1039,13 @@ namespace Microsoft.Coyote.TestingServices.Runtime
         }
 
         /// <summary>
-        /// Creates a new timer that sends a <see cref="TimerElapsedEvent"/> to its owner machine.
+        /// Creates a new timer that sends a <see cref="TimerElapsedEvent"/> to its owner actor.
         /// </summary>
-        internal override IMachineTimer CreateMachineTimer(TimerInfo info, Machine owner)
+        internal override IActorTimer CreateActorTimer(TimerInfo info, Actor owner)
         {
-            var mid = this.CreateMachineId(typeof(MockMachineTimer));
-            this.CreateMachine(mid, typeof(MockMachineTimer), new TimerSetupEvent(info, owner, this.Configuration.TimeoutDelay));
-            return this.GetMachineFromId<MockMachineTimer>(mid);
+            var mid = this.CreateActorId(typeof(MockActorTimer));
+            this.CreateActor(mid, typeof(MockActorTimer), new TimerSetupEvent(info, owner, this.Configuration.TimeoutDelay));
+            return this.GetActorFromId<MockActorTimer>(mid);
         }
 
         /// <summary>
@@ -1061,9 +1061,9 @@ namespace Microsoft.Coyote.TestingServices.Runtime
 
             this.Assert(type.IsSubclassOf(typeof(Monitor)), "Type '{0}' is not a subclass of Monitor.", type.FullName);
 
-            MachineId mid = new MachineId(type, null, this);
+            ActorId mid = new ActorId(type, null, this);
 
-            // MachineOperation op = this.MachineOperations.GetOrAdd(mid.Value, new MachineOperation(mid));
+            // ActorOperation op = this.ActorOperations.GetOrAdd(mid.Value, new ActorOperation(mid));
             // this.Scheduler.NotifyMonitorRegistered(op);
 
             Monitor monitor = Activator.CreateInstance(type) as Monitor;
@@ -1083,9 +1083,9 @@ namespace Microsoft.Coyote.TestingServices.Runtime
         /// <summary>
         /// Invokes the specified monitor with the given event.
         /// </summary>
-        internal override void Monitor(Type type, AsyncMachine sender, Event e)
+        internal override void Monitor(Type type, AsyncActor sender, Event e)
         {
-            this.AssertCorrectCallerMachine(sender as Machine, "Monitor");
+            this.AssertCorrectCallerActor(sender as Actor, "Monitor");
             foreach (var m in this.Monitors)
             {
                 if (m.GetType() == type)
@@ -1171,22 +1171,22 @@ namespace Microsoft.Coyote.TestingServices.Runtime
         /// Asserts that a transition statement (raise, goto or pop) has not
         /// already been called. Records that RGP has been called.
         /// </summary>
-        internal void AssertTransitionStatement(Machine machine)
+        internal void AssertTransitionStatement(Actor actor)
         {
-            var stateManager = machine.StateManager as SerializedMachineStateManager;
+            var stateManager = actor.StateManager as SerializedActorStateManager;
             this.Assert(!stateManager.IsInsideOnExit,
-                "Machine '{0}' has called raise, goto, push or pop inside an OnExit method.",
-                machine.Id.Name);
+                "Actor '{0}' has called raise, goto, push or pop inside an OnExit method.",
+                actor.Id.Name);
             this.Assert(!stateManager.IsTransitionStatementCalledInCurrentAction,
-                "Machine '{0}' has called multiple raise, goto, push or pop in the same action.",
-                machine.Id.Name);
+                "Actor '{0}' has called multiple raise, goto, push or pop in the same action.",
+                actor.Id.Name);
             stateManager.IsTransitionStatementCalledInCurrentAction = true;
         }
 
         /// <summary>
         /// Asserts that a transition statement (raise, goto or pop) has not already been called.
         /// </summary>
-        private void AssertNoPendingTransitionStatement(Machine machine, string action)
+        private void AssertNoPendingTransitionStatement(Actor actor, string action)
         {
             if (!this.Configuration.EnableNoApiCallAfterTransitionStmtAssertion)
             {
@@ -1194,31 +1194,31 @@ namespace Microsoft.Coyote.TestingServices.Runtime
                 return;
             }
 
-            var stateManager = machine.StateManager as SerializedMachineStateManager;
+            var stateManager = actor.StateManager as SerializedActorStateManager;
             this.Assert(!stateManager.IsTransitionStatementCalledInCurrentAction,
-                "Machine '{0}' cannot {1} after calling raise, goto, push or pop in the same action.",
-                machine.Id.Name, action);
+                "Actor '{0}' cannot {1} after calling raise, goto, push or pop in the same action.",
+                actor.Id.Name, action);
         }
 
         /// <summary>
-        /// Asserts that the machine calling a P# machine method is also
-        /// the machine that is currently executing.
+        /// Asserts that the actor calling a Coyote actor method is also
+        /// the actor that is currently executing.
         /// </summary>
-        private void AssertCorrectCallerMachine(Machine callerMachine, string calledAPI)
+        private void AssertCorrectCallerActor(Actor callerActor, string calledAPI)
         {
-            if (callerMachine is null)
+            if (callerActor is null)
             {
                 return;
             }
 
-            var executingMachine = this.GetExecutingMachine<Machine>();
-            if (executingMachine is null)
+            var executingActor = this.GetExecutingActor<Actor>();
+            if (executingActor is null)
             {
                 return;
             }
 
-            this.Assert(executingMachine.Equals(callerMachine), "Machine '{0}' invoked {1} on behalf of machine '{2}'.",
-                executingMachine.Id, calledAPI, callerMachine.Id);
+            this.Assert(executingActor.Equals(callerActor), "Actor '{0}' invoked {1} on behalf of actor '{2}'.",
+                executingActor.Id, calledAPI, callerActor.Id);
         }
 
         /// <summary>
@@ -1249,20 +1249,20 @@ namespace Microsoft.Coyote.TestingServices.Runtime
         /// Returns a nondeterministic boolean choice, that can be
         /// controlled during analysis or testing.
         /// </summary>
-        internal override bool GetNondeterministicBooleanChoice(AsyncMachine caller, int maxValue)
+        internal override bool GetNondeterministicBooleanChoice(AsyncActor caller, int maxValue)
         {
-            caller = caller ?? this.GetExecutingMachine<Machine>();
-            this.AssertCorrectCallerMachine(caller as Machine, "Random");
-            if (caller is Machine machine)
+            caller = caller ?? this.GetExecutingActor<Actor>();
+            this.AssertCorrectCallerActor(caller as Actor, "Random");
+            if (caller is Actor actor)
             {
-                this.AssertNoPendingTransitionStatement(caller as Machine, "invoke 'Random'");
-                (machine.StateManager as SerializedMachineStateManager).ProgramCounter++;
+                this.AssertNoPendingTransitionStatement(caller as Actor, "invoke 'Random'");
+                (actor.StateManager as SerializedActorStateManager).ProgramCounter++;
             }
 
             var choice = this.Scheduler.GetNextNondeterministicBooleanChoice(maxValue);
             this.LogWriter.OnRandom(caller?.Id, choice);
 
-            var stateName = caller is Machine ? (caller as Machine).CurrentStateName : string.Empty;
+            var stateName = caller is Actor ? (caller as Actor).CurrentStateName : string.Empty;
             this.BugTrace.AddRandomChoiceStep(caller?.Id, stateName, choice);
 
             return choice;
@@ -1272,20 +1272,20 @@ namespace Microsoft.Coyote.TestingServices.Runtime
         /// Returns a fair nondeterministic boolean choice, that can be
         /// controlled during analysis or testing.
         /// </summary>
-        internal override bool GetFairNondeterministicBooleanChoice(AsyncMachine caller, string uniqueId)
+        internal override bool GetFairNondeterministicBooleanChoice(AsyncActor caller, string uniqueId)
         {
-            caller = caller ?? this.GetExecutingMachine<Machine>();
-            this.AssertCorrectCallerMachine(caller as Machine, "FairRandom");
-            if (caller is Machine machine)
+            caller = caller ?? this.GetExecutingActor<Actor>();
+            this.AssertCorrectCallerActor(caller as Actor, "FairRandom");
+            if (caller is Actor actor)
             {
-                this.AssertNoPendingTransitionStatement(caller as Machine, "invoke 'FairRandom'");
-                (machine.StateManager as SerializedMachineStateManager).ProgramCounter++;
+                this.AssertNoPendingTransitionStatement(caller as Actor, "invoke 'FairRandom'");
+                (actor.StateManager as SerializedActorStateManager).ProgramCounter++;
             }
 
             var choice = this.Scheduler.GetNextNondeterministicBooleanChoice(2, uniqueId);
             this.LogWriter.OnRandom(caller?.Id, choice);
 
-            var stateName = caller is Machine ? (caller as Machine).CurrentStateName : string.Empty;
+            var stateName = caller is Actor ? (caller as Actor).CurrentStateName : string.Empty;
             this.BugTrace.AddRandomChoiceStep(caller?.Id, stateName, choice);
 
             return choice;
@@ -1295,33 +1295,33 @@ namespace Microsoft.Coyote.TestingServices.Runtime
         /// Returns a nondeterministic integer, that can be
         /// controlled during analysis or testing.
         /// </summary>
-        internal override int GetNondeterministicIntegerChoice(AsyncMachine caller, int maxValue)
+        internal override int GetNondeterministicIntegerChoice(AsyncActor caller, int maxValue)
         {
-            caller = caller ?? this.GetExecutingMachine<Machine>();
-            this.AssertCorrectCallerMachine(caller as Machine, "RandomInteger");
-            if (caller is Machine)
+            caller = caller ?? this.GetExecutingActor<Actor>();
+            this.AssertCorrectCallerActor(caller as Actor, "RandomInteger");
+            if (caller is Actor)
             {
-                this.AssertNoPendingTransitionStatement(caller as Machine, "invoke 'RandomInteger'");
+                this.AssertNoPendingTransitionStatement(caller as Actor, "invoke 'RandomInteger'");
             }
 
             var choice = this.Scheduler.GetNextNondeterministicIntegerChoice(maxValue);
             this.LogWriter.OnRandom(caller?.Id, choice);
 
-            var stateName = caller is Machine ? (caller as Machine).CurrentStateName : string.Empty;
+            var stateName = caller is Actor ? (caller as Actor).CurrentStateName : string.Empty;
             this.BugTrace.AddRandomChoiceStep(caller?.Id, stateName, choice);
 
             return choice;
         }
 
         /// <summary>
-        /// Notifies that a machine entered a state.
+        /// Notifies that an actor entered a state.
         /// </summary>
-        internal override void NotifyEnteredState(Machine machine)
+        internal override void NotifyEnteredState(Actor actor)
         {
-            string machineState = machine.CurrentStateName;
-            this.BugTrace.AddGotoStateStep(machine.Id, machineState);
+            string actorState = actor.CurrentStateName;
+            this.BugTrace.AddGotoStateStep(actor.Id, actorState);
 
-            this.LogWriter.OnMachineState(machine.Id, machineState, isEntry: true);
+            this.LogWriter.OnActorState(actor.Id, actorState, isEntry: true);
         }
 
         /// <summary>
@@ -1336,11 +1336,11 @@ namespace Microsoft.Coyote.TestingServices.Runtime
         }
 
         /// <summary>
-        /// Notifies that a machine exited a state.
+        /// Notifies that an actor exited a state.
         /// </summary>
-        internal override void NotifyExitedState(Machine machine)
+        internal override void NotifyExitedState(Actor actor)
         {
-            this.LogWriter.OnMachineState(machine.Id, machine.CurrentStateName, isEntry: false);
+            this.LogWriter.OnActorState(actor.Id, actor.CurrentStateName, isEntry: false);
         }
 
         /// <summary>
@@ -1353,106 +1353,106 @@ namespace Microsoft.Coyote.TestingServices.Runtime
         }
 
         /// <summary>
-        /// Notifies that a machine invoked an action.
+        /// Notifies that an actor invoked an action.
         /// </summary>
-        internal override void NotifyInvokedAction(Machine machine, MethodInfo action, Event receivedEvent)
+        internal override void NotifyInvokedAction(Actor actor, MethodInfo action, Event receivedEvent)
         {
-            (machine.StateManager as SerializedMachineStateManager).IsTransitionStatementCalledInCurrentAction = false;
-            if (action.ReturnType == typeof(MachineTask))
+            (actor.StateManager as SerializedActorStateManager).IsTransitionStatementCalledInCurrentAction = false;
+            if (action.ReturnType == typeof(ActorTask))
             {
-                (machine.StateManager as SerializedMachineStateManager).IsInsideMachineTaskHandler = true;
+                (actor.StateManager as SerializedActorStateManager).IsInsideActorTaskHandler = true;
             }
 
-            string machineState = machine.CurrentStateName;
-            this.BugTrace.AddInvokeActionStep(machine.Id, machineState, action);
+            string actorState = actor.CurrentStateName;
+            this.BugTrace.AddInvokeActionStep(actor.Id, actorState, action);
 
-            this.LogWriter.OnMachineAction(machine.Id, machineState, action.Name);
+            this.LogWriter.OnActorAction(actor.Id, actorState, action.Name);
             if (this.Configuration.EnableDataRaceDetection)
             {
-                this.Reporter.InAction[machine.Id.Value] = true;
+                this.Reporter.InAction[actor.Id.Value] = true;
             }
         }
 
         /// <summary>
-        /// Notifies that a machine completed an action.
+        /// Notifies that an actor completed an action.
         /// </summary>
-        internal override void NotifyCompletedAction(Machine machine, MethodInfo action, Event receivedEvent)
+        internal override void NotifyCompletedAction(Actor actor, MethodInfo action, Event receivedEvent)
         {
-            (machine.StateManager as SerializedMachineStateManager).IsTransitionStatementCalledInCurrentAction = false;
-            (machine.StateManager as SerializedMachineStateManager).IsInsideMachineTaskHandler = false;
+            (actor.StateManager as SerializedActorStateManager).IsTransitionStatementCalledInCurrentAction = false;
+            (actor.StateManager as SerializedActorStateManager).IsInsideActorTaskHandler = false;
             if (this.Configuration.EnableDataRaceDetection)
             {
-                this.Reporter.InAction[machine.Id.Value] = false;
+                this.Reporter.InAction[actor.Id.Value] = false;
             }
         }
 
         /// <summary>
-        /// Notifies that a machine invoked an action.
+        /// Notifies that an actor invoked an action.
         /// </summary>
-        internal override void NotifyInvokedOnEntryAction(Machine machine, MethodInfo action, Event receivedEvent)
+        internal override void NotifyInvokedOnEntryAction(Actor actor, MethodInfo action, Event receivedEvent)
         {
-            (machine.StateManager as SerializedMachineStateManager).IsTransitionStatementCalledInCurrentAction = false;
-            if (action.ReturnType == typeof(MachineTask))
+            (actor.StateManager as SerializedActorStateManager).IsTransitionStatementCalledInCurrentAction = false;
+            if (action.ReturnType == typeof(ActorTask))
             {
-                (machine.StateManager as SerializedMachineStateManager).IsInsideMachineTaskHandler = true;
+                (actor.StateManager as SerializedActorStateManager).IsInsideActorTaskHandler = true;
             }
 
-            string machineState = machine.CurrentStateName;
-            this.BugTrace.AddInvokeActionStep(machine.Id, machineState, action);
+            string actorState = actor.CurrentStateName;
+            this.BugTrace.AddInvokeActionStep(actor.Id, actorState, action);
 
-            this.LogWriter.OnMachineAction(machine.Id, machineState, action.Name);
+            this.LogWriter.OnActorAction(actor.Id, actorState, action.Name);
             if (this.Configuration.EnableDataRaceDetection)
             {
-                this.Reporter.InAction[machine.Id.Value] = true;
+                this.Reporter.InAction[actor.Id.Value] = true;
             }
         }
 
         /// <summary>
-        /// Notifies that a machine completed invoking an action.
+        /// Notifies that an actor completed invoking an action.
         /// </summary>
-        internal override void NotifyCompletedOnEntryAction(Machine machine, MethodInfo action, Event receivedEvent)
+        internal override void NotifyCompletedOnEntryAction(Actor actor, MethodInfo action, Event receivedEvent)
         {
-            (machine.StateManager as SerializedMachineStateManager).IsTransitionStatementCalledInCurrentAction = false;
-            (machine.StateManager as SerializedMachineStateManager).IsInsideMachineTaskHandler = false;
+            (actor.StateManager as SerializedActorStateManager).IsTransitionStatementCalledInCurrentAction = false;
+            (actor.StateManager as SerializedActorStateManager).IsInsideActorTaskHandler = false;
             if (this.Configuration.EnableDataRaceDetection)
             {
-                this.Reporter.InAction[machine.Id.Value] = false;
+                this.Reporter.InAction[actor.Id.Value] = false;
             }
         }
 
         /// <summary>
-        /// Notifies that a machine invoked an action.
+        /// Notifies that an actor invoked an action.
         /// </summary>
-        internal override void NotifyInvokedOnExitAction(Machine machine, MethodInfo action, Event receivedEvent)
+        internal override void NotifyInvokedOnExitAction(Actor actor, MethodInfo action, Event receivedEvent)
         {
-            (machine.StateManager as SerializedMachineStateManager).IsInsideOnExit = true;
-            (machine.StateManager as SerializedMachineStateManager).IsTransitionStatementCalledInCurrentAction = false;
-            if (action.ReturnType == typeof(MachineTask))
+            (actor.StateManager as SerializedActorStateManager).IsInsideOnExit = true;
+            (actor.StateManager as SerializedActorStateManager).IsTransitionStatementCalledInCurrentAction = false;
+            if (action.ReturnType == typeof(ActorTask))
             {
-                (machine.StateManager as SerializedMachineStateManager).IsInsideMachineTaskHandler = true;
+                (actor.StateManager as SerializedActorStateManager).IsInsideActorTaskHandler = true;
             }
 
-            string machineState = machine.CurrentStateName;
-            this.BugTrace.AddInvokeActionStep(machine.Id, machineState, action);
+            string actorState = actor.CurrentStateName;
+            this.BugTrace.AddInvokeActionStep(actor.Id, actorState, action);
 
-            this.LogWriter.OnMachineAction(machine.Id, machineState, action.Name);
+            this.LogWriter.OnActorAction(actor.Id, actorState, action.Name);
             if (this.Configuration.EnableDataRaceDetection)
             {
-                this.Reporter.InAction[machine.Id.Value] = true;
+                this.Reporter.InAction[actor.Id.Value] = true;
             }
         }
 
         /// <summary>
-        /// Notifies that a machine completed invoking an action.
+        /// Notifies that an actor completed invoking an action.
         /// </summary>
-        internal override void NotifyCompletedOnExitAction(Machine machine, MethodInfo action, Event receivedEvent)
+        internal override void NotifyCompletedOnExitAction(Actor actor, MethodInfo action, Event receivedEvent)
         {
-            (machine.StateManager as SerializedMachineStateManager).IsInsideOnExit = false;
-            (machine.StateManager as SerializedMachineStateManager).IsTransitionStatementCalledInCurrentAction = false;
-            (machine.StateManager as SerializedMachineStateManager).IsInsideMachineTaskHandler = false;
+            (actor.StateManager as SerializedActorStateManager).IsInsideOnExit = false;
+            (actor.StateManager as SerializedActorStateManager).IsTransitionStatementCalledInCurrentAction = false;
+            (actor.StateManager as SerializedActorStateManager).IsInsideActorTaskHandler = false;
             if (this.Configuration.EnableDataRaceDetection)
             {
-                this.Reporter.InAction[machine.Id.Value] = false;
+                this.Reporter.InAction[actor.Id.Value] = false;
             }
         }
 
@@ -1468,16 +1468,16 @@ namespace Microsoft.Coyote.TestingServices.Runtime
         }
 
         /// <summary>
-        /// Notifies that a machine raised an <see cref="Event"/>.
+        /// Notifies that an actor raised an <see cref="Event"/>.
         /// </summary>
-        internal override void NotifyRaisedEvent(Machine machine, Event e, EventInfo eventInfo)
+        internal override void NotifyRaisedEvent(Actor actor, Event e, EventInfo eventInfo)
         {
-            this.AssertTransitionStatement(machine);
+            this.AssertTransitionStatement(actor);
 
-            string machineState = machine.CurrentStateName;
-            this.BugTrace.AddRaiseEventStep(machine.Id, machineState, eventInfo);
+            string actorState = actor.CurrentStateName;
+            this.BugTrace.AddRaiseEventStep(actor.Id, actorState, eventInfo);
 
-            this.LogWriter.OnMachineEvent(machine.Id, machineState, eventInfo.EventName);
+            this.LogWriter.OnActorEvent(actor.Id, actorState, eventInfo.EventName);
         }
 
         /// <summary>
@@ -1493,11 +1493,11 @@ namespace Microsoft.Coyote.TestingServices.Runtime
         }
 
         /// <summary>
-        /// Notifies that a machine dequeued an <see cref="Event"/>.
+        /// Notifies that an actor dequeued an <see cref="Event"/>.
         /// </summary>
-        internal override void NotifyDequeuedEvent(Machine machine, Event e, EventInfo eventInfo)
+        internal override void NotifyDequeuedEvent(Actor actor, Event e, EventInfo eventInfo)
         {
-            MachineOperation op = this.GetAsynchronousOperation(machine.Id.Value);
+            ActorOperation op = this.GetAsynchronousOperation(actor.Id.Value);
 
             // Skip `Receive` if the last operation exited the previous event handler,
             // to avoid scheduling duplicate `Receive` operations.
@@ -1508,69 +1508,69 @@ namespace Microsoft.Coyote.TestingServices.Runtime
             else
             {
                 op.MatchingSendIndex = (ulong)eventInfo.SendStep;
-                this.Scheduler.ScheduleNextOperation(AsyncOperationType.Receive, AsyncOperationTarget.Inbox, machine.Id.Value);
-                ResetProgramCounter(machine);
+                this.Scheduler.ScheduleNextOperation(AsyncOperationType.Receive, AsyncOperationTarget.Inbox, actor.Id.Value);
+                ResetProgramCounter(actor);
             }
 
-            this.LogWriter.OnDequeue(machine.Id, machine.CurrentStateName, eventInfo.EventName);
+            this.LogWriter.OnDequeue(actor.Id, actor.CurrentStateName, eventInfo.EventName);
 
             if (this.Configuration.EnableDataRaceDetection)
             {
-                this.Reporter.RegisterDequeue(eventInfo.OriginInfo?.SenderMachineId, machine.Id, e, (ulong)eventInfo.SendStep);
+                this.Reporter.RegisterDequeue(eventInfo.OriginInfo?.SenderActorId, actor.Id, e, (ulong)eventInfo.SendStep);
             }
 
-            this.BugTrace.AddDequeueEventStep(machine.Id, machine.CurrentStateName, eventInfo);
+            this.BugTrace.AddDequeueEventStep(actor.Id, actor.CurrentStateName, eventInfo);
 
             if (this.Configuration.ReportActivityCoverage)
             {
-                this.ReportActivityCoverageOfReceivedEvent(machine, eventInfo);
-                this.ReportActivityCoverageOfStateTransition(machine, e);
+                this.ReportActivityCoverageOfReceivedEvent(actor, eventInfo);
+                this.ReportActivityCoverageOfStateTransition(actor, e);
             }
         }
 
         /// <summary>
-        /// Notifies that a machine invoked pop.
+        /// Notifies that an actor invoked pop.
         /// </summary>
-        internal override void NotifyPop(Machine machine)
+        internal override void NotifyPop(Actor actor)
         {
-            this.AssertCorrectCallerMachine(machine, "Pop");
-            this.AssertTransitionStatement(machine);
+            this.AssertCorrectCallerActor(actor, "Pop");
+            this.AssertTransitionStatement(actor);
 
-            this.LogWriter.OnPop(machine.Id, string.Empty, machine.CurrentStateName);
+            this.LogWriter.OnPop(actor.Id, string.Empty, actor.CurrentStateName);
 
             if (this.Configuration.ReportActivityCoverage)
             {
-                this.ReportActivityCoverageOfPopTransition(machine, machine.CurrentState, machine.GetStateTypeAtStackIndex(1));
+                this.ReportActivityCoverageOfPopTransition(actor, actor.CurrentState, actor.GetStateTypeAtStackIndex(1));
             }
         }
 
         /// <summary>
-        /// Notifies that a machine called Receive.
+        /// Notifies that an actor called Receive.
         /// </summary>
-        internal override void NotifyReceiveCalled(Machine machine)
+        internal override void NotifyReceiveCalled(Actor actor)
         {
-            this.AssertCorrectCallerMachine(machine, "Receive");
-            this.AssertNoPendingTransitionStatement(machine, "invoke 'Receive'");
+            this.AssertCorrectCallerActor(actor, "Receive");
+            this.AssertNoPendingTransitionStatement(actor, "invoke 'Receive'");
         }
 
         /// <summary>
-        /// Notifies that a machine is handling a raised event.
+        /// Notifies that an actor is handling a raised event.
         /// </summary>
-        internal override void NotifyHandleRaisedEvent(Machine machine, Event e)
+        internal override void NotifyHandleRaisedEvent(Actor actor, Event e)
         {
             if (this.Configuration.ReportActivityCoverage)
             {
-                this.ReportActivityCoverageOfStateTransition(machine, e);
+                this.ReportActivityCoverageOfStateTransition(actor, e);
             }
         }
 
         /// <summary>
-        /// Notifies that a machine is waiting for the specified task to complete.
+        /// Notifies that an actor is waiting for the specified task to complete.
         /// </summary>
-        internal override void NotifyWaitTask(AsyncMachine machine, Task task)
+        internal override void NotifyWaitTask(AsyncActor actor, Task task)
         {
             this.Assert(task != null, "Cannot wait for a null task to complete.");
-            MachineOperation callerOp = this.GetAsynchronousOperation(machine.Id.Value);
+            ActorOperation callerOp = this.GetAsynchronousOperation(actor.Id.Value);
             if (callerOp == null)
             {
                 return;
@@ -1584,28 +1584,28 @@ namespace Microsoft.Coyote.TestingServices.Runtime
             if (callerOp.Status == AsyncOperationStatus.BlockedOnWaitAll)
             {
                 // Only schedule if the task is not already completed.
-                this.Scheduler.ScheduleNextOperation(AsyncOperationType.Join, AsyncOperationTarget.Task, machine.Id.Value);
+                this.Scheduler.ScheduleNextOperation(AsyncOperationType.Join, AsyncOperationTarget.Task, actor.Id.Value);
             }
         }
 
         /// <summary>
-        /// Notifies that a machine is waiting to receive an event of one of the specified types.
+        /// Notifies that an actor is waiting to receive an event of one of the specified types.
         /// </summary>
-        internal override void NotifyWaitEvent(Machine machine, IEnumerable<Type> eventTypes)
+        internal override void NotifyWaitEvent(Actor actor, IEnumerable<Type> eventTypes)
         {
-            MachineOperation op = this.GetAsynchronousOperation(machine.Id.Value);
+            ActorOperation op = this.GetAsynchronousOperation(actor.Id.Value);
             op.OnWaitEvent(eventTypes);
 
             string eventNames;
             var eventWaitTypesArray = eventTypes.ToArray();
             if (eventWaitTypesArray.Length == 1)
             {
-                this.LogWriter.OnWait(machine.Id, machine.CurrentStateName, eventWaitTypesArray[0]);
+                this.LogWriter.OnWait(actor.Id, actor.CurrentStateName, eventWaitTypesArray[0]);
                 eventNames = eventWaitTypesArray[0].FullName;
             }
             else
             {
-                this.LogWriter.OnWait(machine.Id, machine.CurrentStateName, eventWaitTypesArray);
+                this.LogWriter.OnWait(actor.Id, actor.CurrentStateName, eventWaitTypesArray);
                 if (eventWaitTypesArray.Length > 0)
                 {
                     string[] eventNameArray = new string[eventWaitTypesArray.Length - 1];
@@ -1622,139 +1622,139 @@ namespace Microsoft.Coyote.TestingServices.Runtime
                 }
             }
 
-            this.BugTrace.AddWaitToReceiveStep(machine.Id, machine.CurrentStateName, eventNames);
-            this.Scheduler.ScheduleNextOperation(AsyncOperationType.Receive, AsyncOperationTarget.Inbox, machine.Id.Value);
-            ResetProgramCounter(machine);
+            this.BugTrace.AddWaitToReceiveStep(actor.Id, actor.CurrentStateName, eventNames);
+            this.Scheduler.ScheduleNextOperation(AsyncOperationType.Receive, AsyncOperationTarget.Inbox, actor.Id.Value);
+            ResetProgramCounter(actor);
         }
 
         /// <summary>
-        /// Notifies that a machine enqueued an event that it was waiting to receive.
+        /// Notifies that an actor enqueued an event that it was waiting to receive.
         /// </summary>
-        internal override void NotifyReceivedEvent(Machine machine, Event e, EventInfo eventInfo)
+        internal override void NotifyReceivedEvent(Actor actor, Event e, EventInfo eventInfo)
         {
-            this.LogWriter.OnReceive(machine.Id, machine.CurrentStateName, e.GetType().FullName, wasBlocked: true);
-            this.BugTrace.AddReceivedEventStep(machine.Id, machine.CurrentStateName, eventInfo);
+            this.LogWriter.OnReceive(actor.Id, actor.CurrentStateName, e.GetType().FullName, wasBlocked: true);
+            this.BugTrace.AddReceivedEventStep(actor.Id, actor.CurrentStateName, eventInfo);
 
-            // A subsequent enqueue unblocked the receive action of machine.
+            // A subsequent enqueue unblocked the receive action of actor.
             if (this.Configuration.EnableDataRaceDetection)
             {
-                this.Reporter.RegisterDequeue(eventInfo.OriginInfo?.SenderMachineId, machine.Id, e, (ulong)eventInfo.SendStep);
+                this.Reporter.RegisterDequeue(eventInfo.OriginInfo?.SenderActorId, actor.Id, e, (ulong)eventInfo.SendStep);
             }
 
-            MachineOperation op = this.GetAsynchronousOperation(machine.Id.Value);
+            ActorOperation op = this.GetAsynchronousOperation(actor.Id.Value);
             op.OnReceivedEvent((ulong)eventInfo.SendStep);
 
             if (this.Configuration.ReportActivityCoverage)
             {
-                this.ReportActivityCoverageOfReceivedEvent(machine, eventInfo);
+                this.ReportActivityCoverageOfReceivedEvent(actor, eventInfo);
             }
         }
 
         /// <summary>
-        /// Notifies that a machine received an event without waiting because the event
-        /// was already in the inbox when the machine invoked the receive statement.
+        /// Notifies that an actor received an event without waiting because the event
+        /// was already in the inbox when the actor invoked the receive statement.
         /// </summary>
-        internal override void NotifyReceivedEventWithoutWaiting(Machine machine, Event e, EventInfo eventInfo)
+        internal override void NotifyReceivedEventWithoutWaiting(Actor actor, Event e, EventInfo eventInfo)
         {
-            this.LogWriter.OnReceive(machine.Id, machine.CurrentStateName, e.GetType().FullName, wasBlocked: false);
+            this.LogWriter.OnReceive(actor.Id, actor.CurrentStateName, e.GetType().FullName, wasBlocked: false);
 
-            MachineOperation op = this.GetAsynchronousOperation(machine.Id.Value);
+            ActorOperation op = this.GetAsynchronousOperation(actor.Id.Value);
             op.MatchingSendIndex = (ulong)eventInfo.SendStep;
 
             if (this.Configuration.EnableDataRaceDetection)
             {
-                this.Reporter.RegisterDequeue(eventInfo.OriginInfo?.SenderMachineId, machine.Id, e, (ulong)eventInfo.SendStep);
+                this.Reporter.RegisterDequeue(eventInfo.OriginInfo?.SenderActorId, actor.Id, e, (ulong)eventInfo.SendStep);
             }
 
-            this.Scheduler.ScheduleNextOperation(AsyncOperationType.Receive, AsyncOperationTarget.Inbox, machine.Id.Value);
-            ResetProgramCounter(machine);
+            this.Scheduler.ScheduleNextOperation(AsyncOperationType.Receive, AsyncOperationTarget.Inbox, actor.Id.Value);
+            ResetProgramCounter(actor);
         }
 
         /// <summary>
-        /// Notifies that a machine has halted.
+        /// Notifies that an actor has halted.
         /// </summary>
-        internal override void NotifyHalted(Machine machine)
+        internal override void NotifyHalted(Actor actor)
         {
-            this.BugTrace.AddHaltStep(machine.Id, null);
+            this.BugTrace.AddHaltStep(actor.Id, null);
         }
 
         /// <summary>
-        /// Notifies that the inbox of the specified machine is about to be
+        /// Notifies that the inbox of the specified actor is about to be
         /// checked to see if the default event handler should fire.
         /// </summary>
-        internal override void NotifyDefaultEventHandlerCheck(Machine machine)
+        internal override void NotifyDefaultEventHandlerCheck(Actor actor)
         {
-            this.Scheduler.ScheduleNextOperation(AsyncOperationType.Send, AsyncOperationTarget.Inbox, machine.Id.Value);
+            this.Scheduler.ScheduleNextOperation(AsyncOperationType.Send, AsyncOperationTarget.Inbox, actor.Id.Value);
 
             // If the default event handler fires, the next receive in NotifyDefaultHandlerFired
             // will use this as its MatchingSendIndex.
             // If it does not fire, MatchingSendIndex will be overwritten.
-            this.GetAsynchronousOperation(machine.Id.Value).MatchingSendIndex = (ulong)this.Scheduler.ScheduledSteps;
+            this.GetAsynchronousOperation(actor.Id.Value).MatchingSendIndex = (ulong)this.Scheduler.ScheduledSteps;
         }
 
         /// <summary>
-        /// Notifies that the default handler of the specified machine has been fired.
+        /// Notifies that the default handler of the specified actor has been fired.
         /// </summary>
-        internal override void NotifyDefaultHandlerFired(Machine machine)
+        internal override void NotifyDefaultHandlerFired(Actor actor)
         {
             // MatchingSendIndex is set in NotifyDefaultEventHandlerCheck.
-            this.Scheduler.ScheduleNextOperation(AsyncOperationType.Receive, AsyncOperationTarget.Inbox, machine.Id.Value);
-            ResetProgramCounter(machine);
+            this.Scheduler.ScheduleNextOperation(AsyncOperationType.Receive, AsyncOperationTarget.Inbox, actor.Id.Value);
+            ResetProgramCounter(actor);
         }
 
         /// <summary>
         /// Reports coverage for the specified received event.
         /// </summary>
-        private void ReportActivityCoverageOfReceivedEvent(Machine machine, EventInfo eventInfo)
+        private void ReportActivityCoverageOfReceivedEvent(Actor actor, EventInfo eventInfo)
         {
-            string originMachine = eventInfo.OriginInfo.SenderMachineName;
+            string originActor = eventInfo.OriginInfo.SenderActorName;
             string originState = eventInfo.OriginInfo.SenderStateName;
             string edgeLabel = eventInfo.EventName;
-            string destMachine = machine.GetType().FullName;
-            string destState = NameResolver.GetStateNameForLogging(machine.CurrentState);
+            string destActor = actor.GetType().FullName;
+            string destState = NameResolver.GetStateNameForLogging(actor.CurrentState);
 
-            this.CoverageInfo.AddTransition(originMachine, originState, edgeLabel, destMachine, destState);
+            this.CoverageInfo.AddTransition(originActor, originState, edgeLabel, destActor, destState);
         }
 
         /// <summary>
         /// Reports coverage for the specified monitor event.
         /// </summary>
-        private void ReportActivityCoverageOfMonitorEvent(AsyncMachine sender, Monitor monitor, Event e)
+        private void ReportActivityCoverageOfMonitorEvent(AsyncActor sender, Monitor monitor, Event e)
         {
-            string originMachine = sender is null ? "Env" : sender.GetType().FullName;
+            string originActor = sender is null ? "Env" : sender.GetType().FullName;
             string originState = sender is null ? "Env" :
-                (sender is Machine) ? NameResolver.GetStateNameForLogging((sender as Machine).CurrentState) : "Env";
+                (sender is Actor) ? NameResolver.GetStateNameForLogging((sender as Actor).CurrentState) : "Env";
 
             string edgeLabel = e.GetType().FullName;
-            string destMachine = monitor.GetType().FullName;
+            string destActor = monitor.GetType().FullName;
             string destState = NameResolver.GetStateNameForLogging(monitor.CurrentState);
 
-            this.CoverageInfo.AddTransition(originMachine, originState, edgeLabel, destMachine, destState);
+            this.CoverageInfo.AddTransition(originActor, originState, edgeLabel, destActor, destState);
         }
 
         /// <summary>
-        /// Reports coverage for the specified machine.
+        /// Reports coverage for the specified actor.
         /// </summary>
-        private void ReportActivityCoverageOfMachine(Machine machine)
+        private void ReportActivityCoverageOfActor(Actor actor)
         {
-            var machineName = machine.GetType().FullName;
-            if (this.CoverageInfo.IsMachineDeclared(machineName))
+            var actorName = actor.GetType().FullName;
+            if (this.CoverageInfo.IsActorDeclared(actorName))
             {
                 return;
             }
 
             // Fetch states.
-            var states = machine.GetAllStates();
+            var states = actor.GetAllStates();
             foreach (var state in states)
             {
-                this.CoverageInfo.DeclareMachineState(machineName, state);
+                this.CoverageInfo.DeclareActorState(actorName, state);
             }
 
             // Fetch registered events.
-            var pairs = machine.GetAllStateEventPairs();
+            var pairs = actor.GetAllStateEventPairs();
             foreach (var tup in pairs)
             {
-                this.CoverageInfo.DeclareStateEvent(machineName, tup.Item1, tup.Item2);
+                this.CoverageInfo.DeclareStateEvent(actorName, tup.Item1, tup.Item2);
             }
         }
 
@@ -1770,7 +1770,7 @@ namespace Microsoft.Coyote.TestingServices.Runtime
 
             foreach (var state in states)
             {
-                this.CoverageInfo.DeclareMachineState(monitorName, state);
+                this.CoverageInfo.DeclareActorState(monitorName, state);
             }
 
             // Fetch registered events.
@@ -1785,11 +1785,11 @@ namespace Microsoft.Coyote.TestingServices.Runtime
         /// <summary>
         /// Reports coverage for the specified state transition.
         /// </summary>
-        private void ReportActivityCoverageOfStateTransition(Machine machine, Event e)
+        private void ReportActivityCoverageOfStateTransition(Actor actor, Event e)
         {
-            string originMachine = machine.GetType().FullName;
-            string originState = NameResolver.GetStateNameForLogging(machine.CurrentState);
-            string destMachine = machine.GetType().FullName;
+            string originActor = actor.GetType().FullName;
+            string originState = NameResolver.GetStateNameForLogging(actor.CurrentState);
+            string destActor = actor.GetType().FullName;
 
             string edgeLabel;
             string destState;
@@ -1803,38 +1803,38 @@ namespace Microsoft.Coyote.TestingServices.Runtime
                 edgeLabel = "push";
                 destState = NameResolver.GetStateNameForLogging(pushStateEvent.State);
             }
-            else if (machine.GotoTransitions.ContainsKey(e.GetType()))
+            else if (actor.GotoTransitions.ContainsKey(e.GetType()))
             {
                 edgeLabel = e.GetType().FullName;
                 destState = NameResolver.GetStateNameForLogging(
-                    machine.GotoTransitions[e.GetType()].TargetState);
+                    actor.GotoTransitions[e.GetType()].TargetState);
             }
-            else if (machine.PushTransitions.ContainsKey(e.GetType()))
+            else if (actor.PushTransitions.ContainsKey(e.GetType()))
             {
                 edgeLabel = e.GetType().FullName;
                 destState = NameResolver.GetStateNameForLogging(
-                    machine.PushTransitions[e.GetType()].TargetState);
+                    actor.PushTransitions[e.GetType()].TargetState);
             }
             else
             {
                 return;
             }
 
-            this.CoverageInfo.AddTransition(originMachine, originState, edgeLabel, destMachine, destState);
+            this.CoverageInfo.AddTransition(originActor, originState, edgeLabel, destActor, destState);
         }
 
         /// <summary>
         /// Reports coverage for a pop transition.
         /// </summary>
-        private void ReportActivityCoverageOfPopTransition(Machine machine, Type fromState, Type toState)
+        private void ReportActivityCoverageOfPopTransition(Actor actor, Type fromState, Type toState)
         {
-            string originMachine = machine.GetType().FullName;
+            string originActor = actor.GetType().FullName;
             string originState = NameResolver.GetStateNameForLogging(fromState);
-            string destMachine = machine.GetType().FullName;
+            string destActor = actor.GetType().FullName;
             string edgeLabel = "pop";
             string destState = NameResolver.GetStateNameForLogging(toState);
 
-            this.CoverageInfo.AddTransition(originMachine, originState, edgeLabel, destMachine, destState);
+            this.CoverageInfo.AddTransition(originActor, originState, edgeLabel, destActor, destState);
         }
 
         /// <summary>
@@ -1842,9 +1842,9 @@ namespace Microsoft.Coyote.TestingServices.Runtime
         /// </summary>
         private void ReportActivityCoverageOfMonitorTransition(Monitor monitor, Event e)
         {
-            string originMachine = monitor.GetType().FullName;
+            string originActor = monitor.GetType().FullName;
             string originState = NameResolver.GetStateNameForLogging(monitor.CurrentState);
-            string destMachine = originMachine;
+            string destActor = originActor;
 
             string edgeLabel;
             string destState;
@@ -1864,53 +1864,53 @@ namespace Microsoft.Coyote.TestingServices.Runtime
                 return;
             }
 
-            this.CoverageInfo.AddTransition(originMachine, originState, edgeLabel, destMachine, destState);
+            this.CoverageInfo.AddTransition(originActor, originState, edgeLabel, destActor, destState);
         }
 
         /// <summary>
-        /// Resets the program counter of the specified machine.
+        /// Resets the program counter of the specified actor.
         /// </summary>
-        private static void ResetProgramCounter(Machine machine)
+        private static void ResetProgramCounter(Actor actor)
         {
-            if (machine != null)
+            if (actor != null)
             {
-                (machine.StateManager as SerializedMachineStateManager).ProgramCounter = 0;
+                (actor.StateManager as SerializedActorStateManager).ProgramCounter = 0;
             }
         }
 
         /// <summary>
-        /// Gets the currently executing machine of type <typeparamref name="TMachine"/>,
-        /// or null if no such machine is currently executing.
+        /// Gets the currently executing actor of type <typeparamref name="TActor"/>,
+        /// or null if no such actor is currently executing.
         /// </summary>
-        internal TMachine GetExecutingMachine<TMachine>()
-            where TMachine : AsyncMachine
+        internal TActor GetExecutingActor<TActor>()
+            where TActor : AsyncActor
         {
             if (Task.CurrentId.HasValue &&
-                this.Scheduler.ControlledTaskMap.TryGetValue(Task.CurrentId.Value, out MachineOperation op) &&
-                op?.Machine is TMachine machine)
+                this.Scheduler.ControlledTaskMap.TryGetValue(Task.CurrentId.Value, out ActorOperation op) &&
+                op?.Actor is TActor actor)
             {
-                return machine;
+                return actor;
             }
 
             return null;
         }
 
         /// <summary>
-        /// Gets the id of the currently executing machine.
+        /// Gets the id of the currently executing actor.
         /// </summary>
-        internal MachineId GetCurrentMachineId() => this.GetExecutingMachine<AsyncMachine>()?.Id;
+        internal ActorId GetCurrentActorId() => this.GetExecutingActor<AsyncActor>()?.Id;
 
         /// <summary>
         /// Gets the asynchronous operation associated with the specified id.
         /// </summary>
-        internal MachineOperation GetAsynchronousOperation(ulong id)
+        internal ActorOperation GetAsynchronousOperation(ulong id)
         {
             if (!this.IsRunning)
             {
                 throw new ExecutionCanceledException();
             }
 
-            this.MachineOperations.TryGetValue(id, out MachineOperation op);
+            this.ActorOperations.TryGetValue(id, out ActorOperation op);
             return op;
         }
 
@@ -1927,12 +1927,12 @@ namespace Microsoft.Coyote.TestingServices.Runtime
                 if (abstractionLevel is AbstractionLevel.Default ||
                     abstractionLevel is AbstractionLevel.Full)
                 {
-                    foreach (var machine in this.MachineMap.Values)
+                    foreach (var actor in this.ActorMap.Values)
                     {
-                        int machineHash = 37;
-                        machineHash = (machineHash * 397) + machine.GetHashedState(abstractionLevel);
-                        machineHash = (machineHash * 397) + this.GetAsynchronousOperation(machine.Id.Value).Type.GetHashCode();
-                        hash *= machineHash;
+                        int actorHash = 37;
+                        actorHash = (actorHash * 397) + actor.GetHashedState(abstractionLevel);
+                        actorHash = (actorHash * 397) + this.GetAsynchronousOperation(actor.Id.Value).Type.GetHashCode();
+                        hash *= actorHash;
                     }
 
                     foreach (var monitor in this.Monitors)
@@ -1943,11 +1943,11 @@ namespace Microsoft.Coyote.TestingServices.Runtime
                 else if (abstractionLevel is AbstractionLevel.InboxOnly ||
                     abstractionLevel is AbstractionLevel.Custom)
                 {
-                    foreach (var machine in this.MachineMap.Values)
+                    foreach (var actor in this.ActorMap.Values)
                     {
-                        int machineHash = 37;
-                        machineHash = (machineHash * 397) + machine.GetHashedState(abstractionLevel);
-                        hash *= machineHash;
+                        int actorHash = 37;
+                        actorHash = (actorHash * 397) + actor.GetHashedState(abstractionLevel);
+                        hash *= actorHash;
                     }
 
                     foreach (var monitor in this.Monitors)
@@ -1978,8 +1978,8 @@ namespace Microsoft.Coyote.TestingServices.Runtime
             if (disposing)
             {
                 this.Monitors.Clear();
-                this.MachineMap.Clear();
-                this.MachineOperations.Clear();
+                this.ActorMap.Clear();
+                this.ActorOperations.Clear();
             }
 
             base.Dispose(disposing);

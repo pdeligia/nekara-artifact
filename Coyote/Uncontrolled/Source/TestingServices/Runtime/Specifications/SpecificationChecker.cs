@@ -57,7 +57,7 @@ namespace Microsoft.Coyote.TestingServices.Specifications
         /// </summary>
         internal override void InjectContextSwitch()
         {
-            AsyncMachine caller = this.Runtime.GetExecutingMachine<AsyncMachine>();
+            AsyncActor caller = this.Runtime.GetExecutingActor<AsyncActor>();
             if (caller != null)
             {
                 this.Runtime.Scheduler.ScheduleNextOperation(AsyncOperationType.Default,

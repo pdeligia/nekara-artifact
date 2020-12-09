@@ -13,9 +13,9 @@ using Microsoft.Coyote.Threading;
 namespace Microsoft.Coyote.TestingServices.Threading
 {
     /// <summary>
-    /// Implements a machine that can execute a <see cref="SynchronizationContext"/> callback asynchronously.
+    /// Implements an actor that can execute a <see cref="SynchronizationContext"/> callback asynchronously.
     /// </summary>
-    internal sealed class SyncContextWorkMachine : WorkMachine
+    internal sealed class SyncContextWorkActor : WorkActor
     {
         /// <summary>
         /// Callback to be executed asynchronously.
@@ -43,9 +43,9 @@ namespace Microsoft.Coyote.TestingServices.Threading
         internal override int AwaiterTaskId => this.AwaiterTask.Id;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SyncContextWorkMachine"/> class.
+        /// Initializes a new instance of the <see cref="SyncContextWorkActor"/> class.
         /// </summary>
-        internal SyncContextWorkMachine(SystematicTestingRuntime runtime, SendOrPostCallback callback, object state)
+        internal SyncContextWorkActor(SystematicTestingRuntime runtime, SendOrPostCallback callback, object state)
             : base(runtime)
         {
             this.Callback = callback;
@@ -58,11 +58,11 @@ namespace Microsoft.Coyote.TestingServices.Threading
         /// </summary>
         internal override Task ExecuteAsync()
         {
-            IO.Debug.WriteLine($"Machine '{this.Id}' is executing sync context callback on task '{MachineTask.CurrentId}' (tcs: {this.Awaiter.Task.Id})");
+            IO.Debug.WriteLine($"Actor '{this.Id}' is executing sync context callback on task '{ActorTask.CurrentId}' (tcs: {this.Awaiter.Task.Id})");
             this.Callback(this.State);
-            IO.Debug.WriteLine($"Machine '{this.Id}' executed sync context callback on task '{MachineTask.CurrentId}' (tcs: {this.Awaiter.Task.Id})");
+            IO.Debug.WriteLine($"Actor '{this.Id}' executed sync context callback on task '{ActorTask.CurrentId}' (tcs: {this.Awaiter.Task.Id})");
             this.Awaiter.SetResult(default);
-            IO.Debug.WriteLine($"Machine '{this.Id}' completed sync context callback on task '{MachineTask.CurrentId}' (tcs: {this.Awaiter.Task.Id})");
+            IO.Debug.WriteLine($"Actor '{this.Id}' completed sync context callback on task '{ActorTask.CurrentId}' (tcs: {this.Awaiter.Task.Id})");
             return Task.CompletedTask;
         }
     }

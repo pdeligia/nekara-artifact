@@ -12,7 +12,7 @@ using Microsoft.Coyote.TestingServices.Coverage;
 namespace Microsoft.Coyote.TestingServices
 {
     /// <summary>
-    /// Class implementing the P# test report.
+    /// Class implementing the Coyote test report.
     /// </summary>
     [DataContract]
     public class TestReport

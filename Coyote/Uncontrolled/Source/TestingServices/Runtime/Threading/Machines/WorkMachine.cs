@@ -12,9 +12,9 @@ using Microsoft.Coyote.TestingServices.Runtime;
 namespace Microsoft.Coyote.TestingServices.Threading
 {
     /// <summary>
-    /// Abstract machine that can execute work asynchronously.
+    /// Abstract actor that can execute work asynchronously.
     /// </summary>
-    internal abstract class WorkMachine : AsyncMachine
+    internal abstract class WorkActor : AsyncActor
     {
         /// <summary>
         /// The id of the task that provides access to the completed work.
@@ -22,17 +22,17 @@ namespace Microsoft.Coyote.TestingServices.Threading
         internal abstract int AwaiterTaskId { get; }
 
         /// <summary>
-        /// Id used to identify subsequent operations performed by this machine.
+        /// Id used to identify subsequent operations performed by this actor.
         /// </summary>
         protected internal override Guid OperationGroupId { get; set; } = Guid.Empty;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="WorkMachine"/> class.
+        /// Initializes a new instance of the <see cref="WorkActor"/> class.
         /// </summary>
-        internal WorkMachine(SystematicTestingRuntime runtime)
+        internal WorkActor(SystematicTestingRuntime runtime)
         {
-            // var mid = new MachineId(this.GetType(), MachineTask.Name, runtime);
-            var mid = new MachineId(this.GetType(), null, runtime);
+            // var mid = new ActorId(this.GetType(), ActorTask.Name, runtime);
+            var mid = new ActorId(this.GetType(), null, runtime);
             this.Initialize(runtime, mid);
         }
 

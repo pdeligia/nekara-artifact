@@ -6,7 +6,7 @@
 namespace Microsoft.Coyote.Runtime
 {
     /// <summary>
-    /// Handles the <see cref="IMachineRuntime.OnEventDropped"/> event.
+    /// Handles the <see cref="IActorRuntime.OnEventDropped"/> event.
     /// </summary>
-    public delegate void OnEventDroppedHandler(Event e, MachineId target);
+    public delegate void OnEventDroppedHandler(Event e, ActorId target);
 }

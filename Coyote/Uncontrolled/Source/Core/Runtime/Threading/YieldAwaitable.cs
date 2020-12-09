@@ -14,14 +14,14 @@ namespace Microsoft.Coyote.Threading
     public readonly struct YieldAwaitable
     {
         /// <summary>
-        /// The currently installed <see cref="MachineTask"/> scheduler.
+        /// The currently installed <see cref="ActorTask"/> scheduler.
         /// </summary>
-        private readonly MachineTaskScheduler Scheduler;
+        private readonly ActorTaskScheduler Scheduler;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="YieldAwaitable"/> struct.
         /// </summary>
-        internal YieldAwaitable(MachineTaskScheduler scheduler)
+        internal YieldAwaitable(ActorTaskScheduler scheduler)
         {
             this.Scheduler = scheduler;
         }
@@ -37,9 +37,9 @@ namespace Microsoft.Coyote.Threading
         public readonly struct YieldAwaiter : ICriticalNotifyCompletion, INotifyCompletion
         {
             /// <summary>
-            /// The currently installed <see cref="MachineTask"/> scheduler.
+            /// The currently installed <see cref="ActorTask"/> scheduler.
             /// </summary>
-            private readonly MachineTaskScheduler Scheduler;
+            private readonly ActorTaskScheduler Scheduler;
 
             /// <summary>
             /// The internal yield awaiter.
@@ -56,7 +56,7 @@ namespace Microsoft.Coyote.Threading
             /// <summary>
             /// Initializes a new instance of the <see cref="YieldAwaiter"/> struct.
             /// </summary>
-            internal YieldAwaiter(MachineTaskScheduler scheduler)
+            internal YieldAwaiter(ActorTaskScheduler scheduler)
             {
                 this.Scheduler = scheduler;
                 this.Awaiter = default;

@@ -29,12 +29,12 @@ namespace Microsoft.Coyote.TestingServices.Threading
 
         public override void Send(SendOrPostCallback d, object state)
         {
-            this.Runtime.DispatchWork(new SyncContextWorkMachine(this.Runtime, d, state), null);
+            this.Runtime.DispatchWork(new SyncContextWorkActor(this.Runtime, d, state), null);
         }
 
         public override void Post(SendOrPostCallback d, object state)
         {
-            this.Runtime.DispatchWork(new SyncContextWorkMachine(this.Runtime, d, state), null);
+            this.Runtime.DispatchWork(new SyncContextWorkActor(this.Runtime, d, state), null);
         }
     }
 }

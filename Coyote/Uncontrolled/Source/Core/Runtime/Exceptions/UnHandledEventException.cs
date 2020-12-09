@@ -6,12 +6,12 @@
 namespace Microsoft.Coyote.Runtime
 {
     /// <summary>
-    /// Signals that a machine received an unhandled event.
+    /// Signals that an actor received an unhandled event.
     /// </summary>
     public sealed class UnhandledEventException : RuntimeException
     {
         /// <summary>
-        /// Name of the current state of the machine.
+        /// Name of the current state of the actor.
         /// </summary>
         public string CurrentStateName;
 

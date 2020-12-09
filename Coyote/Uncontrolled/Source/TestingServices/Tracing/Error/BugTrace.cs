@@ -11,7 +11,7 @@ using System.Runtime.Serialization;
 namespace Microsoft.Coyote.TestingServices.Tracing.Error
 {
     /// <summary>
-    /// Class implementing a P# bug trace. A trace is a
+    /// Class implementing a Coyote bug trace. A trace is a
     /// series of transitions from some initial state to
     /// some end state.
     /// </summary>
@@ -52,25 +52,25 @@ namespace Microsoft.Coyote.TestingServices.Tracing.Error
         /// <summary>
         /// Adds a bug trace step.
         /// </summary>
-        internal void AddCreateMachineStep(Machine machine, MachineId targetMachine, EventInfo eventInfo)
+        internal void AddCreateActorStep(Actor actor, ActorId targetActor, EventInfo eventInfo)
         {
-            MachineId mid = null;
-            string machineState = null;
-            if (machine != null)
+            ActorId mid = null;
+            string actorState = null;
+            if (actor != null)
             {
-                mid = machine.Id;
-                machineState = machine.CurrentStateName;
+                mid = actor.Id;
+                actorState = actor.CurrentStateName;
             }
 
-            var scheduleStep = BugTraceStep.Create(this.Count, BugTraceStepType.CreateMachine,
-                mid, machineState, eventInfo, null, targetMachine, null, null, null);
+            var scheduleStep = BugTraceStep.Create(this.Count, BugTraceStepType.CreateActor,
+                mid, actorState, eventInfo, null, targetActor, null, null, null);
             this.Push(scheduleStep);
         }
 
         /// <summary>
         /// Adds a bug trace step.
         /// </summary>
-        internal void AddCreateMonitorStep(MachineId monitor)
+        internal void AddCreateMonitorStep(ActorId monitor)
         {
             var scheduleStep = BugTraceStep.Create(this.Count, BugTraceStepType.CreateMonitor,
                 null, null, null, null, monitor, null, null, null);
@@ -80,101 +80,101 @@ namespace Microsoft.Coyote.TestingServices.Tracing.Error
         /// <summary>
         /// Adds a bug trace step.
         /// </summary>
-        internal void AddSendEventStep(MachineId machine, string machineState,
-            EventInfo eventInfo, MachineId targetMachine)
+        internal void AddSendEventStep(ActorId actor, string actorState,
+            EventInfo eventInfo, ActorId targetActor)
         {
             var scheduleStep = BugTraceStep.Create(this.Count, BugTraceStepType.SendEvent,
-                machine, machineState, eventInfo, null, targetMachine, null, null, null);
+                actor, actorState, eventInfo, null, targetActor, null, null, null);
             this.Push(scheduleStep);
         }
 
         /// <summary>
         /// Adds a bug trace step.
         /// </summary>
-        internal void AddDequeueEventStep(MachineId machine, string machineState, EventInfo eventInfo)
+        internal void AddDequeueEventStep(ActorId actor, string actorState, EventInfo eventInfo)
         {
             var scheduleStep = BugTraceStep.Create(this.Count, BugTraceStepType.DequeueEvent,
-                machine, machineState, eventInfo, null, null, null, null, null);
+                actor, actorState, eventInfo, null, null, null, null, null);
             this.Push(scheduleStep);
         }
 
         /// <summary>
         /// Adds a bug trace step.
         /// </summary>
-        internal void AddRaiseEventStep(MachineId machine, string machineState, EventInfo eventInfo)
+        internal void AddRaiseEventStep(ActorId actor, string actorState, EventInfo eventInfo)
         {
             var scheduleStep = BugTraceStep.Create(this.Count, BugTraceStepType.RaiseEvent,
-                machine, machineState, eventInfo, null, null, null, null, null);
+                actor, actorState, eventInfo, null, null, null, null, null);
             this.Push(scheduleStep);
         }
 
         /// <summary>
         /// Adds a bug trace step.
         /// </summary>
-        internal void AddGotoStateStep(MachineId machine, string machineState)
+        internal void AddGotoStateStep(ActorId actor, string actorState)
         {
             var scheduleStep = BugTraceStep.Create(this.Count, BugTraceStepType.GotoState,
-                machine, machineState, null, null, null, null, null, null);
+                actor, actorState, null, null, null, null, null, null);
             this.Push(scheduleStep);
         }
 
         /// <summary>
         /// Adds a bug trace step.
         /// </summary>
-        internal void AddInvokeActionStep(MachineId machine, string machineState, MethodInfo action)
+        internal void AddInvokeActionStep(ActorId actor, string actorState, MethodInfo action)
         {
             var scheduleStep = BugTraceStep.Create(this.Count, BugTraceStepType.InvokeAction,
-                machine, machineState, null, action, null, null, null, null);
+                actor, actorState, null, action, null, null, null, null);
             this.Push(scheduleStep);
         }
 
         /// <summary>
         /// Adds a bug trace step.
         /// </summary>
-        internal void AddWaitToReceiveStep(MachineId machine, string machineState, string eventNames)
+        internal void AddWaitToReceiveStep(ActorId actor, string actorState, string eventNames)
         {
             var scheduleStep = BugTraceStep.Create(this.Count, BugTraceStepType.WaitToReceive,
-                machine, machineState, null, null, null, null, null, eventNames);
+                actor, actorState, null, null, null, null, null, eventNames);
             this.Push(scheduleStep);
         }
 
         /// <summary>
         /// Adds a bug trace step.
         /// </summary>
-        internal void AddReceivedEventStep(MachineId machine, string machineState, EventInfo eventInfo)
+        internal void AddReceivedEventStep(ActorId actor, string actorState, EventInfo eventInfo)
         {
             var scheduleStep = BugTraceStep.Create(this.Count, BugTraceStepType.ReceiveEvent,
-                machine, machineState, eventInfo, null, null, null, null, null);
+                actor, actorState, eventInfo, null, null, null, null, null);
             this.Push(scheduleStep);
         }
 
         /// <summary>
         /// Adds a bug trace step.
         /// </summary>
-        internal void AddRandomChoiceStep(MachineId machine, string machineState, bool choice)
+        internal void AddRandomChoiceStep(ActorId actor, string actorState, bool choice)
         {
             var scheduleStep = BugTraceStep.Create(this.Count, BugTraceStepType.RandomChoice,
-                machine, machineState, null, null, null, choice, null, null);
+                actor, actorState, null, null, null, choice, null, null);
             this.Push(scheduleStep);
         }
 
         /// <summary>
         /// Adds a bug trace step.
         /// </summary>
-        internal void AddRandomChoiceStep(MachineId machine, string machineState, int choice)
+        internal void AddRandomChoiceStep(ActorId actor, string actorState, int choice)
         {
             var scheduleStep = BugTraceStep.Create(this.Count, BugTraceStepType.RandomChoice,
-                machine, machineState, null, null, null, null, choice, null);
+                actor, actorState, null, null, null, null, choice, null);
             this.Push(scheduleStep);
         }
 
         /// <summary>
         /// Adds a bug trace step.
         /// </summary>
-        internal void AddHaltStep(MachineId machine, string machineState)
+        internal void AddHaltStep(ActorId actor, string actorState)
         {
             var scheduleStep = BugTraceStep.Create(this.Count, BugTraceStepType.Halt,
-                machine, machineState, null, null, null, null, null, null);
+                actor, actorState, null, null, null, null, null, null);
             this.Push(scheduleStep);
         }
 

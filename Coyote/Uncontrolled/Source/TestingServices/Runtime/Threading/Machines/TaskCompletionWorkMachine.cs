@@ -12,9 +12,9 @@ using Microsoft.Coyote.Threading;
 namespace Microsoft.Coyote.TestingServices.Threading
 {
     /// <summary>
-    /// Implements a machine that can complete a task asynchronously.
+    /// Implements an actor that can complete a task asynchronously.
     /// </summary>
-    internal sealed class TaskCompletionWorkMachine : WorkMachine
+    internal sealed class TaskCompletionWorkActor : WorkActor
     {
         /// <summary>
         /// Task that provides access to the completed work.
@@ -27,9 +27,9 @@ namespace Microsoft.Coyote.TestingServices.Threading
         internal override int AwaiterTaskId => this.AwaiterTask.Id;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TaskCompletionWorkMachine"/> class.
+        /// Initializes a new instance of the <see cref="TaskCompletionWorkActor"/> class.
         /// </summary>
-        internal TaskCompletionWorkMachine(SystematicTestingRuntime runtime, Task task)
+        internal TaskCompletionWorkActor(SystematicTestingRuntime runtime, Task task)
             : base(runtime)
         {
             this.AwaiterTask = task;
@@ -40,15 +40,15 @@ namespace Microsoft.Coyote.TestingServices.Threading
         /// </summary>
         internal override Task ExecuteAsync()
         {
-            IO.Debug.WriteLine($"Machine '{this.Id}' completed task '{this.AwaiterTask.Id}' on task '{MachineTask.CurrentId}'");
+            IO.Debug.WriteLine($"Actor '{this.Id}' completed task '{this.AwaiterTask.Id}' on task '{ActorTask.CurrentId}'");
             return Task.CompletedTask;
         }
     }
 
     /// <summary>
-    /// Implements a machine that can complete a task asynchronously.
+    /// Implements an actor that can complete a task asynchronously.
     /// </summary>
-    internal sealed class TaskCompletionWorkMachine<TResult> : WorkMachine
+    internal sealed class TaskCompletionWorkActor<TResult> : WorkActor
     {
         /// <summary>
         /// Task that provides access to the completed work.
@@ -61,9 +61,9 @@ namespace Microsoft.Coyote.TestingServices.Threading
         internal override int AwaiterTaskId => this.AwaiterTask.Id;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TaskCompletionWorkMachine{TResult}"/> class.
+        /// Initializes a new instance of the <see cref="TaskCompletionWorkActor{TResult}"/> class.
         /// </summary>
-        internal TaskCompletionWorkMachine(SystematicTestingRuntime runtime, Task<TResult> task)
+        internal TaskCompletionWorkActor(SystematicTestingRuntime runtime, Task<TResult> task)
             : base(runtime)
         {
             this.AwaiterTask = task;
@@ -74,7 +74,7 @@ namespace Microsoft.Coyote.TestingServices.Threading
         /// </summary>
         internal override Task ExecuteAsync()
         {
-            Console.WriteLine($"\n\nMachine '{this.Id}' completed task '{this.AwaiterTask.Id}' on task '{MachineTask.CurrentId}'\n\n");
+            Console.WriteLine($"\n\nActor '{this.Id}' completed task '{this.AwaiterTask.Id}' on task '{ActorTask.CurrentId}'\n\n");
             return Task.CompletedTask;
         }
     }

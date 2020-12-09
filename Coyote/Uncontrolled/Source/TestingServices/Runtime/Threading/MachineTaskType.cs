@@ -8,9 +8,9 @@ using Microsoft.Coyote.Threading;
 namespace Microsoft.Coyote.TestingServices.Threading
 {
     /// <summary>
-    /// Specifies the type of a <see cref="MachineTask"/>.
+    /// Specifies the type of a <see cref="ActorTask"/>.
     /// </summary>
-    internal enum MachineTaskType
+    internal enum ActorTaskType
     {
         /// <summary>
         /// Specifies that the task was explicitly created.

@@ -14,7 +14,7 @@ namespace Microsoft.Coyote
 {
 #pragma warning disable CA1724 // Type names should not match namespaces
     /// <summary>
-    /// The P# project configurations.
+    /// The Coyote project configurations.
     /// </summary>
     [DataContract]
     [Serializable]
@@ -114,7 +114,7 @@ namespace Microsoft.Coyote
         /// <summary>
         /// The assembly that contains the testing runtime.
         /// By default it is empty, which uses the default
-        /// testing runtime of P#.
+        /// testing runtime of Coyote.
         /// </summary>
         [DataMember]
         public string TestingRuntimeAssembly;
@@ -126,7 +126,7 @@ namespace Microsoft.Coyote
         public string TestMethodName;
 
         /// <summary>
-        /// Scheduling strategy to use with the P# tester.
+        /// Scheduling strategy to use with the Coyote tester.
         /// </summary>
         [DataMember]
         public SchedulingStrategy SchedulingStrategy;
@@ -150,7 +150,7 @@ namespace Microsoft.Coyote
         public int? SchedulingSeed;
 
         /// <summary>
-        /// If true, the P# tester performs a full exploration,
+        /// If true, the Coyote tester performs a full exploration,
         /// and does not stop when it finds a bug.
         /// </summary>
         [DataMember]
@@ -225,7 +225,7 @@ namespace Microsoft.Coyote
         public uint TestingProcessId;
 
         /// <summary>
-        /// If true, then the P# tester will consider an execution
+        /// If true, then the Coyote tester will consider an execution
         /// that hits the depth bound as buggy.
         /// </summary>
         [DataMember]
@@ -336,13 +336,13 @@ namespace Microsoft.Coyote
         public bool EnableRaceDetectorLogging = false;
 
         /// <summary>
-        /// Enables code coverage reporting of a P# program.
+        /// Enables code coverage reporting of a Coyote program.
         /// </summary>
         [DataMember]
         public bool ReportCodeCoverage;
 
         /// <summary>
-        /// Enables activity coverage reporting of a P# program.
+        /// Enables activity coverage reporting of a Coyote program.
         /// </summary>
         [DataMember]
         public bool ReportActivityCoverage;
@@ -372,7 +372,7 @@ namespace Microsoft.Coyote
         public int NumberOfContainers;
 
         /// <summary>
-        /// The path to the P# application to run remotely.
+        /// The path to the Coyote application to run remotely.
         /// </summary>
         [DataMember]
         public string RemoteApplicationFilePath;
@@ -413,7 +413,7 @@ namespace Microsoft.Coyote
         public bool EnableColoredConsoleOutput;
 
         /// <summary>
-        /// If true, then P# will throw any internal exceptions.
+        /// If true, then Coyote will throw any internal exceptions.
         /// </summary>
         internal bool ThrowInternalExceptions;
 

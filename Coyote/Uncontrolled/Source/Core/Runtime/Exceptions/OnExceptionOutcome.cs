@@ -6,7 +6,7 @@
 namespace Microsoft.Coyote.Runtime
 {
     /// <summary>
-    /// The outcome when a machine throws an exception.
+    /// The outcome when an actor throws an exception.
     /// </summary>
     public enum OnExceptionOutcome
     {
@@ -16,13 +16,13 @@ namespace Microsoft.Coyote.Runtime
         ThrowException = 0,
 
         /// <summary>
-        /// The exception was handled and Machine should continue execution.
+        /// The exception was handled and Actor should continue execution.
         /// </summary>
         HandledException = 1,
 
         /// <summary>
-        /// Halt the machine (do not throw the exception).
+        /// Halt the actor (do not throw the exception).
         /// </summary>
-        HaltMachine = 2
+        HaltActor = 2
     }
 }

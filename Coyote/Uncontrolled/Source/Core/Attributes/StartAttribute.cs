@@ -8,7 +8,7 @@ using System;
 namespace Microsoft.Coyote
 {
     /// <summary>
-    /// Attribute for declaring that a state of a machine
+    /// Attribute for declaring that a state of an actor
     /// is the start one.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class)]

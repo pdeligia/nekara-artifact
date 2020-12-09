@@ -8,7 +8,7 @@ using Microsoft.Coyote.Timers;
 namespace Microsoft.Coyote.TestingServices.Timers
 {
     /// <summary>
-    /// Defines a timer elapsed event that is sent from a timer to the machine that owns the timer.
+    /// Defines a timer elapsed event that is sent from a timer to the actor that owns the timer.
     /// </summary>
     internal class TimerSetupEvent : Event
     {
@@ -18,9 +18,9 @@ namespace Microsoft.Coyote.TestingServices.Timers
         internal readonly TimerInfo Info;
 
         /// <summary>
-        /// The machine that owns the timer.
+        /// The actor that owns the timer.
         /// </summary>
-        internal readonly Machine Owner;
+        internal readonly Actor Owner;
 
         /// <summary>
         /// Adjusts the probability of firing a timeout event.
@@ -31,9 +31,9 @@ namespace Microsoft.Coyote.TestingServices.Timers
         /// Initializes a new instance of the <see cref="TimerSetupEvent"/> class.
         /// </summary>
         /// <param name="info">Stores information about the timer.</param>
-        /// <param name="owner">The machine that owns the timer.</param>
+        /// <param name="owner">The actor that owns the timer.</param>
         /// <param name="delay">Adjusts the probability of firing a timeout event.</param>
-        internal TimerSetupEvent(TimerInfo info, Machine owner, uint delay)
+        internal TimerSetupEvent(TimerInfo info, Actor owner, uint delay)
         {
             this.Info = info;
             this.Owner = owner;

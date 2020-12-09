@@ -6,7 +6,7 @@
 namespace Microsoft.Coyote.SharedObjects
 {
     /// <summary>
-    /// Event used to communicate with a shared counter machine.
+    /// Event used to communicate with a shared counter actor.
     /// </summary>
     internal class SharedCounterEvent : Event
     {
@@ -39,14 +39,14 @@ namespace Microsoft.Coyote.SharedObjects
         public int Comparand { get; private set; }
 
         /// <summary>
-        /// The sender machine stored in this event.
+        /// The sender actor stored in this event.
         /// </summary>
-        public MachineId Sender { get; private set; }
+        public ActorId Sender { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SharedCounterEvent"/> class.
         /// </summary>
-        private SharedCounterEvent(SharedCounterOperation op, int value, int comparand, MachineId sender)
+        private SharedCounterEvent(SharedCounterOperation op, int value, int comparand, ActorId sender)
         {
             this.Operation = op;
             this.Value = value;
@@ -73,7 +73,7 @@ namespace Microsoft.Coyote.SharedObjects
         /// <summary>
         /// Creates a new event for the 'SET' operation.
         /// </summary>
-        public static SharedCounterEvent SetEvent(MachineId sender, int value)
+        public static SharedCounterEvent SetEvent(ActorId sender, int value)
         {
             return new SharedCounterEvent(SharedCounterOperation.SET, value, 0, sender);
         }
@@ -81,7 +81,7 @@ namespace Microsoft.Coyote.SharedObjects
         /// <summary>
         /// Creates a new event for the 'GET' operation.
         /// </summary>
-        public static SharedCounterEvent GetEvent(MachineId sender)
+        public static SharedCounterEvent GetEvent(ActorId sender)
         {
             return new SharedCounterEvent(SharedCounterOperation.GET, 0, 0, sender);
         }
@@ -89,7 +89,7 @@ namespace Microsoft.Coyote.SharedObjects
         /// <summary>
         /// Creates a new event for the 'ADD' operation.
         /// </summary>
-        public static SharedCounterEvent AddEvent(MachineId sender, int value)
+        public static SharedCounterEvent AddEvent(ActorId sender, int value)
         {
             return new SharedCounterEvent(SharedCounterOperation.ADD, value, 0, sender);
         }
@@ -97,7 +97,7 @@ namespace Microsoft.Coyote.SharedObjects
         /// <summary>
         /// Creates a new event for the 'CAS' operation.
         /// </summary>
-        public static SharedCounterEvent CasEvent(MachineId sender, int value, int comparand)
+        public static SharedCounterEvent CasEvent(ActorId sender, int value, int comparand)
         {
             return new SharedCounterEvent(SharedCounterOperation.CAS, value, comparand, sender);
         }

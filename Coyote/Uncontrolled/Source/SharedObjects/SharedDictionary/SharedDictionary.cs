@@ -11,15 +11,15 @@ using Microsoft.Coyote.TestingServices.Runtime;
 namespace Microsoft.Coyote.SharedObjects
 {
     /// <summary>
-    /// Shared dictionary that can be safely shared by multiple P# machines.
+    /// Shared dictionary that can be safely shared by multiple Coyote actors.
     /// </summary>
     public static class SharedDictionary
     {
         /// <summary>
         /// Creates a new shared dictionary.
         /// </summary>
-        /// <param name="runtime">The machine runtime.</param>
-        public static ISharedDictionary<TKey, TValue> Create<TKey, TValue>(IMachineRuntime runtime)
+        /// <param name="runtime">The actor runtime.</param>
+        public static ISharedDictionary<TKey, TValue> Create<TKey, TValue>(IActorRuntime runtime)
         {
             if (runtime is ProductionRuntime)
             {
@@ -39,8 +39,8 @@ namespace Microsoft.Coyote.SharedObjects
         /// Creates a new shared dictionary.
         /// </summary>
         /// <param name="comparer">The key comparer.</param>
-        /// <param name="runtime">The machine runtime.</param>
-        public static ISharedDictionary<TKey, TValue> Create<TKey, TValue>(IEqualityComparer<TKey> comparer, IMachineRuntime runtime)
+        /// <param name="runtime">The actor runtime.</param>
+        public static ISharedDictionary<TKey, TValue> Create<TKey, TValue>(IEqualityComparer<TKey> comparer, IActorRuntime runtime)
         {
             if (runtime is ProductionRuntime)
             {

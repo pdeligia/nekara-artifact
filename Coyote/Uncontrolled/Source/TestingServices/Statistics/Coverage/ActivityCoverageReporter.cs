@@ -12,7 +12,7 @@ using System.Xml;
 namespace Microsoft.Coyote.TestingServices.Coverage
 {
     /// <summary>
-    /// The P# code coverage reporter.
+    /// The Coyote code coverage reporter.
     /// </summary>
     public class ActivityCoverageReporter
     {
@@ -68,23 +68,23 @@ namespace Microsoft.Coyote.TestingServices.Coverage
             // Starts Nodes element.
             writer.WriteStartElement("Nodes");
 
-            // Iterates machines.
-            foreach (var machine in this.CoverageInfo.MachinesToStates.Keys)
+            // Iterates actors.
+            foreach (var actor in this.CoverageInfo.ActorsToStates.Keys)
             {
                 writer.WriteStartElement("Node");
-                writer.WriteAttributeString("Id", machine);
+                writer.WriteAttributeString("Id", actor);
                 writer.WriteAttributeString("Group", "Expanded");
                 writer.WriteEndElement();
             }
 
             // Iterates states.
-            foreach (var tup in this.CoverageInfo.MachinesToStates)
+            foreach (var tup in this.CoverageInfo.ActorsToStates)
             {
-                var machine = tup.Key;
+                var actor = tup.Key;
                 foreach (var state in tup.Value)
                 {
                     writer.WriteStartElement("Node");
-                    writer.WriteAttributeString("Id", GetStateId(machine, state));
+                    writer.WriteAttributeString("Id", GetStateId(actor, state));
                     writer.WriteAttributeString("Label", state);
                     writer.WriteEndElement();
                 }
@@ -97,14 +97,14 @@ namespace Microsoft.Coyote.TestingServices.Coverage
             writer.WriteStartElement("Links");
 
             // Iterates states.
-            foreach (var tup in this.CoverageInfo.MachinesToStates)
+            foreach (var tup in this.CoverageInfo.ActorsToStates)
             {
-                var machine = tup.Key;
+                var actor = tup.Key;
                 foreach (var state in tup.Value)
                 {
                     writer.WriteStartElement("Link");
-                    writer.WriteAttributeString("Source", machine);
-                    writer.WriteAttributeString("Target", GetStateId(machine, state));
+                    writer.WriteAttributeString("Source", actor);
+                    writer.WriteAttributeString("Target", GetStateId(actor, state));
                     writer.WriteAttributeString("Category", "Contains");
                     writer.WriteEndElement();
                 }
@@ -115,8 +115,8 @@ namespace Microsoft.Coyote.TestingServices.Coverage
             // Iterates transitions.
             foreach (var transition in this.CoverageInfo.Transitions)
             {
-                var source = GetStateId(transition.MachineOrigin, transition.StateOrigin);
-                var target = GetStateId(transition.MachineTarget, transition.StateTarget);
+                var source = GetStateId(transition.ActorOrigin, transition.StateOrigin);
+                var target = GetStateId(transition.ActorTarget, transition.StateTarget);
                 var counter = 0;
                 if (parallelEdgeCounter.ContainsKey(Tuple.Create(source, target)))
                 {
@@ -155,18 +155,18 @@ namespace Microsoft.Coyote.TestingServices.Coverage
         /// </summary>
         internal void WriteCoverageText(TextWriter writer)
         {
-            var machines = new List<string>(this.CoverageInfo.MachinesToStates.Keys);
+            var actors = new List<string>(this.CoverageInfo.ActorsToStates.Keys);
 
             var uncoveredEvents = new HashSet<Tuple<string, string, string>>(this.CoverageInfo.RegisteredEvents);
             foreach (var transition in this.CoverageInfo.Transitions)
             {
-                if (transition.MachineOrigin == transition.MachineTarget)
+                if (transition.ActorOrigin == transition.ActorTarget)
                 {
-                    uncoveredEvents.Remove(Tuple.Create(transition.MachineOrigin, transition.StateOrigin, transition.EdgeLabel));
+                    uncoveredEvents.Remove(Tuple.Create(transition.ActorOrigin, transition.StateOrigin, transition.EdgeLabel));
                 }
                 else
                 {
-                    uncoveredEvents.Remove(Tuple.Create(transition.MachineTarget, transition.StateTarget, transition.EdgeLabel));
+                    uncoveredEvents.Remove(Tuple.Create(transition.ActorTarget, transition.StateTarget, transition.EdgeLabel));
                 }
             }
 
@@ -174,102 +174,102 @@ namespace Microsoft.Coyote.TestingServices.Coverage
                 ((this.CoverageInfo.RegisteredEvents.Count - uncoveredEvents.Count) * 100.0 / this.CoverageInfo.RegisteredEvents.Count).ToString("F1");
             writer.WriteLine("Total event coverage: {0}%", eventCoverage);
 
-            // Map from machines to states to registered events.
-            var machineToStatesToEvents = new Dictionary<string, Dictionary<string, HashSet<string>>>();
-            machines.ForEach(m => machineToStatesToEvents.Add(m, new Dictionary<string, HashSet<string>>()));
-            machines.ForEach(m =>
+            // Map from actors to states to registered events.
+            var actorToStatesToEvents = new Dictionary<string, Dictionary<string, HashSet<string>>>();
+            actors.ForEach(m => actorToStatesToEvents.Add(m, new Dictionary<string, HashSet<string>>()));
+            actors.ForEach(m =>
             {
-                foreach (var state in this.CoverageInfo.MachinesToStates[m])
+                foreach (var state in this.CoverageInfo.ActorsToStates[m])
                 {
-                    machineToStatesToEvents[m].Add(state, new HashSet<string>());
+                    actorToStatesToEvents[m].Add(state, new HashSet<string>());
                 }
             });
 
             foreach (var ev in this.CoverageInfo.RegisteredEvents)
             {
-                machineToStatesToEvents[ev.Item1][ev.Item2].Add(ev.Item3);
+                actorToStatesToEvents[ev.Item1][ev.Item2].Add(ev.Item3);
             }
 
-            // Maps from machines to transitions.
-            var machineToOutgoingTransitions = new Dictionary<string, List<Transition>>();
-            var machineToIncomingTransitions = new Dictionary<string, List<Transition>>();
-            var machineToIntraTransitions = new Dictionary<string, List<Transition>>();
+            // Maps from actors to transitions.
+            var actorToOutgoingTransitions = new Dictionary<string, List<Transition>>();
+            var actorToIncomingTransitions = new Dictionary<string, List<Transition>>();
+            var actorToIntraTransitions = new Dictionary<string, List<Transition>>();
 
-            machines.ForEach(m => machineToIncomingTransitions.Add(m, new List<Transition>()));
-            machines.ForEach(m => machineToOutgoingTransitions.Add(m, new List<Transition>()));
-            machines.ForEach(m => machineToIntraTransitions.Add(m, new List<Transition>()));
+            actors.ForEach(m => actorToIncomingTransitions.Add(m, new List<Transition>()));
+            actors.ForEach(m => actorToOutgoingTransitions.Add(m, new List<Transition>()));
+            actors.ForEach(m => actorToIntraTransitions.Add(m, new List<Transition>()));
 
             foreach (var tr in this.CoverageInfo.Transitions)
             {
-                if (tr.MachineOrigin == tr.MachineTarget)
+                if (tr.ActorOrigin == tr.ActorTarget)
                 {
-                    machineToIntraTransitions[tr.MachineOrigin].Add(tr);
+                    actorToIntraTransitions[tr.ActorOrigin].Add(tr);
                 }
                 else
                 {
-                    machineToIncomingTransitions[tr.MachineTarget].Add(tr);
-                    machineToOutgoingTransitions[tr.MachineOrigin].Add(tr);
+                    actorToIncomingTransitions[tr.ActorTarget].Add(tr);
+                    actorToOutgoingTransitions[tr.ActorOrigin].Add(tr);
                 }
             }
 
-            // Per-machine data.
-            foreach (var machine in machines)
+            // Per-actor data.
+            foreach (var actor in actors)
             {
-                writer.WriteLine("Machine: {0}", machine);
+                writer.WriteLine("Actor: {0}", actor);
                 writer.WriteLine("***************");
 
-                var machineUncoveredEvents = new Dictionary<string, HashSet<string>>();
-                foreach (var state in this.CoverageInfo.MachinesToStates[machine])
+                var actorUncoveredEvents = new Dictionary<string, HashSet<string>>();
+                foreach (var state in this.CoverageInfo.ActorsToStates[actor])
                 {
-                    machineUncoveredEvents.Add(state, new HashSet<string>(machineToStatesToEvents[machine][state]));
+                    actorUncoveredEvents.Add(state, new HashSet<string>(actorToStatesToEvents[actor][state]));
                 }
 
-                foreach (var tr in machineToIncomingTransitions[machine])
+                foreach (var tr in actorToIncomingTransitions[actor])
                 {
-                    machineUncoveredEvents[tr.StateTarget].Remove(tr.EdgeLabel);
+                    actorUncoveredEvents[tr.StateTarget].Remove(tr.EdgeLabel);
                 }
 
-                foreach (var tr in machineToIntraTransitions[machine])
+                foreach (var tr in actorToIntraTransitions[actor])
                 {
-                    machineUncoveredEvents[tr.StateOrigin].Remove(tr.EdgeLabel);
+                    actorUncoveredEvents[tr.StateOrigin].Remove(tr.EdgeLabel);
                 }
 
                 var numTotalEvents = 0;
-                foreach (var tup in machineToStatesToEvents[machine])
+                foreach (var tup in actorToStatesToEvents[actor])
                 {
                     numTotalEvents += tup.Value.Count;
                 }
 
                 var numUncoveredEvents = 0;
-                foreach (var tup in machineUncoveredEvents)
+                foreach (var tup in actorUncoveredEvents)
                 {
                     numUncoveredEvents += tup.Value.Count;
                 }
 
                 eventCoverage = numTotalEvents == 0 ? "100.0" : ((numTotalEvents - numUncoveredEvents) * 100.0 / numTotalEvents).ToString("F1");
-                writer.WriteLine("Machine event coverage: {0}%", eventCoverage);
+                writer.WriteLine("Actor event coverage: {0}%", eventCoverage);
 
                 // Find uncovered states.
-                var uncoveredStates = new HashSet<string>(this.CoverageInfo.MachinesToStates[machine]);
-                foreach (var tr in machineToIntraTransitions[machine])
+                var uncoveredStates = new HashSet<string>(this.CoverageInfo.ActorsToStates[actor]);
+                foreach (var tr in actorToIntraTransitions[actor])
                 {
                     uncoveredStates.Remove(tr.StateOrigin);
                     uncoveredStates.Remove(tr.StateTarget);
                 }
 
-                foreach (var tr in machineToIncomingTransitions[machine])
+                foreach (var tr in actorToIncomingTransitions[actor])
                 {
                     uncoveredStates.Remove(tr.StateTarget);
                 }
 
-                foreach (var tr in machineToOutgoingTransitions[machine])
+                foreach (var tr in actorToOutgoingTransitions[actor])
                 {
                     uncoveredStates.Remove(tr.StateOrigin);
                 }
 
                 // State maps.
                 var stateToIncomingEvents = new Dictionary<string, HashSet<string>>();
-                foreach (var tr in machineToIncomingTransitions[machine])
+                foreach (var tr in actorToIncomingTransitions[actor])
                 {
                     if (!stateToIncomingEvents.ContainsKey(tr.StateTarget))
                     {
@@ -280,7 +280,7 @@ namespace Microsoft.Coyote.TestingServices.Coverage
                 }
 
                 var stateToOutgoingEvents = new Dictionary<string, HashSet<string>>();
-                foreach (var tr in machineToOutgoingTransitions[machine])
+                foreach (var tr in actorToOutgoingTransitions[actor])
                 {
                     if (!stateToOutgoingEvents.ContainsKey(tr.StateOrigin))
                     {
@@ -292,7 +292,7 @@ namespace Microsoft.Coyote.TestingServices.Coverage
 
                 var stateToOutgoingStates = new Dictionary<string, HashSet<string>>();
                 var stateToIncomingStates = new Dictionary<string, HashSet<string>>();
-                foreach (var tr in machineToIntraTransitions[machine])
+                foreach (var tr in actorToIntraTransitions[actor])
                 {
                     if (!stateToOutgoingStates.ContainsKey(tr.StateOrigin))
                     {
@@ -310,15 +310,15 @@ namespace Microsoft.Coyote.TestingServices.Coverage
                 }
 
                 // Per-state data.
-                foreach (var state in this.CoverageInfo.MachinesToStates[machine])
+                foreach (var state in this.CoverageInfo.ActorsToStates[actor])
                 {
                     writer.WriteLine();
                     writer.WriteLine("\tState: {0}{1}", state, uncoveredStates.Contains(state) ? " is uncovered" : string.Empty);
                     if (!uncoveredStates.Contains(state))
                     {
-                        eventCoverage = machineToStatesToEvents[machine][state].Count == 0 ? "100.0" :
-                            ((machineToStatesToEvents[machine][state].Count - machineUncoveredEvents[state].Count) * 100.0 /
-                              machineToStatesToEvents[machine][state].Count).ToString("F1");
+                        eventCoverage = actorToStatesToEvents[actor][state].Count == 0 ? "100.0" :
+                            ((actorToStatesToEvents[actor][state].Count - actorUncoveredEvents[state].Count) * 100.0 /
+                              actorToStatesToEvents[actor][state].Count).ToString("F1");
                         writer.WriteLine("\t\tState event coverage: {0}%", eventCoverage);
                     }
 
@@ -344,10 +344,10 @@ namespace Microsoft.Coyote.TestingServices.Coverage
                         writer.WriteLine();
                     }
 
-                    if (machineUncoveredEvents.ContainsKey(state) && machineUncoveredEvents[state].Count > 0)
+                    if (actorUncoveredEvents.ContainsKey(state) && actorUncoveredEvents[state].Count > 0)
                     {
                         writer.Write("\t\tEvents not covered: ");
-                        foreach (var e in machineUncoveredEvents[state])
+                        foreach (var e in actorUncoveredEvents[state])
                         {
                             writer.Write("{0} ", e);
                         }
@@ -382,7 +382,7 @@ namespace Microsoft.Coyote.TestingServices.Coverage
             }
         }
 
-        private static string GetStateId(string machineName, string stateName) =>
-            string.Format("{0}::{1}", stateName, machineName);
+        private static string GetStateId(string actorName, string stateName) =>
+            string.Format("{0}::{1}", stateName, actorName);
     }
 }

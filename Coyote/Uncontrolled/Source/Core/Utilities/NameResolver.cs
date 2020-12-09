@@ -22,7 +22,7 @@ namespace Microsoft.Coyote.Utilities
 
         /// <summary>
         /// Returns the qualified (i.e. <see cref="StateGroup"/>) name of the specified
-        /// machine or monitor state, or the empty string if there is no such name.
+        /// actor or monitor state, or the empty string if there is no such name.
         /// </summary>
         internal static string GetQualifiedStateName(Type state)
         {

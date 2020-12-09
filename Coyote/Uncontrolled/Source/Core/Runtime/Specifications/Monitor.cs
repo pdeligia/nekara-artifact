@@ -18,7 +18,7 @@ using Microsoft.Coyote.Utilities;
 namespace Microsoft.Coyote
 {
     /// <summary>
-    /// Abstract class representing a P# monitor.
+    /// Abstract class representing a Coyote monitor.
     /// </summary>
     public abstract class Monitor
     {
@@ -46,7 +46,7 @@ namespace Microsoft.Coyote
         /// <summary>
         /// The runtime that executes this monitor.
         /// </summary>
-        private MachineRuntime Runtime;
+        private ActorRuntime Runtime;
 
         /// <summary>
         /// The monitor state.
@@ -84,7 +84,7 @@ namespace Microsoft.Coyote
         /// <summary>
         /// The unique monitor id.
         /// </summary>
-        internal MachineId Id { get; private set; }
+        internal ActorId Id { get; private set; }
 
         /// <summary>
         /// Gets the name of this monitor.
@@ -98,7 +98,7 @@ namespace Microsoft.Coyote
         protected virtual int HashedState => 0;
 
         /// <summary>
-        /// The logger installed to the P# runtime.
+        /// The logger installed to the Coyote runtime.
         /// </summary>
         protected ILogger Logger => this.Runtime.Logger;
 
@@ -171,7 +171,7 @@ namespace Microsoft.Coyote
         /// </summary>
         /// <param name="runtime">The runtime that executes this monitor.</param>
         /// <param name="mid">The monitor id.</param>
-        internal void Initialize(MachineRuntime runtime, MachineId mid)
+        internal void Initialize(ActorRuntime runtime, ActorId mid)
         {
             this.Id = mid;
             this.Runtime = runtime;

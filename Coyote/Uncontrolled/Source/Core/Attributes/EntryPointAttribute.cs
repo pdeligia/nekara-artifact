@@ -8,7 +8,7 @@ using System;
 namespace Microsoft.Coyote
 {
     /// <summary>
-    /// Attribute for declaring the entry point to a P# program.
+    /// Attribute for declaring the entry point to a Coyote program.
     /// </summary>
     [AttributeUsage(AttributeTargets.Method)]
     public sealed class EntryPointAttribute : Attribute

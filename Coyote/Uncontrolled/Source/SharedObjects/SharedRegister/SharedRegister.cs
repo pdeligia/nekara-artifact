@@ -9,16 +9,16 @@ using Microsoft.Coyote.TestingServices.Runtime;
 namespace Microsoft.Coyote.SharedObjects
 {
     /// <summary>
-    /// Shared register that can be safely shared by multiple P# machines.
+    /// Shared register that can be safely shared by multiple Coyote actors.
     /// </summary>
     public static class SharedRegister
     {
         /// <summary>
         /// Creates a new shared register.
         /// </summary>
-        /// <param name="runtime">The machine runtime.</param>
+        /// <param name="runtime">The actor runtime.</param>
         /// <param name="value">The initial value.</param>
-        public static ISharedRegister<T> Create<T>(IMachineRuntime runtime, T value = default)
+        public static ISharedRegister<T> Create<T>(IActorRuntime runtime, T value = default)
             where T : struct
         {
             if (runtime is ProductionRuntime)

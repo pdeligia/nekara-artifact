@@ -9,7 +9,7 @@ using System.Collections.Generic;
 namespace Microsoft.Coyote.TestingServices.Tracing.Schedule
 {
     /// <summary>
-    /// Class implementing a P# program schedule trace.
+    /// Class implementing a Coyote program schedule trace.
     /// A trace is a series of transitions from some
     /// initial state to some end state.
     /// </summary>
@@ -82,9 +82,9 @@ namespace Microsoft.Coyote.TestingServices.Tracing.Schedule
         /// <summary>
         /// Adds a scheduling choice.
         /// </summary>
-        internal void AddSchedulingChoice(ulong scheduledMachineId)
+        internal void AddSchedulingChoice(ulong scheduledActorId)
         {
-            var scheduleStep = ScheduleStep.CreateSchedulingChoice(this.Count, scheduledMachineId);
+            var scheduleStep = ScheduleStep.CreateSchedulingChoice(this.Count, scheduledActorId);
             this.Push(scheduleStep);
         }
 

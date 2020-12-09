@@ -8,7 +8,7 @@ using System;
 namespace Microsoft.Coyote.Runtime
 {
     /// <summary>
-    /// The exception that is thrown by the P# runtime upon assertion failure.
+    /// The exception that is thrown by the Coyote runtime upon assertion failure.
     /// </summary>
     internal sealed class AssertionFailureException : RuntimeException
     {

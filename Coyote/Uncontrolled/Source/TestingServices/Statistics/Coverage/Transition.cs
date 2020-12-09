@@ -14,10 +14,10 @@ namespace Microsoft.Coyote.TestingServices.Coverage
     public struct Transition
     {
         /// <summary>
-        /// The origin machine.
+        /// The origin actor.
         /// </summary>
         [DataMember]
-        public readonly string MachineOrigin;
+        public readonly string ActorOrigin;
 
         /// <summary>
         /// The origin state.
@@ -32,10 +32,10 @@ namespace Microsoft.Coyote.TestingServices.Coverage
         public readonly string EdgeLabel;
 
         /// <summary>
-        /// The target machine.
+        /// The target actor.
         /// </summary>
         [DataMember]
-        public readonly string MachineTarget;
+        public readonly string ActorTarget;
 
         /// <summary>
         /// The target state.
@@ -46,13 +46,13 @@ namespace Microsoft.Coyote.TestingServices.Coverage
         /// <summary>
         /// Initializes a new instance of the <see cref="Transition"/> struct.
         /// </summary>
-        public Transition(string machineOrigin, string stateOrigin, string edgeLabel,
-            string machineTarget, string stateTarget)
+        public Transition(string actorOrigin, string stateOrigin, string edgeLabel,
+            string actorTarget, string stateTarget)
         {
-            this.MachineOrigin = machineOrigin;
+            this.ActorOrigin = actorOrigin;
             this.StateOrigin = stateOrigin;
             this.EdgeLabel = edgeLabel;
-            this.MachineTarget = machineTarget;
+            this.ActorTarget = actorTarget;
             this.StateTarget = stateTarget;
         }
 
@@ -61,12 +61,12 @@ namespace Microsoft.Coyote.TestingServices.Coverage
         /// </summary>
         public override string ToString()
         {
-            if (this.MachineOrigin == this.MachineTarget)
+            if (this.ActorOrigin == this.ActorTarget)
             {
-                return string.Format("{0}: {1} --{2}--> {3}", this.MachineOrigin, this.StateOrigin, this.EdgeLabel, this.StateTarget);
+                return string.Format("{0}: {1} --{2}--> {3}", this.ActorOrigin, this.StateOrigin, this.EdgeLabel, this.StateTarget);
             }
 
-            return string.Format("({0}, {1}) --{2}--> ({3}, {4})", this.MachineOrigin, this.StateOrigin, this.EdgeLabel, this.MachineTarget, this.StateTarget);
+            return string.Format("({0}, {1}) --{2}--> ({3}, {4})", this.ActorOrigin, this.StateOrigin, this.EdgeLabel, this.ActorTarget, this.StateTarget);
         }
     }
 }

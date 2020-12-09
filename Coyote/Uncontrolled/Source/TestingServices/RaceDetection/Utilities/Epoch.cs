@@ -50,7 +50,7 @@ namespace Microsoft.Coyote.TestingServices.RaceDetection.Util
         }
 
         /// <summary>
-        /// Obtains an epoch c@t from machine identifier t and clock c.
+        /// Obtains an epoch c@t from actor identifier t and clock c.
         /// </summary>
         public static long MakeEpoch(long mId, long clock)
         {
@@ -59,9 +59,9 @@ namespace Microsoft.Coyote.TestingServices.RaceDetection.Util
         }
 
         /// <summary>
-        /// Obtains an epoch c@t from machineId t = mId.Value and clock c.
+        /// Obtains an epoch c@t from actorId t = mId.Value and clock c.
         /// </summary>
-        public static long MakeEpoch(MachineId mId, long clock)
+        public static long MakeEpoch(ActorId mId, long clock)
         {
             return MakeEpoch((long)mId.Value, clock);
         }
@@ -89,7 +89,7 @@ namespace Microsoft.Coyote.TestingServices.RaceDetection.Util
         /// </summary>
         public static bool Leq(long e1, long e2)
         {
-            Debug.Assert(MId(e1) == MId(e2), "Comparing epochs across different machines");
+            Debug.Assert(MId(e1) == MId(e2), "Comparing epochs across different actors");
             return Clock(e1) <= Clock(e2);
         }
 
@@ -98,13 +98,13 @@ namespace Microsoft.Coyote.TestingServices.RaceDetection.Util
         /// </summary>
         public static long Max(long e1, long e2)
         {
-            Debug.Assert(MId(e1) == MId(e2), "Joining epochs across different machines");
+            Debug.Assert(MId(e1) == MId(e2), "Joining epochs across different actors");
             return MakeEpoch(MId(e1), Math.Max(Clock(e1), Clock(e2)));
         }
 
         /// <summary>
         /// Following the FastTrack convention, represent an epoch as
-        /// m:c where m is the machine Id and c is its clock.
+        /// m:c where m is the actor Id and c is its clock.
         /// </summary>
         public static string ToString(long epoch)
         {

@@ -41,12 +41,12 @@ namespace Microsoft.Coyote.TestingServices.Scheduling
         /// <summary>
         /// Map from unique ids to asynchronous operations.
         /// </summary>
-        private readonly Dictionary<ulong, MachineOperation> OperationMap;
+        private readonly Dictionary<ulong, ActorOperation> OperationMap;
 
         /// <summary>
         /// Map from ids of tasks that are controlled by the runtime to operations.
         /// </summary>
-        internal readonly ConcurrentDictionary<int, MachineOperation> ControlledTaskMap;
+        internal readonly ConcurrentDictionary<int, ActorOperation> ControlledTaskMap;
 
         /// <summary>
         /// The program schedule trace.
@@ -66,7 +66,7 @@ namespace Microsoft.Coyote.TestingServices.Scheduling
         /// <summary>
         /// The currently scheduled asynchronous operation.
         /// </summary>
-        internal MachineOperation ScheduledOperation { get; private set; }
+        internal ActorOperation ScheduledOperation { get; private set; }
 
         /// <summary>
         /// Number of scheduled steps.
@@ -97,8 +97,8 @@ namespace Microsoft.Coyote.TestingServices.Scheduling
             this.Configuration = configuration;
             this.Runtime = runtime;
             this.Strategy = strategy;
-            this.OperationMap = new Dictionary<ulong, MachineOperation>();
-            this.ControlledTaskMap = new ConcurrentDictionary<int, MachineOperation>();
+            this.OperationMap = new Dictionary<ulong, ActorOperation>();
+            this.ControlledTaskMap = new ConcurrentDictionary<int, ActorOperation>();
             this.ScheduleTrace = trace;
             this.CompletionSource = new TaskCompletionSource<bool>();
             this.IsSchedulerRunning = true;
@@ -131,7 +131,7 @@ namespace Microsoft.Coyote.TestingServices.Scheduling
             // Checks if the scheduling steps bound has been reached.
             this.CheckIfSchedulingStepsBoundIsReached();
 
-            MachineOperation current = this.ScheduledOperation;
+            ActorOperation current = this.ScheduledOperation;
             current.SetNextOperation(type, target, targetId);
 
             // Update the current execution state.
@@ -153,7 +153,7 @@ namespace Microsoft.Coyote.TestingServices.Scheduling
             if (!this.Strategy.GetNext(current, ops, out IAsyncOperation next))
             {
                 // Checks if the program has livelocked.
-                this.CheckIfProgramHasLivelocked(ops.Select(op => op as MachineOperation));
+                this.CheckIfProgramHasLivelocked(ops.Select(op => op as ActorOperation));
 
                 Debug.WriteLine("<ScheduleDebug> Schedule explored.");
                 this.HasFullyExploredSchedule = true;
@@ -161,7 +161,7 @@ namespace Microsoft.Coyote.TestingServices.Scheduling
                 throw new ExecutionCanceledException();
             }
 
-            this.ScheduledOperation = next as MachineOperation;
+            this.ScheduledOperation = next as ActorOperation;
             this.ScheduleTrace.AddSchedulingChoice(next.SourceId);
 
             Debug.WriteLine($"<ScheduleDebug> Scheduling the next operation of '{next.SourceName}'.");
@@ -273,7 +273,7 @@ namespace Microsoft.Coyote.TestingServices.Scheduling
         /// <summary>
         /// Waits for the specified asynchronous operation to start.
         /// </summary>
-        internal void WaitForOperationToStart(MachineOperation op)
+        internal void WaitForOperationToStart(ActorOperation op)
         {
             lock (op)
             {
@@ -296,7 +296,7 @@ namespace Microsoft.Coyote.TestingServices.Scheduling
         /// Notify that the specified asynchronous operation has been created
         /// and will start executing on the specified task.
         /// </summary>
-        internal void NotifyOperationCreated(MachineOperation op, Task task)
+        internal void NotifyOperationCreated(ActorOperation op, Task task)
         {
             this.ControlledTaskMap.TryAdd(task.Id, op);
             if (!this.OperationMap.ContainsKey(op.SourceId))
@@ -315,7 +315,7 @@ namespace Microsoft.Coyote.TestingServices.Scheduling
         /// <summary>
         /// Notify that the specified asynchronous operation has started.
         /// </summary>
-        internal static void NotifyOperationStarted(MachineOperation op)
+        internal static void NotifyOperationStarted(ActorOperation op)
         {
             Debug.WriteLine($"<ScheduleDebug> Starting the current operation of '{op.SourceName}' on task '{Task.CurrentId}'.");
 
@@ -374,11 +374,11 @@ namespace Microsoft.Coyote.TestingServices.Scheduling
         internal HashSet<ulong> GetEnabledSchedulableIds()
         {
             var enabledSchedulableIds = new HashSet<ulong>();
-            foreach (var machineInfo in this.OperationMap.Values)
+            foreach (var actorInfo in this.OperationMap.Values)
             {
-                if (machineInfo.Status is AsyncOperationStatus.Enabled)
+                if (actorInfo.Status is AsyncOperationStatus.Enabled)
                 {
-                    enabledSchedulableIds.Add(machineInfo.SourceId);
+                    enabledSchedulableIds.Add(actorInfo.SourceId);
                 }
             }
 
@@ -450,7 +450,7 @@ namespace Microsoft.Coyote.TestingServices.Scheduling
             if (!Task.CurrentId.HasValue || !this.ControlledTaskMap.ContainsKey(Task.CurrentId.Value))
             {
                 this.NotifyAssertionFailure(string.Format(CultureInfo.InvariantCulture,
-                    "Task with id '{0}' that is not controlled by the P# runtime invoked a runtime method.",
+                    "Task with id '{0}' that is not controlled by the Coyote runtime invoked a runtime method.",
                     Task.CurrentId.HasValue ? Task.CurrentId.Value.ToString() : "<unknown>"));
             }
         }
@@ -460,7 +460,7 @@ namespace Microsoft.Coyote.TestingServices.Scheduling
         /// but there is one or more blocked operations that are waiting to receive an event
         /// or for a task to complete.
         /// </summary>
-        private void CheckIfProgramHasLivelocked(IEnumerable<MachineOperation> ops)
+        private void CheckIfProgramHasLivelocked(IEnumerable<ActorOperation> ops)
         {
             var blockedOnReceiveOperations = ops.Where(op => op.Status is AsyncOperationStatus.BlockedOnReceive).ToList();
             var blockedOnWaitOperations = ops.Where(op => op.Status is AsyncOperationStatus.BlockedOnWaitAll ||
@@ -537,7 +537,7 @@ namespace Microsoft.Coyote.TestingServices.Scheduling
 
         /// <summary>
         /// Checks if the scheduling steps bound has been reached. If yes,
-        /// it stops the scheduler and kills all enabled machines.
+        /// it stops the scheduler and kills all enabled actors.
         /// </summary>
         private void CheckIfSchedulingStepsBoundIsReached()
         {

@@ -9,7 +9,7 @@ namespace Microsoft.Coyote
 {
     /// <summary>
     /// Attribute for declaring what events should be deferred in
-    /// a machine state.
+    /// an actor state.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class)]
     public sealed class DeferEventsAttribute : Attribute

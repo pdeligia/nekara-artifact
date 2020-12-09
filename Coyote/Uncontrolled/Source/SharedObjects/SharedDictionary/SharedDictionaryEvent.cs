@@ -6,7 +6,7 @@
 namespace Microsoft.Coyote.SharedObjects
 {
     /// <summary>
-    /// Event used to communicate with a shared counter machine.
+    /// Event used to communicate with a shared counter actor.
     /// </summary>
     internal class SharedDictionaryEvent : Event
     {
@@ -46,9 +46,9 @@ namespace Microsoft.Coyote.SharedObjects
         internal object ComparisonValue { get; private set; }
 
         /// <summary>
-        /// The sender machine stored in this event.
+        /// The sender actor stored in this event.
         /// </summary>
-        internal MachineId Sender { get; private set; }
+        internal ActorId Sender { get; private set; }
 
         /// <summary>
         /// The comparer stored in this event.
@@ -58,7 +58,7 @@ namespace Microsoft.Coyote.SharedObjects
         /// <summary>
         /// Initializes a new instance of the <see cref="SharedDictionaryEvent"/> class.
         /// </summary>
-        private SharedDictionaryEvent(SharedDictionaryOperation op, object key, object value, object comparisonValue, MachineId sender, object comparer)
+        private SharedDictionaryEvent(SharedDictionaryOperation op, object key, object value, object comparisonValue, ActorId sender, object comparer)
         {
             this.Operation = op;
             this.Key = key;
@@ -77,25 +77,25 @@ namespace Microsoft.Coyote.SharedObjects
         /// <summary>
         /// Creates a new event for the 'TRYADD' operation.
         /// </summary>
-        internal static SharedDictionaryEvent TryAddEvent(object key, object value, MachineId sender) =>
+        internal static SharedDictionaryEvent TryAddEvent(object key, object value, ActorId sender) =>
             new SharedDictionaryEvent(SharedDictionaryOperation.TRYADD, key, value, null, sender, null);
 
         /// <summary>
         /// Creates a new event for the 'TRYUPDATE' operation.
         /// </summary>
-        internal static SharedDictionaryEvent TryUpdateEvent(object key, object value, object comparisonValue, MachineId sender) =>
+        internal static SharedDictionaryEvent TryUpdateEvent(object key, object value, object comparisonValue, ActorId sender) =>
             new SharedDictionaryEvent(SharedDictionaryOperation.TRYUPDATE, key, value, comparisonValue, sender, null);
 
         /// <summary>
         /// Creates a new event for the 'GET' operation.
         /// </summary>
-        internal static SharedDictionaryEvent GetEvent(object key, MachineId sender) =>
+        internal static SharedDictionaryEvent GetEvent(object key, ActorId sender) =>
             new SharedDictionaryEvent(SharedDictionaryOperation.GET, key, null, null, sender, null);
 
         /// <summary>
         /// Creates a new event for the 'TRYGET' operation.
         /// </summary>
-        internal static SharedDictionaryEvent TryGetEvent(object key, MachineId sender) =>
+        internal static SharedDictionaryEvent TryGetEvent(object key, ActorId sender) =>
             new SharedDictionaryEvent(SharedDictionaryOperation.TRYGET, key, null, null, sender, null);
 
         /// <summary>
@@ -107,13 +107,13 @@ namespace Microsoft.Coyote.SharedObjects
         /// <summary>
         /// Creates a new event for the 'COUNT' operation.
         /// </summary>
-        internal static SharedDictionaryEvent CountEvent(MachineId sender) =>
+        internal static SharedDictionaryEvent CountEvent(ActorId sender) =>
             new SharedDictionaryEvent(SharedDictionaryOperation.COUNT, null, null, null, sender, null);
 
         /// <summary>
         /// Creates a new event for the 'TRYREMOVE' operation.
         /// </summary>
-        internal static SharedDictionaryEvent TryRemoveEvent(object key, MachineId sender) =>
+        internal static SharedDictionaryEvent TryRemoveEvent(object key, ActorId sender) =>
             new SharedDictionaryEvent(SharedDictionaryOperation.TRYREMOVE, key, null, null, sender, null);
     }
 }

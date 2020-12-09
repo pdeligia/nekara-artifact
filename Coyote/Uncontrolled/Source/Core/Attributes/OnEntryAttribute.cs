@@ -9,7 +9,7 @@ namespace Microsoft.Coyote
 {
     /// <summary>
     /// Attribute for declaring what action to perform
-    /// when entering a machine state.
+    /// when entering an actor state.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class)]
     public sealed class OnEntryAttribute : Attribute

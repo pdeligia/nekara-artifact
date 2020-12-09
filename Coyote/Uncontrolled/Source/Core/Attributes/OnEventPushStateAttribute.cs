@@ -8,7 +8,7 @@ using System;
 namespace Microsoft.Coyote
 {
     /// <summary>
-    /// Attribute for declaring which state a machine should push transition to
+    /// Attribute for declaring which state an actor should push transition to
     /// when it receives an event in a given state.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]

@@ -15,9 +15,9 @@ using Microsoft.Coyote.Threading;
 namespace Microsoft.Coyote.TestingServices.Threading
 {
     /// <summary>
-    /// A <see cref="MachineTask"/> that is controlled by the runtime scheduler.
+    /// A <see cref="ActorTask"/> that is controlled by the runtime scheduler.
     /// </summary>
-    internal sealed class ControlledMachineTask : MachineTask
+    internal sealed class ControlledActorTask : ActorTask
     {
         /// <summary>
         /// The testing runtime executing this task.
@@ -27,15 +27,15 @@ namespace Microsoft.Coyote.TestingServices.Threading
         /// <summary>
         /// The type of the task.
         /// </summary>
-        private readonly MachineTaskType Type;
+        private readonly ActorTaskType Type;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ControlledMachineTask"/> class.
+        /// Initializes a new instance of the <see cref="ControlledActorTask"/> class.
         /// </summary>
-        internal ControlledMachineTask(SystematicTestingRuntime runtime, Task task, MachineTaskType taskType)
+        internal ControlledActorTask(SystematicTestingRuntime runtime, Task task, ActorTaskType taskType)
             : base(task)
         {
-            IO.Debug.WriteLine("<MachineTask> Creating task '{0}' from task '{1}' (option: {2}).",
+            IO.Debug.WriteLine("<ActorTask> Creating task '{0}' from task '{1}' (option: {2}).",
                 task.Id, Task.CurrentId, taskType);
             this.Runtime = runtime;
             this.Type = taskType;
@@ -44,10 +44,10 @@ namespace Microsoft.Coyote.TestingServices.Threading
         /// <summary>
         /// Gets an awaiter for this awaitable.
         /// </summary>
-        public override MachineTaskAwaiter GetAwaiter()
+        public override ActorTaskAwaiter GetAwaiter()
         {
-            IO.Debug.WriteLine("<MachineTask> Awaiting task '{0}' from task '{1}'.", this.AwaiterTask.Id, Task.CurrentId);
-            return new MachineTaskAwaiter(this, this.AwaiterTask);
+            IO.Debug.WriteLine("<ActorTask> Awaiting task '{0}' from task '{1}'.", this.AwaiterTask.Id, Task.CurrentId);
+            return new ActorTaskAwaiter(this, this.AwaiterTask);
         }
 
         /// <summary>
@@ -55,10 +55,10 @@ namespace Microsoft.Coyote.TestingServices.Threading
         /// </summary>
         internal override void GetResult(TaskAwaiter awaiter)
         {
-            AsyncMachine caller = this.Runtime.GetExecutingMachine<AsyncMachine>();
-            IO.Debug.WriteLine("<MachineTask> Machine '{0}' is waiting task '{1}' to complete from task '{2}'.",
+            AsyncActor caller = this.Runtime.GetExecutingActor<AsyncActor>();
+            IO.Debug.WriteLine("<ActorTask> Actor '{0}' is waiting task '{1}' to complete from task '{2}'.",
                 caller.Id, this.Id, Task.CurrentId);
-            MachineOperation callerOp = this.Runtime.GetAsynchronousOperation(caller.Id.Value);
+            ActorOperation callerOp = this.Runtime.GetAsynchronousOperation(caller.Id.Value);
             callerOp.OnWaitTask(this.AwaiterTask);
             this.Runtime.Scheduler.ScheduleNextOperation(AsyncOperationType.Join, AsyncOperationTarget.Task, caller.Id.Value);
             awaiter.GetResult();
@@ -83,31 +83,31 @@ namespace Microsoft.Coyote.TestingServices.Threading
         {
             try
             {
-                AsyncMachine caller = this.Runtime.GetExecutingMachine<AsyncMachine>();
+                AsyncActor caller = this.Runtime.GetExecutingActor<AsyncActor>();
                 this.Runtime.Assert(caller != null,
-                    "Task with id '{0}' that is not controlled by the P# runtime is executing machine task '{1}'.",
+                    "Task with id '{0}' that is not controlled by the Coyote runtime is executing actor task '{1}'.",
                     Task.CurrentId.HasValue ? Task.CurrentId.Value.ToString() : "<unknown>", this.Id);
 
-                if (caller is Machine machine)
+                if (caller is Actor actor)
                 {
-                    this.Runtime.Assert((machine.StateManager as SerializedMachineStateManager).IsInsideMachineTaskHandler,
-                        "Machine '{0}' is executing machine task '{1}' inside a handler that does not return a 'MachineTask'.",
+                    this.Runtime.Assert((actor.StateManager as SerializedActorStateManager).IsInsideActorTaskHandler,
+                        "Actor '{0}' is executing actor task '{1}' inside a handler that does not return a 'ActorTask'.",
                         caller.Id, this.Id);
                 }
 
-                if (this.Type is MachineTaskType.CompletionSourceTask)
+                if (this.Type is ActorTaskType.CompletionSourceTask)
                 {
-                    IO.Debug.WriteLine("<MachineTask> Machine '{0}' is executing continuation of task '{1}' on task '{2}'.",
+                    IO.Debug.WriteLine("<ActorTask> Actor '{0}' is executing continuation of task '{1}' on task '{2}'.",
                         caller.Id, this.Id, Task.CurrentId);
                     continuation();
-                    IO.Debug.WriteLine("<MachineTask> Machine '{0}' resumed after continuation of task '{1}' on task '{2}'.",
+                    IO.Debug.WriteLine("<ActorTask> Actor '{0}' resumed after continuation of task '{1}' on task '{2}'.",
                         caller.Id, this.Id, Task.CurrentId);
                 }
-                else if (this.Type is MachineTaskType.ExplicitTask)
+                else if (this.Type is ActorTaskType.ExplicitTask)
                 {
-                    IO.Debug.WriteLine("<MachineTask> Machine '{0}' is dispatching continuation of task '{1}'.", caller.Id, this.Id);
-                    this.Runtime.DispatchWork(new ActionWorkMachine(this.Runtime, continuation), this.AwaiterTask);
-                    IO.Debug.WriteLine("<MachineTask> Machine '{0}' dispatched continuation of task '{1}'.", caller.Id, this.Id);
+                    IO.Debug.WriteLine("<ActorTask> Actor '{0}' is dispatching continuation of task '{1}'.", caller.Id, this.Id);
+                    this.Runtime.DispatchWork(new ActionWorkActor(this.Runtime, continuation), this.AwaiterTask);
+                    IO.Debug.WriteLine("<ActorTask> Actor '{0}' dispatched continuation of task '{1}'.", caller.Id, this.Id);
                 }
             }
             catch (ExecutionCanceledException)
@@ -118,9 +118,9 @@ namespace Microsoft.Coyote.TestingServices.Threading
     }
 
     /// <summary>
-    /// A <see cref="MachineTask{TResult}"/> that is controlled by the runtime scheduler.
+    /// A <see cref="ActorTask{TResult}"/> that is controlled by the runtime scheduler.
     /// </summary>
-    internal sealed class ControlledMachineTask<TResult> : MachineTask<TResult>
+    internal sealed class ControlledActorTask<TResult> : ActorTask<TResult>
     {
         /// <summary>
         /// The testing runtime executing this task.
@@ -130,15 +130,15 @@ namespace Microsoft.Coyote.TestingServices.Threading
         /// <summary>
         /// The type of the task.
         /// </summary>
-        private readonly MachineTaskType Type;
+        private readonly ActorTaskType Type;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ControlledMachineTask{TResult}"/> class.
+        /// Initializes a new instance of the <see cref="ControlledActorTask{TResult}"/> class.
         /// </summary>
-        internal ControlledMachineTask(SystematicTestingRuntime runtime, Task<TResult> task, MachineTaskType taskType)
+        internal ControlledActorTask(SystematicTestingRuntime runtime, Task<TResult> task, ActorTaskType taskType)
             : base(task)
         {
-            IO.Debug.WriteLine("<MachineTask> Creating task '{0}' with result type '{1}' from task '{2}' (option: {3}).",
+            IO.Debug.WriteLine("<ActorTask> Creating task '{0}' with result type '{1}' from task '{2}' (option: {3}).",
                 task.Id, typeof(TResult), Task.CurrentId, taskType);
             this.Runtime = runtime;
             this.Type = taskType;
@@ -147,11 +147,11 @@ namespace Microsoft.Coyote.TestingServices.Threading
         /// <summary>
         /// Gets an awaiter for this awaitable.
         /// </summary>
-        public override MachineTaskAwaiter<TResult> GetAwaiter()
+        public override ActorTaskAwaiter<TResult> GetAwaiter()
         {
-            IO.Debug.WriteLine("<MachineTask> Awaiting task '{0}' with result type '{1}' and type '{2}' from task '{3}'.",
+            IO.Debug.WriteLine("<ActorTask> Awaiting task '{0}' with result type '{1}' and type '{2}' from task '{3}'.",
                 this.AwaiterTask.Id, typeof(TResult), this.Type, Task.CurrentId);
-            return new MachineTaskAwaiter<TResult>(this, this.AwaiterTask);
+            return new ActorTaskAwaiter<TResult>(this, this.AwaiterTask);
         }
 
         /// <summary>
@@ -159,10 +159,10 @@ namespace Microsoft.Coyote.TestingServices.Threading
         /// </summary>
         internal override void GetResult(TaskAwaiter awaiter)
         {
-            AsyncMachine caller = this.Runtime.GetExecutingMachine<AsyncMachine>();
-            IO.Debug.WriteLine("<MachineTask> Machine '{0}' is waiting task '{1}' with result type '{2}' to complete from task '{3}'.",
+            AsyncActor caller = this.Runtime.GetExecutingActor<AsyncActor>();
+            IO.Debug.WriteLine("<ActorTask> Actor '{0}' is waiting task '{1}' with result type '{2}' to complete from task '{3}'.",
                 caller.Id, this.Id, typeof(TResult), Task.CurrentId);
-            MachineOperation callerOp = this.Runtime.GetAsynchronousOperation(caller.Id.Value);
+            ActorOperation callerOp = this.Runtime.GetAsynchronousOperation(caller.Id.Value);
             callerOp.OnWaitTask(this.AwaiterTask);
             this.Runtime.Scheduler.ScheduleNextOperation(AsyncOperationType.Join, AsyncOperationTarget.Task, caller.Id.Value);
             awaiter.GetResult();
@@ -187,32 +187,32 @@ namespace Microsoft.Coyote.TestingServices.Threading
         {
             try
             {
-                AsyncMachine caller = this.Runtime.GetExecutingMachine<AsyncMachine>();
+                AsyncActor caller = this.Runtime.GetExecutingActor<AsyncActor>();
                 this.Runtime.Assert(caller != null,
-                    "Task with id '{0}' that is not controlled by the P# runtime is executing machine task '{1}'.",
+                    "Task with id '{0}' that is not controlled by the Coyote runtime is executing actor task '{1}'.",
                     Task.CurrentId.HasValue ? Task.CurrentId.Value.ToString() : "<unknown>", this.Id);
 
-                if (caller is Machine machine)
+                if (caller is Actor actor)
                 {
-                    this.Runtime.Assert((machine.StateManager as SerializedMachineStateManager).IsInsideMachineTaskHandler,
-                        "Machine '{0}' is executing machine task '{1}' inside a handler that does not return a 'MachineTask'.",
+                    this.Runtime.Assert((actor.StateManager as SerializedActorStateManager).IsInsideActorTaskHandler,
+                        "Actor '{0}' is executing actor task '{1}' inside a handler that does not return a 'ActorTask'.",
                         caller.Id, this.Id);
                 }
 
-                if (this.Type is MachineTaskType.CompletionSourceTask)
+                if (this.Type is ActorTaskType.CompletionSourceTask)
                 {
-                    IO.Debug.WriteLine("<MachineTask> Machine '{0}' is executing continuation of task '{1}' with result type '{2}' on task '{3}'.",
+                    IO.Debug.WriteLine("<ActorTask> Actor '{0}' is executing continuation of task '{1}' with result type '{2}' on task '{3}'.",
                         caller.Id, this.Id, typeof(TResult), Task.CurrentId);
                     continuation();
-                    IO.Debug.WriteLine("<MachineTask> Machine '{0}' resumed after continuation of task '{1}' with result type '{2}' on task '{3}'.",
+                    IO.Debug.WriteLine("<ActorTask> Actor '{0}' resumed after continuation of task '{1}' with result type '{2}' on task '{3}'.",
                         caller.Id, this.Id, typeof(TResult), Task.CurrentId);
                 }
-                else if (this.Type is MachineTaskType.ExplicitTask)
+                else if (this.Type is ActorTaskType.ExplicitTask)
                 {
-                    IO.Debug.WriteLine("<MachineTask> Machine '{0}' is dispatching continuation of task '{1}' with result type '{2}'.",
+                    IO.Debug.WriteLine("<ActorTask> Actor '{0}' is dispatching continuation of task '{1}' with result type '{2}'.",
                         caller.Id, this.Id, typeof(TResult));
-                    this.Runtime.DispatchWork(new ActionWorkMachine(this.Runtime, continuation), this.AwaiterTask);
-                    IO.Debug.WriteLine("<MachineTask> Machine '{0}' dispatched continuation of task '{1}' with result type '{2}'.",
+                    this.Runtime.DispatchWork(new ActionWorkActor(this.Runtime, continuation), this.AwaiterTask);
+                    IO.Debug.WriteLine("<ActorTask> Actor '{0}' dispatched continuation of task '{1}' with result type '{2}'.",
                         caller.Id, this.Id, typeof(TResult));
                 }
             }

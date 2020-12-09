@@ -9,7 +9,7 @@ namespace Microsoft.Coyote
 {
     /// <summary>
     /// Attribute for declaring what action to perform
-    /// when exiting a machine state.
+    /// when exiting an actor state.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class)]
     public sealed class OnExitAttribute : Attribute

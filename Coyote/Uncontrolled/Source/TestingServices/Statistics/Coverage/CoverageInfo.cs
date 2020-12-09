@@ -17,19 +17,19 @@ namespace Microsoft.Coyote.TestingServices.Coverage
     public class CoverageInfo
     {
         /// <summary>
-        /// Map from machines to states.
+        /// Map from actors to states.
         /// </summary>
         [DataMember]
-        public Dictionary<string, HashSet<string>> MachinesToStates { get; private set; }
+        public Dictionary<string, HashSet<string>> ActorsToStates { get; private set; }
 
         /// <summary>
-        /// Set of (machines, states, registered events).
+        /// Set of (actors, states, registered events).
         /// </summary>
         [DataMember]
         public HashSet<Tuple<string, string, string>> RegisteredEvents { get; private set; }
 
         /// <summary>
-        /// Set of machine transitions.
+        /// Set of actor transitions.
         /// </summary>
         [DataMember]
         public HashSet<Transition> Transitions { get; private set; }
@@ -39,40 +39,40 @@ namespace Microsoft.Coyote.TestingServices.Coverage
         /// </summary>
         public CoverageInfo()
         {
-            this.MachinesToStates = new Dictionary<string, HashSet<string>>();
+            this.ActorsToStates = new Dictionary<string, HashSet<string>>();
             this.RegisteredEvents = new HashSet<Tuple<string, string, string>>();
             this.Transitions = new HashSet<Transition>();
         }
 
         /// <summary>
-        /// Checks if the machine type has already been registered for coverage.
+        /// Checks if the actor type has already been registered for coverage.
         /// </summary>
-        public bool IsMachineDeclared(string machineName) => this.MachinesToStates.ContainsKey(machineName);
+        public bool IsActorDeclared(string actorName) => this.ActorsToStates.ContainsKey(actorName);
 
         /// <summary>
         /// Adds a new transition.
         /// </summary>
-        public void AddTransition(string machineOrigin, string stateOrigin, string edgeLabel,
-            string machineTarget, string stateTarget)
+        public void AddTransition(string actorOrigin, string stateOrigin, string edgeLabel,
+            string actorTarget, string stateTarget)
         {
-            this.AddState(machineOrigin, stateOrigin);
-            this.AddState(machineTarget, stateTarget);
-            this.Transitions.Add(new Transition(machineOrigin, stateOrigin,
-                edgeLabel, machineTarget, stateTarget));
+            this.AddState(actorOrigin, stateOrigin);
+            this.AddState(actorTarget, stateTarget);
+            this.Transitions.Add(new Transition(actorOrigin, stateOrigin,
+                edgeLabel, actorTarget, stateTarget));
         }
 
         /// <summary>
         /// Declares a state.
         /// </summary>
-        public void DeclareMachineState(string machine, string state) => this.AddState(machine, state);
+        public void DeclareActorState(string actor, string state) => this.AddState(actor, state);
 
         /// <summary>
         /// Declares a registered state, event pair.
         /// </summary>
-        public void DeclareStateEvent(string machine, string state, string eventName)
+        public void DeclareStateEvent(string actor, string state, string eventName)
         {
-            this.AddState(machine, state);
-            this.RegisteredEvents.Add(Tuple.Create(machine, state, eventName));
+            this.AddState(actor, state);
+            this.RegisteredEvents.Add(Tuple.Create(actor, state, eventName));
         }
 
         /// <summary>
@@ -81,11 +81,11 @@ namespace Microsoft.Coyote.TestingServices.Coverage
         /// </summary>
         public void Merge(CoverageInfo coverageInfo)
         {
-            foreach (var machine in coverageInfo.MachinesToStates)
+            foreach (var actor in coverageInfo.ActorsToStates)
             {
-                foreach (var state in machine.Value)
+                foreach (var state in actor.Value)
                 {
-                    this.DeclareMachineState(machine.Key, state);
+                    this.DeclareActorState(actor.Key, state);
                 }
             }
 
@@ -96,22 +96,22 @@ namespace Microsoft.Coyote.TestingServices.Coverage
 
             foreach (var transition in coverageInfo.Transitions)
             {
-                this.AddTransition(transition.MachineOrigin, transition.StateOrigin,
-                    transition.EdgeLabel, transition.MachineTarget, transition.StateTarget);
+                this.AddTransition(transition.ActorOrigin, transition.StateOrigin,
+                    transition.EdgeLabel, transition.ActorTarget, transition.StateTarget);
             }
         }
 
         /// <summary>
         /// Adds a new state.
         /// </summary>
-        private void AddState(string machineName, string stateName)
+        private void AddState(string actorName, string stateName)
         {
-            if (!this.MachinesToStates.ContainsKey(machineName))
+            if (!this.ActorsToStates.ContainsKey(actorName))
             {
-                this.MachinesToStates.Add(machineName, new HashSet<string>());
+                this.ActorsToStates.Add(actorName, new HashSet<string>());
             }
 
-            this.MachinesToStates[machineName].Add(stateName);
+            this.ActorsToStates[actorName].Add(stateName);
         }
     }
 }

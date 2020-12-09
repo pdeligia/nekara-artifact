@@ -12,9 +12,9 @@ using Microsoft.Coyote.Threading;
 namespace Microsoft.Coyote.TestingServices.Threading
 {
     /// <summary>
-    /// Implements a machine that can execute a delay asynchronously.
+    /// Implements an actor that can execute a delay asynchronously.
     /// </summary>
-    internal sealed class DelayWorkMachine : WorkMachine
+    internal sealed class DelayWorkActor : WorkActor
     {
         /// <summary>
         /// Provides the capability to await for work completion.
@@ -32,9 +32,9 @@ namespace Microsoft.Coyote.TestingServices.Threading
         internal override int AwaiterTaskId => this.AwaiterTask.Id;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DelayWorkMachine"/> class.
+        /// Initializes a new instance of the <see cref="DelayWorkActor"/> class.
         /// </summary>
-        internal DelayWorkMachine(SystematicTestingRuntime runtime)
+        internal DelayWorkActor(SystematicTestingRuntime runtime)
             : base(runtime)
         {
             this.Awaiter = new TaskCompletionSource<object>();
@@ -45,9 +45,9 @@ namespace Microsoft.Coyote.TestingServices.Threading
         /// </summary>
         internal override Task ExecuteAsync()
         {
-            IO.Debug.WriteLine($"Machine '{this.Id}' is performing a delay on task '{MachineTask.CurrentId}' (tcs: {this.Awaiter.Task.Id})");
+            IO.Debug.WriteLine($"Actor '{this.Id}' is performing a delay on task '{ActorTask.CurrentId}' (tcs: {this.Awaiter.Task.Id})");
             this.Awaiter.SetResult(default);
-            IO.Debug.WriteLine($"Machine '{this.Id}' completed a delay on task '{MachineTask.CurrentId}' (tcs: {this.Awaiter.Task.Id})");
+            IO.Debug.WriteLine($"Actor '{this.Id}' completed a delay on task '{ActorTask.CurrentId}' (tcs: {this.Awaiter.Task.Id})");
             return Task.CompletedTask;
         }
     }

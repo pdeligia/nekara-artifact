@@ -8,10 +8,10 @@ using Microsoft.Coyote.Timers;
 namespace Microsoft.Coyote.TestingServices.Timers
 {
     /// <summary>
-    /// A mock timer that replaces <see cref="MachineTimer"/> during testing.
-    /// It is implemented as a machine.
+    /// A mock timer that replaces <see cref="ActorTimer"/> during testing.
+    /// It is implemented as an actor.
     /// </summary>
-    internal class MockMachineTimer : Machine, IMachineTimer
+    internal class MockActorTimer : Actor, IActorTimer
     {
         /// <summary>
         /// Stores information about this timer.
@@ -21,12 +21,12 @@ namespace Microsoft.Coyote.TestingServices.Timers
         /// <summary>
         /// Stores information about this timer.
         /// </summary>
-        TimerInfo IMachineTimer.Info => this.TimerInfo;
+        TimerInfo IActorTimer.Info => this.TimerInfo;
 
         /// <summary>
-        /// The machine that owns this timer.
+        /// The actor that owns this timer.
         /// </summary>
-        private Machine Owner;
+        private Actor Owner;
 
         /// <summary>
         /// The timeout event.
@@ -41,7 +41,7 @@ namespace Microsoft.Coyote.TestingServices.Timers
         [Start]
         [OnEntry(nameof(Setup))]
         [OnEventDoAction(typeof(Default), nameof(HandleTimeout))]
-        private class Active : MachineState
+        private class Active : ActorState
         {
         }
 
@@ -79,7 +79,7 @@ namespace Microsoft.Coyote.TestingServices.Timers
             }
         }
 
-        private class Inactive : MachineState
+        private class Inactive : ActorState
         {
         }
 
@@ -89,7 +89,7 @@ namespace Microsoft.Coyote.TestingServices.Timers
         /// </summary>
         public override bool Equals(object obj)
         {
-            if (obj is MockMachineTimer timer)
+            if (obj is MockActorTimer timer)
             {
                 return this.Id == timer.Id;
             }
@@ -108,12 +108,12 @@ namespace Microsoft.Coyote.TestingServices.Timers
         public override string ToString() => this.Id.Name;
 
         /// <summary>
-        /// Indicates whether the specified <see cref="MachineId"/> is equal
-        /// to the current <see cref="MachineId"/>.
+        /// Indicates whether the specified <see cref="ActorId"/> is equal
+        /// to the current <see cref="ActorId"/>.
         /// </summary>
         /// <param name="other">An object to compare with this object.</param>
         /// <returns>true if the current object is equal to the other parameter; otherwise, false.</returns>
-        public bool Equals(MachineTimer other)
+        public bool Equals(ActorTimer other)
         {
             return this.Equals((object)other);
         }

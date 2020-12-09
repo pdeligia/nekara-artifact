@@ -6,7 +6,7 @@
 namespace Microsoft.Coyote.Utilities
 {
     /// <summary>
-    /// P# compilation target.
+    /// Coyote compilation target.
     /// </summary>
     public enum CompilationTarget
     {

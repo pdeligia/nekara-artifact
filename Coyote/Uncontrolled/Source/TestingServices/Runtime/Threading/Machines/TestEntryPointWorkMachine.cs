@@ -12,9 +12,9 @@ using Microsoft.Coyote.Threading;
 namespace Microsoft.Coyote.TestingServices.Threading
 {
     /// <summary>
-    /// Implements a machine that can execute a test entry point asynchronously.
+    /// Implements an actor that can execute a test entry point asynchronously.
     /// </summary>
-    internal sealed class TestEntryPointWorkMachine : WorkMachine
+    internal sealed class TestEntryPointWorkActor : WorkActor
     {
         /// <summary>
         /// Test to be executed asynchronously.
@@ -37,9 +37,9 @@ namespace Microsoft.Coyote.TestingServices.Threading
         internal override int AwaiterTaskId => this.AwaiterTask.Id;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TestEntryPointWorkMachine"/> class.
+        /// Initializes a new instance of the <see cref="TestEntryPointWorkActor"/> class.
         /// </summary>
-        internal TestEntryPointWorkMachine(SystematicTestingRuntime runtime, Delegate test)
+        internal TestEntryPointWorkActor(SystematicTestingRuntime runtime, Delegate test)
             : base(runtime)
         {
             this.Test = test;
@@ -51,9 +51,9 @@ namespace Microsoft.Coyote.TestingServices.Threading
         /// </summary>
         internal override async Task ExecuteAsync()
         {
-            IO.Debug.WriteLine($"Machine '{this.Id}' is executing test on task '{MachineTask.CurrentId}' (tcs: {this.Awaiter.Task.Id})");
+            IO.Debug.WriteLine($"Actor '{this.Id}' is executing test on task '{ActorTask.CurrentId}' (tcs: {this.Awaiter.Task.Id})");
 
-            if (this.Test is Action<IMachineRuntime> actionWithRuntime)
+            if (this.Test is Action<IActorRuntime> actionWithRuntime)
             {
                 actionWithRuntime(this.Runtime);
             }
@@ -61,11 +61,11 @@ namespace Microsoft.Coyote.TestingServices.Threading
             {
                 action();
             }
-            else if (this.Test is Func<IMachineRuntime, MachineTask> functionWithRuntime)
+            else if (this.Test is Func<IActorRuntime, ActorTask> functionWithRuntime)
             {
                 await functionWithRuntime(this.Runtime);
             }
-            else if (this.Test is Func<MachineTask> function)
+            else if (this.Test is Func<ActorTask> function)
             {
                 await function();
             }
@@ -74,9 +74,9 @@ namespace Microsoft.Coyote.TestingServices.Threading
                 throw new InvalidOperationException($"Unsupported test delegate of type '{this.Test?.GetType()}'.");
             }
 
-            IO.Debug.WriteLine($"Machine '{this.Id}' executed test on task '{MachineTask.CurrentId}' (tcs: {this.Awaiter.Task.Id})");
+            IO.Debug.WriteLine($"Actor '{this.Id}' executed test on task '{ActorTask.CurrentId}' (tcs: {this.Awaiter.Task.Id})");
             this.Awaiter.SetResult(default);
-            IO.Debug.WriteLine($"Machine '{this.Id}' completed test on task '{MachineTask.CurrentId}' (tcs: {this.Awaiter.Task.Id})");
+            IO.Debug.WriteLine($"Actor '{this.Id}' completed test on task '{ActorTask.CurrentId}' (tcs: {this.Awaiter.Task.Id})");
         }
     }
 }

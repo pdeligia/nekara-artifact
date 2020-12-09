@@ -5,10 +5,10 @@ namespace Benchmarks.Protocols
 {
     internal class Raft
     {
-        public static void Execute(IMachineRuntime runtime)
+        public static void Execute(IActorRuntime runtime)
         {
             runtime.RegisterMonitor(typeof(SafetyMonitor));
-            runtime.CreateMachine(typeof(ClusterManager), "ClusterManager");
+            runtime.CreateActor(typeof(ClusterManager), "ClusterManager");
         }
 
         private class Log
@@ -23,14 +23,14 @@ namespace Benchmarks.Protocols
             }
         }
 
-        private class ClusterManager : Machine
+        private class ClusterManager : Actor
         {
             internal class NotifyLeaderUpdate : Event
             {
-                public MachineId Leader;
+                public ActorId Leader;
                 public int Term;
 
-                public NotifyLeaderUpdate(MachineId leader, int term)
+                public NotifyLeaderUpdate(ActorId leader, int term)
                     : base()
                 {
                     this.Leader = leader;
@@ -52,20 +52,20 @@ namespace Benchmarks.Protocols
             internal class ShutDown : Event { }
             private class LocalEvent : Event { }
 
-            MachineId[] Servers;
+            ActorId[] Servers;
             int NumberOfServers;
 
-            MachineId Leader;
+            ActorId Leader;
             int LeaderTerm;
 
             int Counter;
 
-            MachineId Client;
+            ActorId Client;
 
             [Start]
             [OnEntry(nameof(EntryOnInit))]
             [OnEventGotoState(typeof(LocalEvent), typeof(Configuring))]
-            class Init : MachineState { }
+            class Init : ActorState { }
 
             void EntryOnInit()
             {
@@ -73,21 +73,21 @@ namespace Benchmarks.Protocols
                 this.LeaderTerm = 0;
                 this.Counter = 0;
 
-                this.Servers = new MachineId[this.NumberOfServers];
+                this.Servers = new ActorId[this.NumberOfServers];
 
                 for (int idx = 0; idx < this.NumberOfServers; idx++)
                 {
-                    this.Servers[idx] = this.CreateMachine(typeof(Server), $"Server{idx}");
+                    this.Servers[idx] = this.CreateActor(typeof(Server), $"Server{idx}");
                 }
 
-                this.Client = this.CreateMachine(typeof(Client), "Client");
+                this.Client = this.CreateActor(typeof(Client), "Client");
 
                 this.Raise(new LocalEvent());
             }
 
             [OnEntry(nameof(ConfiguringOnInit))]
             [OnEventGotoState(typeof(LocalEvent), typeof(Availability.Unavailable))]
-            class Configuring : MachineState { }
+            class Configuring : ActorState { }
 
             void ConfiguringOnInit()
             {
@@ -107,7 +107,7 @@ namespace Benchmarks.Protocols
                 [OnEventDoAction(typeof(ShutDown), nameof(ShuttingDown))]
                 [OnEventGotoState(typeof(LocalEvent), typeof(Available))]
                 [DeferEvents(typeof(Client.Request))]
-                public class Unavailable : MachineState { }
+                public class Unavailable : ActorState { }
 
 
                 [OnEventDoAction(typeof(Client.Request), nameof(SendClientRequestToLeader))]
@@ -115,7 +115,7 @@ namespace Benchmarks.Protocols
                 [OnEventDoAction(typeof(NotifyLeaderUpdate), nameof(RefreshLeader))]
                 [OnEventDoAction(typeof(ShutDown), nameof(ShuttingDown))]
                 [OnEventGotoState(typeof(LocalEvent), typeof(Unavailable))]
-                public class Available : MachineState { }
+                public class Available : ActorState { }
             }
 
             void BecomeAvailable()
@@ -169,7 +169,7 @@ namespace Benchmarks.Protocols
             }
         }
 
-        private class Server : Machine
+        private class Server : Actor
         {
             /// <summary>
             /// Used to configure the server.
@@ -177,10 +177,10 @@ namespace Benchmarks.Protocols
             public class ConfigureEvent : Event
             {
                 public int Id;
-                public MachineId[] Servers;
-                public MachineId ClusterManager;
+                public ActorId[] Servers;
+                public ActorId ClusterManager;
 
-                public ConfigureEvent(int id, MachineId[] servers, MachineId manager)
+                public ConfigureEvent(int id, ActorId[] servers, ActorId manager)
                     : base()
                 {
                     this.Id = id;
@@ -195,11 +195,11 @@ namespace Benchmarks.Protocols
             public class VoteRequest : Event
             {
                 public int Term; // candidate’s term
-                public MachineId CandidateId; // candidate requesting vote
+                public ActorId CandidateId; // candidate requesting vote
                 public int LastLogIndex; // index of candidate’s last log entry
                 public int LastLogTerm; // term of candidate’s last log entry
 
-                public VoteRequest(int term, MachineId candidateId, int lastLogIndex, int lastLogTerm)
+                public VoteRequest(int term, ActorId candidateId, int lastLogIndex, int lastLogTerm)
                     : base()
                 {
                     this.Term = term;
@@ -215,10 +215,10 @@ namespace Benchmarks.Protocols
             public class VoteResponse : Event
             {
                 public int Term; // currentTerm, for candidate to update itself
-                public MachineId VoterId;
+                public ActorId VoterId;
                 public bool VoteGranted; // true means candidate received vote
 
-                public VoteResponse(int term, MachineId voterId, bool voteGranted)
+                public VoteResponse(int term, ActorId voterId, bool voteGranted)
                     : base()
                 {
                     this.Term = term;
@@ -234,16 +234,16 @@ namespace Benchmarks.Protocols
             public class AppendEntriesRequest : Event
             {
                 public int Term; // leader's term
-                public MachineId LeaderId; // so follower can redirect clients
+                public ActorId LeaderId; // so follower can redirect clients
                 public int PrevLogIndex; // index of log entry immediately preceding new ones
                 public int PrevLogTerm; // term of PrevLogIndex entry
                 public List<Log> Entries; // log entries to store (empty for heartbeat; may send more than one for efficiency)
                 public int LeaderCommit; // leader’s CommitIndex
 
-                public MachineId ReceiverEndpoint; // client
+                public ActorId ReceiverEndpoint; // client
 
-                public AppendEntriesRequest(int term, MachineId leaderId, int prevLogIndex,
-                    int prevLogTerm, List<Log> entries, int leaderCommit, MachineId client)
+                public AppendEntriesRequest(int term, ActorId leaderId, int prevLogIndex,
+                    int prevLogTerm, List<Log> entries, int leaderCommit, ActorId client)
                     : base()
                 {
                     this.Term = term;
@@ -264,10 +264,10 @@ namespace Benchmarks.Protocols
                 public int Term; // current Term, for leader to update itself
                 public bool Success; // true if follower contained entry matching PrevLogIndex and PrevLogTerm
 
-                public MachineId Server;
-                public MachineId ReceiverEndpoint; // client
+                public ActorId Server;
+                public ActorId ReceiverEndpoint; // client
 
-                public AppendEntriesResponse(int term, bool success, MachineId server, MachineId client)
+                public AppendEntriesResponse(int term, bool success, ActorId server, ActorId client)
                     : base()
                 {
                     this.Term = term;
@@ -290,29 +290,29 @@ namespace Benchmarks.Protocols
             int ServerId;
 
             /// <summary>
-            /// The cluster manager machine.
+            /// The cluster manager actor.
             /// </summary>
-            MachineId ClusterManager;
+            ActorId ClusterManager;
 
             /// <summary>
             /// The servers.
             /// </summary>
-            MachineId[] Servers;
+            ActorId[] Servers;
 
             /// <summary>
             /// Leader id.
             /// </summary>
-            MachineId LeaderId;
+            ActorId LeaderId;
 
             /// <summary>
             /// The election timer of this server.
             /// </summary>
-            MachineId ElectionTimer;
+            ActorId ElectionTimer;
 
             /// <summary>
             /// The periodic timer of this server.
             /// </summary>
-            MachineId PeriodicTimer;
+            ActorId PeriodicTimer;
 
             /// <summary>
             /// Latest term server has seen (initialized to 0 on
@@ -323,7 +323,7 @@ namespace Benchmarks.Protocols
             /// <summary>
             /// Candidate id that received vote in current term (or null if none).
             /// </summary>
-            MachineId VotedFor;
+            ActorId VotedFor;
 
             /// <summary>
             /// Log entries.
@@ -337,7 +337,7 @@ namespace Benchmarks.Protocols
             int CommitIndex;
 
             /// <summary>
-            /// Index of highest log entry applied to state machine (initialized
+            /// Index of highest log entry applied to state actor (initialized
             /// to 0, increases monotonically).
             /// </summary>
             int LastApplied;
@@ -346,13 +346,13 @@ namespace Benchmarks.Protocols
             /// For each server, index of the next log entry to send to that
             /// server (initialized to leader last log index + 1).
             /// </summary>
-            Dictionary<MachineId, int> NextIndex;
+            Dictionary<ActorId, int> NextIndex;
 
             /// <summary>
             /// For each server, index of highest log entry known to be replicated
             /// on server (initialized to 0, increases monotonically).
             /// </summary>
-            Dictionary<MachineId, int> MatchIndex;
+            Dictionary<ActorId, int> MatchIndex;
 
             /// <summary>
             /// Number of received votes.
@@ -389,7 +389,7 @@ namespace Benchmarks.Protocols
             [OnEventDoAction(typeof(ConfigureEvent), nameof(Configure))]
             [OnEventGotoState(typeof(BecomeFollower), typeof(Follower))]
             [DeferEvents(typeof(VoteRequest), typeof(AppendEntriesRequest))]
-            class Init : MachineState { }
+            class Init : ActorState { }
 
             void EntryOnInit()
             {
@@ -403,8 +403,8 @@ namespace Benchmarks.Protocols
                 this.CommitIndex = 0;
                 this.LastApplied = 0;
 
-                this.NextIndex = new Dictionary<MachineId, int>();
-                this.MatchIndex = new Dictionary<MachineId, int>();
+                this.NextIndex = new Dictionary<ActorId, int>();
+                this.MatchIndex = new Dictionary<ActorId, int>();
             }
 
             void Configure()
@@ -414,10 +414,10 @@ namespace Benchmarks.Protocols
                 this.Servers = (this.ReceivedEvent as ConfigureEvent).Servers;
                 this.ClusterManager = (this.ReceivedEvent as ConfigureEvent).ClusterManager;
 
-                this.ElectionTimer = this.CreateMachine(typeof(ElectionTimer), $"ElectionTimer{this.ServerId}");
+                this.ElectionTimer = this.CreateActor(typeof(ElectionTimer), $"ElectionTimer{this.ServerId}");
                 this.Send(this.ElectionTimer, new ElectionTimer.ConfigureEvent(this.Id));
 
-                this.PeriodicTimer = this.CreateMachine(typeof(PeriodicTimer), $"PeriodicTimer{this.ServerId}");
+                this.PeriodicTimer = this.CreateActor(typeof(PeriodicTimer), $"PeriodicTimer{this.ServerId}");
                 this.Send(this.PeriodicTimer, new PeriodicTimer.ConfigureEvent(this.Id));
 
                 this.Raise(new BecomeFollower());
@@ -434,7 +434,7 @@ namespace Benchmarks.Protocols
             [OnEventGotoState(typeof(BecomeFollower), typeof(Follower))]
             [OnEventGotoState(typeof(BecomeCandidate), typeof(Candidate))]
             [IgnoreEvents(typeof(PeriodicTimer.TimeoutEvent))]
-            class Follower : MachineState { }
+            class Follower : ActorState { }
 
             void FollowerOnInit()
             {
@@ -517,7 +517,7 @@ namespace Benchmarks.Protocols
             [OnEventGotoState(typeof(BecomeLeader), typeof(Leader))]
             [OnEventGotoState(typeof(BecomeFollower), typeof(Follower))]
             [OnEventGotoState(typeof(BecomeCandidate), typeof(Candidate))]
-            class Candidate : MachineState { }
+            class Candidate : ActorState { }
 
             void CandidateOnInit()
             {
@@ -631,7 +631,7 @@ namespace Benchmarks.Protocols
             [OnEventDoAction(typeof(ShutDown), nameof(ShuttingDown))]
             [OnEventGotoState(typeof(BecomeFollower), typeof(Follower))]
             [IgnoreEvents(typeof(ElectionTimer.TimeoutEvent), typeof(PeriodicTimer.TimeoutEvent))]
-            class Leader : MachineState { }
+            class Leader : ActorState { }
 
             void LeaderOnInit()
             {
@@ -949,7 +949,7 @@ namespace Benchmarks.Protocols
             }
         }
 
-        private class Client : Machine
+        private class Client : Actor
         {
 
             /// <summary>
@@ -957,9 +957,9 @@ namespace Benchmarks.Protocols
             /// </summary>
             public class ConfigureEvent : Event
             {
-                public MachineId Cluster;
+                public ActorId Cluster;
 
-                public ConfigureEvent(MachineId cluster)
+                public ConfigureEvent(ActorId cluster)
                     : base()
                 {
                     this.Cluster = cluster;
@@ -971,10 +971,10 @@ namespace Benchmarks.Protocols
             /// </summary>
             internal class Request : Event
             {
-                public MachineId Client;
+                public ActorId Client;
                 public int Command;
 
-                public Request(MachineId client, int command)
+                public Request(ActorId client, int command)
                     : base()
                 {
                     this.Client = client;
@@ -986,7 +986,7 @@ namespace Benchmarks.Protocols
 
             private class LocalEvent : Event { }
 
-            MachineId Cluster;
+            ActorId Cluster;
 
             int LatestCommand;
             int Counter;
@@ -995,7 +995,7 @@ namespace Benchmarks.Protocols
             [OnEntry(nameof(InitOnEntry))]
             [OnEventDoAction(typeof(ConfigureEvent), nameof(Configure))]
             [OnEventGotoState(typeof(LocalEvent), typeof(PumpRequest))]
-            class Init : MachineState { }
+            class Init : ActorState { }
 
             void InitOnEntry()
             {
@@ -1012,7 +1012,7 @@ namespace Benchmarks.Protocols
             [OnEntry(nameof(PumpRequestOnEntry))]
             [OnEventDoAction(typeof(Response), nameof(ProcessResponse))]
             [OnEventGotoState(typeof(LocalEvent), typeof(PumpRequest))]
-            class PumpRequest : MachineState { }
+            class PumpRequest : ActorState { }
 
             void PumpRequestOnEntry()
             {
@@ -1038,13 +1038,13 @@ namespace Benchmarks.Protocols
             }
         }
 
-        private class ElectionTimer : Machine
+        private class ElectionTimer : Actor
         {
             internal class ConfigureEvent : Event
             {
-                public MachineId Target;
+                public ActorId Target;
 
-                public ConfigureEvent(MachineId id)
+                public ConfigureEvent(ActorId id)
                     : base()
                 {
                     this.Target = id;
@@ -1057,13 +1057,13 @@ namespace Benchmarks.Protocols
 
             private class TickEvent : Event { }
 
-            MachineId Target;
+            ActorId Target;
             int Counter;
 
             [Start]
             [OnEventDoAction(typeof(ConfigureEvent), nameof(Configure))]
             [OnEventGotoState(typeof(StartTimerEvent), typeof(Active))]
-            class Init : MachineState { }
+            class Init : ActorState { }
 
             void Configure()
             {
@@ -1076,7 +1076,7 @@ namespace Benchmarks.Protocols
             [OnEventDoAction(typeof(TickEvent), nameof(Tick))]
             [OnEventGotoState(typeof(CancelTimerEvent), typeof(Inactive))]
             [IgnoreEvents(typeof(StartTimerEvent))]
-            class Active : MachineState { }
+            class Active : ActorState { }
 
             void ActiveOnEntry()
             {
@@ -1107,16 +1107,16 @@ namespace Benchmarks.Protocols
 
             // [OnEventGotoState(typeof(StartTimerEvent), typeof(Active))]
             [IgnoreEvents(typeof(StartTimerEvent), typeof(CancelTimerEvent), typeof(TickEvent))]
-            class Inactive : MachineState { }
+            class Inactive : ActorState { }
         }
 
-        private class PeriodicTimer : Machine
+        private class PeriodicTimer : Actor
         {
             internal class ConfigureEvent : Event
             {
-                public MachineId Target;
+                public ActorId Target;
 
-                public ConfigureEvent(MachineId id)
+                public ConfigureEvent(ActorId id)
                     : base()
                 {
                     this.Target = id;
@@ -1129,14 +1129,14 @@ namespace Benchmarks.Protocols
 
             private class TickEvent : Event { }
 
-            MachineId Target;
+            ActorId Target;
 
             int Count;
 
             [Start]
             [OnEventDoAction(typeof(ConfigureEvent), nameof(Configure))]
             [OnEventGotoState(typeof(StartTimerEvent), typeof(Active))]
-            class Init : MachineState { }
+            class Init : ActorState { }
 
             void Configure()
             {
@@ -1148,7 +1148,7 @@ namespace Benchmarks.Protocols
             [OnEventDoAction(typeof(TickEvent), nameof(Tick))]
             [OnEventGotoState(typeof(CancelTimerEvent), typeof(Inactive))]
             [IgnoreEvents(typeof(StartTimerEvent))]
-            class Active : MachineState { }
+            class Active : ActorState { }
 
             void ActiveOnEntry()
             {
@@ -1176,7 +1176,7 @@ namespace Benchmarks.Protocols
 
             // [OnEventGotoState(typeof(StartTimerEvent), typeof(Active))]
             [IgnoreEvents(typeof(StartTimerEvent), typeof(CancelTimerEvent), typeof(TickEvent))]
-            class Inactive : MachineState { }
+            class Inactive : ActorState { }
         }
 
         private class SafetyMonitor : Monitor

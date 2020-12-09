@@ -8,22 +8,22 @@ using System;
 namespace Microsoft.Coyote.Net
 {
     /// <summary>
-    /// Interface for a P# network provider.
+    /// Interface for a Coyote network provider.
     /// </summary>
     public interface INetworkProvider : IDisposable
     {
         /// <summary>
-        /// Creates a new remote machine of the specified type
+        /// Creates a new remote actor of the specified type
         /// and with the specified event. An optional friendly
         /// name can be specified. If the friendly name is null
         /// or the empty string, a default value will be given.
         /// </summary>
-        MachineId RemoteCreateMachine(Type type, string friendlyName, string endpoint, Event e);
+        ActorId RemoteCreateActor(Type type, string friendlyName, string endpoint, Event e);
 
         /// <summary>
-        /// Sends an event to the specified remote machine.
+        /// Sends an event to the specified remote actor.
         /// </summary>
-        void RemoteSend(MachineId target, Event e);
+        void RemoteSend(ActorId target, Event e);
 
         /// <summary>
         /// Returns the local endpoint.

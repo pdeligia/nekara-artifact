@@ -8,7 +8,7 @@ using Microsoft.Coyote.Runtime;
 namespace Microsoft.Coyote
 {
     /// <summary>
-    /// The runtime for creating and executing machines.
+    /// The runtime for creating and executing actors.
     /// </summary>
     public static class CoyoteRuntime
     {
@@ -16,7 +16,7 @@ namespace Microsoft.Coyote
         /// Creates a new runtime.
         /// </summary>
         /// <returns>The created runtime.</returns>
-        public static IMachineRuntime Create()
+        public static IActorRuntime Create()
         {
             return new ProductionRuntime(Configuration.Create());
         }
@@ -26,7 +26,7 @@ namespace Microsoft.Coyote
         /// </summary>
         /// <param name="configuration">The runtime configuration to use.</param>
         /// <returns>The created runtime.</returns>
-        public static IMachineRuntime Create(Configuration configuration)
+        public static IActorRuntime Create(Configuration configuration)
         {
             return new ProductionRuntime(configuration ?? Configuration.Create());
         }

@@ -11,12 +11,12 @@ namespace Microsoft.Coyote.Utilities
     public enum AbstractionLevel
     {
         /// <summary>
-        /// Basic P# hash: state, inbox and next-action.
+        /// Basic Coyote hash: state, inbox and next-action.
         /// </summary>
         Default = 0,
 
         /// <summary>
-        /// Only hash the machine inboxes during exploration.
+        /// Only hash the actor inboxes during exploration.
         /// </summary>
         InboxOnly,
 
@@ -26,7 +26,7 @@ namespace Microsoft.Coyote.Utilities
         Custom,
 
         /// <summary>
-        /// Use the default P# hash and any additional custom hash provided.
+        /// Use the default Coyote hash and any additional custom hash provided.
         /// </summary>
         Full
     }

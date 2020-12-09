@@ -13,14 +13,14 @@ namespace Microsoft.Coyote.Threading
     public static class TaskExtensions
     {
         /// <summary>
-        /// Converts the specified <see cref="Task"/> into a <see cref="MachineTask"/>.
+        /// Converts the specified <see cref="Task"/> into a <see cref="ActorTask"/>.
         /// </summary>
-        public static MachineTask ToMachineTask(this Task @this) => new MachineTask(@this);
+        public static ActorTask ToActorTask(this Task @this) => new ActorTask(@this);
 
         /// <summary>
-        /// Converts the specified <see cref="Task{TResult}"/> into a <see cref="MachineTask{TResult}"/>.
+        /// Converts the specified <see cref="Task{TResult}"/> into a <see cref="ActorTask{TResult}"/>.
         /// </summary>
-        public static MachineTask<TResult> ToMachineTask<TResult>(this Task<TResult> @this) =>
-            new MachineTask<TResult>(@this);
+        public static ActorTask<TResult> ToActorTask<TResult>(this Task<TResult> @this) =>
+            new ActorTask<TResult>(@this);
     }
 }

@@ -12,9 +12,9 @@ using Microsoft.Coyote.Threading;
 namespace Microsoft.Coyote.TestingServices.Threading
 {
     /// <summary>
-    /// Implements a machine that can execute an <see cref="Action"/> asynchronously.
+    /// Implements an actor that can execute an <see cref="Action"/> asynchronously.
     /// </summary>
-    internal sealed class ActionWorkMachine : WorkMachine
+    internal sealed class ActionWorkActor : WorkActor
     {
         /// <summary>
         /// Work to be executed asynchronously.
@@ -37,9 +37,9 @@ namespace Microsoft.Coyote.TestingServices.Threading
         internal override int AwaiterTaskId => this.AwaiterTask.Id;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ActionWorkMachine"/> class.
+        /// Initializes a new instance of the <see cref="ActionWorkActor"/> class.
         /// </summary>
-        internal ActionWorkMachine(SystematicTestingRuntime runtime, Action work)
+        internal ActionWorkActor(SystematicTestingRuntime runtime, Action work)
             : base(runtime)
         {
             this.Work = work;
@@ -51,11 +51,11 @@ namespace Microsoft.Coyote.TestingServices.Threading
         /// </summary>
         internal override Task ExecuteAsync()
         {
-            IO.Debug.WriteLine($"Machine '{this.Id}' is executing action on task '{MachineTask.CurrentId}' (tcs: {this.Awaiter.Task.Id})");
+            IO.Debug.WriteLine($"Actor '{this.Id}' is executing action on task '{ActorTask.CurrentId}' (tcs: {this.Awaiter.Task.Id})");
             this.Work();
-            IO.Debug.WriteLine($"Machine '{this.Id}' executed action on task '{MachineTask.CurrentId}' (tcs: {this.Awaiter.Task.Id})");
+            IO.Debug.WriteLine($"Actor '{this.Id}' executed action on task '{ActorTask.CurrentId}' (tcs: {this.Awaiter.Task.Id})");
             this.Awaiter.SetResult(default);
-            IO.Debug.WriteLine($"Machine '{this.Id}' completed action on task '{MachineTask.CurrentId}' (tcs: {this.Awaiter.Task.Id})");
+            IO.Debug.WriteLine($"Actor '{this.Id}' completed action on task '{ActorTask.CurrentId}' (tcs: {this.Awaiter.Task.Id})");
             return Task.CompletedTask;
         }
     }

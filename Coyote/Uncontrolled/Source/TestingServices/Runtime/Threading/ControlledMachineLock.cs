@@ -13,9 +13,9 @@ using Microsoft.Coyote.Threading;
 namespace Microsoft.Coyote.TestingServices.Threading
 {
     /// <summary>
-    /// A <see cref="MachineLock"/> that is controlled by the runtime scheduler.
+    /// A <see cref="ActorLock"/> that is controlled by the runtime scheduler.
     /// </summary>
-    internal sealed class ControlledMachineLock : MachineLock, ISynchronizedResource
+    internal sealed class ControlledActorLock : ActorLock, ISynchronizedResource
     {
         /// <summary>
         /// The testing runtime controlling this lock.
@@ -25,7 +25,7 @@ namespace Microsoft.Coyote.TestingServices.Threading
         /// <summary>
         /// Queue of operations awaiting to acquire the lock.
         /// </summary>
-        private readonly Queue<MachineOperation> Awaiters;
+        private readonly Queue<ActorOperation> Awaiters;
 
         /// <summary>
         /// True if the resource has been acquired, else false.
@@ -33,13 +33,13 @@ namespace Microsoft.Coyote.TestingServices.Threading
         bool ISynchronizedResource.IsAcquired => this.IsAcquired;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ControlledMachineLock"/> class.
+        /// Initializes a new instance of the <see cref="ControlledActorLock"/> class.
         /// </summary>
-        internal ControlledMachineLock(SystematicTestingRuntime runtime, ulong id)
+        internal ControlledActorLock(SystematicTestingRuntime runtime, ulong id)
             : base(id)
         {
             this.Runtime = runtime;
-            this.Awaiters = new Queue<MachineOperation>();
+            this.Awaiters = new Queue<ActorOperation>();
         }
 
         /// <summary>
@@ -47,25 +47,25 @@ namespace Microsoft.Coyote.TestingServices.Threading
         /// when the lock has been acquired. The returned task contains a releaser that
         /// releases the lock when disposed.
         /// </summary>
-        public override MachineTask<Releaser> AcquireAsync()
+        public override ActorTask<Releaser> AcquireAsync()
         {
-            AsyncMachine caller = this.Runtime.GetExecutingMachine<AsyncMachine>();
+            AsyncActor caller = this.Runtime.GetExecutingActor<AsyncActor>();
 
             if (this.IsAcquired)
             {
-                this.Runtime.Logger.WriteLine("<SyncLog> Machine '{0}' is waiting to acquire lock '{1}'.",
+                this.Runtime.Logger.WriteLine("<SyncLog> Actor '{0}' is waiting to acquire lock '{1}'.",
                     caller.Id, this.Id);
-                MachineOperation callerOp = this.Runtime.GetAsynchronousOperation(caller.Id.Value);
+                ActorOperation callerOp = this.Runtime.GetAsynchronousOperation(caller.Id.Value);
                 this.Awaiters.Enqueue(callerOp);
                 callerOp.Status = AsyncOperationStatus.BlockedOnResource;
             }
 
             this.IsAcquired = true;
-            this.Runtime.Logger.WriteLine("<SyncLog> Machine '{0}' is acquiring lock '{1}'.", caller.Id, this.Id);
+            this.Runtime.Logger.WriteLine("<SyncLog> Actor '{0}' is acquiring lock '{1}'.", caller.Id, this.Id);
             this.Runtime.Scheduler.ScheduleNextOperation(AsyncOperationType.Acquire,
                 AsyncOperationTarget.Task, caller.Id.Value);
 
-            return MachineTask.FromResult(new Releaser(this));
+            return ActorTask.FromResult(new Releaser(this));
         }
 
         /// <summary>
@@ -73,15 +73,15 @@ namespace Microsoft.Coyote.TestingServices.Threading
         /// </summary>
         protected override void Release()
         {
-            AsyncMachine caller = this.Runtime.GetExecutingMachine<AsyncMachine>();
+            AsyncActor caller = this.Runtime.GetExecutingActor<AsyncActor>();
             this.IsAcquired = false;
             if (this.Awaiters.Count > 0)
             {
-                MachineOperation awaiterOp = this.Awaiters.Dequeue();
+                ActorOperation awaiterOp = this.Awaiters.Dequeue();
                 awaiterOp.Status = AsyncOperationStatus.Enabled;
             }
 
-            this.Runtime.Logger.WriteLine("<SyncLog> Machine '{0}' is releasing lock '{1}'.", caller.Id, this.Id);
+            this.Runtime.Logger.WriteLine("<SyncLog> Actor '{0}' is releasing lock '{1}'.", caller.Id, this.Id);
             this.Runtime.Scheduler.ScheduleNextOperation(AsyncOperationType.Release,
                 AsyncOperationTarget.Task, caller.Id.Value);
         }

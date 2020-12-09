@@ -9,16 +9,16 @@ using Microsoft.Coyote.TestingServices.Runtime;
 namespace Microsoft.Coyote.SharedObjects
 {
     /// <summary>
-    /// Shared counter that can be safely shared by multiple P# machines.
+    /// Shared counter that can be safely shared by multiple Coyote actors.
     /// </summary>
     public static class SharedCounter
     {
         /// <summary>
         /// Creates a new shared counter.
         /// </summary>
-        /// <param name="runtime">The machine runtime.</param>
+        /// <param name="runtime">The actor runtime.</param>
         /// <param name="value">The initial value.</param>
-        public static ISharedCounter Create(IMachineRuntime runtime, int value = 0)
+        public static ISharedCounter Create(IActorRuntime runtime, int value = 0)
         {
             if (runtime is ProductionRuntime)
             {

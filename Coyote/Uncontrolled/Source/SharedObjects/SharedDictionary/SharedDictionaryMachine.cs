@@ -9,9 +9,9 @@ using System.Collections.Generic;
 namespace Microsoft.Coyote.SharedObjects
 {
     /// <summary>
-    /// A shared dictionary modeled using a state-machine for testing.
+    /// A shared dictionary modeled using a state-actor for testing.
     /// </summary>
-    internal sealed class SharedDictionaryMachine<TKey, TValue> : Machine
+    internal sealed class SharedDictionaryActor<TKey, TValue> : Actor
     {
         /// <summary>
         /// The internal shared dictionary.
@@ -19,17 +19,17 @@ namespace Microsoft.Coyote.SharedObjects
         private Dictionary<TKey, TValue> Dictionary;
 
         /// <summary>
-        /// The start state of this machine.
+        /// The start state of this actor.
         /// </summary>
         [Start]
         [OnEntry(nameof(Initialize))]
         [OnEventDoAction(typeof(SharedDictionaryEvent), nameof(ProcessEvent))]
-        private class Init : MachineState
+        private class Init : ActorState
         {
         }
 
         /// <summary>
-        /// Initializes the machine.
+        /// Initializes the actor.
         /// </summary>
         private void Initialize()
         {

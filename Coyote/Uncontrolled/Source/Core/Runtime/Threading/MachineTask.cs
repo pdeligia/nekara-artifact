@@ -15,26 +15,26 @@ namespace Microsoft.Coyote.Threading
 {
     /// <summary>
     /// Provides the capability to execute work asynchronously on a <see cref="TaskScheduler"/>.
-    /// During testing, a <see cref="MachineTask"/> executes in the scope of a <see cref="Machine"/>,
+    /// During testing, a <see cref="ActorTask"/> executes in the scope of a <see cref="Actor"/>,
     /// which enables systematic exploration for finding bugs.
     /// </summary>
-    [AsyncMethodBuilder(typeof(AsyncMachineTaskMethodBuilder))]
-    public class MachineTask : IDisposable
+    [AsyncMethodBuilder(typeof(AsyncActorTaskMethodBuilder))]
+    public class ActorTask : IDisposable
     {
         /// <summary>
         /// Name of the task used for logging purposes.
         /// </summary>
-        internal const string Name = "MachineTask";
+        internal const string Name = "ActorTask";
 
         /// <summary>
-        /// A <see cref="MachineTask"/> that has completed successfully.
+        /// A <see cref="ActorTask"/> that has completed successfully.
         /// </summary>
-        public static MachineTask CompletedTask { get; } = new MachineTask(Task.CompletedTask);
+        public static ActorTask CompletedTask { get; } = new ActorTask(Task.CompletedTask);
 
         /// <summary>
-        /// Returns the id of the currently executing <see cref="MachineTask"/>.
+        /// Returns the id of the currently executing <see cref="ActorTask"/>.
         /// </summary>
-        public static int? CurrentId => MachineRuntime.CurrentScheduler.CurrentTaskId;
+        public static int? CurrentId => ActorRuntime.CurrentScheduler.CurrentTaskId;
 
         /// <summary>
         /// Internal task used to execute the work.
@@ -79,158 +79,158 @@ namespace Microsoft.Coyote.Threading
         public TaskStatus Status => this.InternalTask.Status;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="MachineTask"/> class.
+        /// Initializes a new instance of the <see cref="ActorTask"/> class.
         /// </summary>
-        internal MachineTask(Task task)
+        internal ActorTask(Task task)
         {
             this.InternalTask = task ?? throw new ArgumentNullException(nameof(task));
         }
 
         /// <summary>
-        /// Creates a <see cref="MachineTask{TResult}"/> that is completed successfully with the specified result.
+        /// Creates a <see cref="ActorTask{TResult}"/> that is completed successfully with the specified result.
         /// </summary>
         /// <typeparam name="TResult">The type of the result returned by the task.</typeparam>
         /// <param name="result">The result to store into the completed task.</param>
         /// <returns>The successfully completed task.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static MachineTask<TResult> FromResult<TResult>(TResult result) =>
-            new MachineTask<TResult>(Task.FromResult(result));
+        public static ActorTask<TResult> FromResult<TResult>(TResult result) =>
+            new ActorTask<TResult>(Task.FromResult(result));
 
         /// <summary>
-        /// Creates a <see cref="MachineTask"/> that is completed due to
+        /// Creates a <see cref="ActorTask"/> that is completed due to
         /// cancellation with a specified cancellation token.
         /// </summary>
         /// <param name="cancellationToken">The cancellation token with which to complete the task.</param>
         /// <returns>The canceled task.</returns>
-        public static MachineTask FromCanceled(CancellationToken cancellationToken) =>
-            new MachineTask(Task.FromCanceled(cancellationToken));
+        public static ActorTask FromCanceled(CancellationToken cancellationToken) =>
+            new ActorTask(Task.FromCanceled(cancellationToken));
 
         /// <summary>
-        /// Creates a <see cref="MachineTask{TResult}"/> that is completed due to
+        /// Creates a <see cref="ActorTask{TResult}"/> that is completed due to
         /// cancellation with a specified cancellation token.
         /// </summary>
         /// <typeparam name="TResult">The type of the result returned by the task.</typeparam>
         /// <param name="cancellationToken">The cancellation token with which to complete the task.</param>
         /// <returns>The canceled task.</returns>
-        public static MachineTask<TResult> FromCanceled<TResult>(CancellationToken cancellationToken) =>
-            new MachineTask<TResult>(Task.FromCanceled<TResult>(cancellationToken));
+        public static ActorTask<TResult> FromCanceled<TResult>(CancellationToken cancellationToken) =>
+            new ActorTask<TResult>(Task.FromCanceled<TResult>(cancellationToken));
 
         /// <summary>
-        /// Creates a <see cref="MachineTask"/> that is completed with a specified exception.
+        /// Creates a <see cref="ActorTask"/> that is completed with a specified exception.
         /// </summary>
         /// <param name="exception">The exception with which to complete the task.</param>
         /// <returns>The faulted task.</returns>
-        public static MachineTask FromException(Exception exception) =>
-            new MachineTask(Task.FromException(exception));
+        public static ActorTask FromException(Exception exception) =>
+            new ActorTask(Task.FromException(exception));
 
         /// <summary>
-        /// Creates a <see cref="MachineTask{TResult}"/> that is completed with a specified exception.
+        /// Creates a <see cref="ActorTask{TResult}"/> that is completed with a specified exception.
         /// </summary>
         /// <typeparam name="TResult">The type of the result returned by the task.</typeparam>
         /// <param name="exception">The exception with which to complete the task.</param>
         /// <returns>The faulted task.</returns>
-        public static MachineTask<TResult> FromException<TResult>(Exception exception) =>
-            new MachineTask<TResult>(Task.FromException<TResult>(exception));
+        public static ActorTask<TResult> FromException<TResult>(Exception exception) =>
+            new ActorTask<TResult>(Task.FromException<TResult>(exception));
 
         /// <summary>
         /// Executes the specified work asynchronously on <see cref="TaskScheduler.Default"/>
-        /// and returns the scheduled <see cref="MachineTask"/>.
+        /// and returns the scheduled <see cref="ActorTask"/>.
         /// </summary>
         /// <param name="action">The work to execute asynchronously.</param>
         /// <returns>Task that represents the work to run asynchronously.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static MachineTask Run(Action action) => MachineRuntime.CurrentScheduler.RunAsync(action, default);
+        public static ActorTask Run(Action action) => ActorRuntime.CurrentScheduler.RunAsync(action, default);
 
         /// <summary>
         /// Executes the specified work asynchronously on <see cref="TaskScheduler.Default"/>
-        /// and returns the scheduled <see cref="MachineTask"/>.
+        /// and returns the scheduled <see cref="ActorTask"/>.
         /// </summary>
         /// <param name="action">The work to execute asynchronously.</param>
         /// <param name="cancellationToken">Cancellation token that can be used to cancel the work.</param>
         /// <returns>Task that represents the work to run asynchronously.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static MachineTask Run(Action action, CancellationToken cancellationToken) =>
-            MachineRuntime.CurrentScheduler.RunAsync(action, cancellationToken);
+        public static ActorTask Run(Action action, CancellationToken cancellationToken) =>
+            ActorRuntime.CurrentScheduler.RunAsync(action, cancellationToken);
 
         /// <summary>
         /// Executes the specified work asynchronously on <see cref="TaskScheduler.Default"/>
-        /// and returns the scheduled <see cref="MachineTask"/>.
+        /// and returns the scheduled <see cref="ActorTask"/>.
         /// </summary>
         /// <param name="function">The work to execute asynchronously.</param>
         /// <returns>Task that represents the work to run asynchronously.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static MachineTask Run(Func<Task> function) => MachineRuntime.CurrentScheduler.RunAsync(function, default);
+        public static ActorTask Run(Func<Task> function) => ActorRuntime.CurrentScheduler.RunAsync(function, default);
 
         /// <summary>
         /// Executes the specified work asynchronously on <see cref="TaskScheduler.Default"/>
-        /// and returns the scheduled <see cref="MachineTask"/>.
+        /// and returns the scheduled <see cref="ActorTask"/>.
         /// </summary>
         /// <param name="function">The work to execute asynchronously.</param>
         /// <param name="cancellationToken">Cancellation token that can be used to cancel the work.</param>
         /// <returns>Task that represents the work to run asynchronously.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static MachineTask Run(Func<Task> function, CancellationToken cancellationToken) =>
-            MachineRuntime.CurrentScheduler.RunAsync(function, cancellationToken);
+        public static ActorTask Run(Func<Task> function, CancellationToken cancellationToken) =>
+            ActorRuntime.CurrentScheduler.RunAsync(function, cancellationToken);
 
         /// <summary>
         /// Executes the specified work asynchronously on <see cref="TaskScheduler.Default"/>
-        /// and returns the scheduled <see cref="MachineTask"/>.
+        /// and returns the scheduled <see cref="ActorTask"/>.
         /// </summary>
         /// <typeparam name="TResult">The result type of the task.</typeparam>
         /// <param name="function">The work to execute asynchronously.</param>
         /// <returns>Task that represents the work to run asynchronously.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static MachineTask<TResult> Run<TResult>(Func<TResult> function) =>
-            MachineRuntime.CurrentScheduler.RunAsync(function, default);
+        public static ActorTask<TResult> Run<TResult>(Func<TResult> function) =>
+            ActorRuntime.CurrentScheduler.RunAsync(function, default);
 
         /// <summary>
         /// Executes the specified work asynchronously on <see cref="TaskScheduler.Default"/>
-        /// and returns the scheduled <see cref="MachineTask"/>.
-        /// </summary>
-        /// <typeparam name="TResult">The result type of the task.</typeparam>
-        /// <param name="function">The work to execute asynchronously.</param>
-        /// <param name="cancellationToken">Cancellation token that can be used to cancel the work.</param>
-        /// <returns>Task that represents the work to run asynchronously.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static MachineTask<TResult> Run<TResult>(Func<TResult> function, CancellationToken cancellationToken) =>
-            MachineRuntime.CurrentScheduler.RunAsync(function, cancellationToken);
-
-        /// <summary>
-        /// Executes the specified work asynchronously on <see cref="TaskScheduler.Default"/>
-        /// and returns the scheduled <see cref="MachineTask"/>.
-        /// </summary>
-        /// <typeparam name="TResult">The result type of the task.</typeparam>
-        /// <param name="function">The work to execute asynchronously.</param>
-        /// <returns>Task that represents the work to run asynchronously.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static MachineTask<TResult> Run<TResult>(Func<Task<TResult>> function) =>
-            MachineRuntime.CurrentScheduler.RunAsync(function, default);
-
-        /// <summary>
-        /// Executes the specified work asynchronously on <see cref="TaskScheduler.Default"/>
-        /// and returns the scheduled <see cref="MachineTask"/>.
+        /// and returns the scheduled <see cref="ActorTask"/>.
         /// </summary>
         /// <typeparam name="TResult">The result type of the task.</typeparam>
         /// <param name="function">The work to execute asynchronously.</param>
         /// <param name="cancellationToken">Cancellation token that can be used to cancel the work.</param>
         /// <returns>Task that represents the work to run asynchronously.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static MachineTask<TResult> Run<TResult>(Func<Task<TResult>> function, CancellationToken cancellationToken) =>
-            MachineRuntime.CurrentScheduler.RunAsync(function, cancellationToken);
+        public static ActorTask<TResult> Run<TResult>(Func<TResult> function, CancellationToken cancellationToken) =>
+            ActorRuntime.CurrentScheduler.RunAsync(function, cancellationToken);
 
         /// <summary>
-        /// Creates a <see cref="MachineTask"/> that completes after a time delay.
+        /// Executes the specified work asynchronously on <see cref="TaskScheduler.Default"/>
+        /// and returns the scheduled <see cref="ActorTask"/>.
+        /// </summary>
+        /// <typeparam name="TResult">The result type of the task.</typeparam>
+        /// <param name="function">The work to execute asynchronously.</param>
+        /// <returns>Task that represents the work to run asynchronously.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ActorTask<TResult> Run<TResult>(Func<Task<TResult>> function) =>
+            ActorRuntime.CurrentScheduler.RunAsync(function, default);
+
+        /// <summary>
+        /// Executes the specified work asynchronously on <see cref="TaskScheduler.Default"/>
+        /// and returns the scheduled <see cref="ActorTask"/>.
+        /// </summary>
+        /// <typeparam name="TResult">The result type of the task.</typeparam>
+        /// <param name="function">The work to execute asynchronously.</param>
+        /// <param name="cancellationToken">Cancellation token that can be used to cancel the work.</param>
+        /// <returns>Task that represents the work to run asynchronously.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ActorTask<TResult> Run<TResult>(Func<Task<TResult>> function, CancellationToken cancellationToken) =>
+            ActorRuntime.CurrentScheduler.RunAsync(function, cancellationToken);
+
+        /// <summary>
+        /// Creates a <see cref="ActorTask"/> that completes after a time delay.
         /// </summary>
         /// <param name="millisecondsDelay">
         /// The number of milliseconds to wait before completing the returned task, or -1 to wait indefinitely.
         /// </param>
         /// <returns>Task that represents the time delay.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static MachineTask Delay(int millisecondsDelay) =>
-            MachineRuntime.CurrentScheduler.DelayAsync(millisecondsDelay, default);
+        public static ActorTask Delay(int millisecondsDelay) =>
+            ActorRuntime.CurrentScheduler.DelayAsync(millisecondsDelay, default);
 
         /// <summary>
-        /// Creates a <see cref="MachineTask"/> that completes after a time delay.
+        /// Creates a <see cref="ActorTask"/> that completes after a time delay.
         /// </summary>
         /// <param name="millisecondsDelay">
         /// The number of milliseconds to wait before completing the returned task, or -1 to wait indefinitely.
@@ -238,165 +238,165 @@ namespace Microsoft.Coyote.Threading
         /// <param name="cancellationToken">Cancellation token that can be used to cancel the delay.</param>
         /// <returns>Task that represents the time delay.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static MachineTask Delay(int millisecondsDelay, CancellationToken cancellationToken) =>
-            MachineRuntime.CurrentScheduler.DelayAsync(millisecondsDelay, cancellationToken);
+        public static ActorTask Delay(int millisecondsDelay, CancellationToken cancellationToken) =>
+            ActorRuntime.CurrentScheduler.DelayAsync(millisecondsDelay, cancellationToken);
 
         /// <summary>
-        /// Creates a <see cref="MachineTask"/> that will complete when all tasks
+        /// Creates a <see cref="ActorTask"/> that will complete when all tasks
         /// in the specified array have completed.
         /// </summary>
         /// <param name="tasks">The tasks to wait for completion.</param>
         /// <returns>Task that represents the completion of all of the specified tasks.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static MachineTask WhenAll(params MachineTask[] tasks) =>
-            MachineRuntime.CurrentScheduler.WaitAllTasksAsync(tasks);
+        public static ActorTask WhenAll(params ActorTask[] tasks) =>
+            ActorRuntime.CurrentScheduler.WaitAllTasksAsync(tasks);
 
         /// <summary>
-        /// Creates a <see cref="MachineTask"/> that will complete when all tasks
+        /// Creates a <see cref="ActorTask"/> that will complete when all tasks
         /// in the specified array have completed.
         /// </summary>
         /// <param name="tasks">The tasks to wait for completion.</param>
         /// <returns>Task that represents the completion of all of the specified tasks.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static MachineTask WhenAll(params Task[] tasks) =>
-            MachineRuntime.CurrentScheduler.WaitAllTasksAsync(tasks);
+        public static ActorTask WhenAll(params Task[] tasks) =>
+            ActorRuntime.CurrentScheduler.WaitAllTasksAsync(tasks);
 
         /// <summary>
-        /// Creates a <see cref="MachineTask"/> that will complete when all tasks
+        /// Creates a <see cref="ActorTask"/> that will complete when all tasks
         /// in the specified enumerable collection have completed.
         /// </summary>
         /// <param name="tasks">The tasks to wait for completion.</param>
         /// <returns>Task that represents the completion of all of the specified tasks.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static MachineTask WhenAll(IEnumerable<MachineTask> tasks) =>
-            MachineRuntime.CurrentScheduler.WaitAllTasksAsync(tasks);
+        public static ActorTask WhenAll(IEnumerable<ActorTask> tasks) =>
+            ActorRuntime.CurrentScheduler.WaitAllTasksAsync(tasks);
 
         /// <summary>
-        /// Creates a <see cref="MachineTask"/> that will complete when all tasks
+        /// Creates a <see cref="ActorTask"/> that will complete when all tasks
         /// in the specified enumerable collection have completed.
         /// </summary>
         /// <param name="tasks">The tasks to wait for completion.</param>
         /// <returns>Task that represents the completion of all of the specified tasks.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static MachineTask WhenAll(IEnumerable<Task> tasks) =>
-            MachineRuntime.CurrentScheduler.WaitAllTasksAsync(tasks);
+        public static ActorTask WhenAll(IEnumerable<Task> tasks) =>
+            ActorRuntime.CurrentScheduler.WaitAllTasksAsync(tasks);
 
         /// <summary>
-        /// Creates a <see cref="MachineTask"/> that will complete when all tasks
-        /// in the specified array have completed.
-        /// </summary>
-        /// <typeparam name="TResult">The result type of the task.</typeparam>
-        /// <param name="tasks">The tasks to wait for completion.</param>
-        /// <returns>Task that represents the completion of all of the specified tasks.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static MachineTask<TResult[]> WhenAll<TResult>(params MachineTask<TResult>[] tasks) =>
-            MachineRuntime.CurrentScheduler.WaitAllTasksAsync(tasks);
-
-        /// <summary>
-        /// Creates a <see cref="MachineTask"/> that will complete when all tasks
+        /// Creates a <see cref="ActorTask"/> that will complete when all tasks
         /// in the specified array have completed.
         /// </summary>
         /// <typeparam name="TResult">The result type of the task.</typeparam>
         /// <param name="tasks">The tasks to wait for completion.</param>
         /// <returns>Task that represents the completion of all of the specified tasks.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static MachineTask<TResult[]> WhenAll<TResult>(params Task<TResult>[] tasks) =>
-            MachineRuntime.CurrentScheduler.WaitAllTasksAsync(tasks);
+        public static ActorTask<TResult[]> WhenAll<TResult>(params ActorTask<TResult>[] tasks) =>
+            ActorRuntime.CurrentScheduler.WaitAllTasksAsync(tasks);
 
         /// <summary>
-        /// Creates a <see cref="MachineTask"/> that will complete when all tasks
+        /// Creates a <see cref="ActorTask"/> that will complete when all tasks
+        /// in the specified array have completed.
+        /// </summary>
+        /// <typeparam name="TResult">The result type of the task.</typeparam>
+        /// <param name="tasks">The tasks to wait for completion.</param>
+        /// <returns>Task that represents the completion of all of the specified tasks.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ActorTask<TResult[]> WhenAll<TResult>(params Task<TResult>[] tasks) =>
+            ActorRuntime.CurrentScheduler.WaitAllTasksAsync(tasks);
+
+        /// <summary>
+        /// Creates a <see cref="ActorTask"/> that will complete when all tasks
         /// in the specified enumerable collection have completed.
         /// </summary>
         /// <typeparam name="TResult">The result type of the task.</typeparam>
         /// <param name="tasks">The tasks to wait for completion.</param>
         /// <returns>Task that represents the completion of all of the specified tasks.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static MachineTask<TResult[]> WhenAll<TResult>(IEnumerable<MachineTask<TResult>> tasks) =>
-            MachineRuntime.CurrentScheduler.WaitAllTasksAsync(tasks);
+        public static ActorTask<TResult[]> WhenAll<TResult>(IEnumerable<ActorTask<TResult>> tasks) =>
+            ActorRuntime.CurrentScheduler.WaitAllTasksAsync(tasks);
 
         /// <summary>
-        /// Creates a <see cref="MachineTask"/> that will complete when all tasks
+        /// Creates a <see cref="ActorTask"/> that will complete when all tasks
         /// in the specified enumerable collection have completed.
         /// </summary>
         /// <typeparam name="TResult">The result type of the task.</typeparam>
         /// <param name="tasks">The tasks to wait for completion.</param>
         /// <returns>Task that represents the completion of all of the specified tasks.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static MachineTask<TResult[]> WhenAll<TResult>(IEnumerable<Task<TResult>> tasks) =>
-            MachineRuntime.CurrentScheduler.WaitAllTasksAsync(tasks);
+        public static ActorTask<TResult[]> WhenAll<TResult>(IEnumerable<Task<TResult>> tasks) =>
+            ActorRuntime.CurrentScheduler.WaitAllTasksAsync(tasks);
 
         /// <summary>
-        /// Creates a <see cref="MachineTask"/> that will complete when any task
+        /// Creates a <see cref="ActorTask"/> that will complete when any task
         /// in the specified array have completed.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static MachineTask<Task> WhenAny(params MachineTask[] tasks) =>
-            MachineRuntime.CurrentScheduler.WaitAnyTaskAsync(tasks);
+        public static ActorTask<Task> WhenAny(params ActorTask[] tasks) =>
+            ActorRuntime.CurrentScheduler.WaitAnyTaskAsync(tasks);
 
         /// <summary>
-        /// Creates a <see cref="MachineTask"/> that will complete when any task
+        /// Creates a <see cref="ActorTask"/> that will complete when any task
         /// in the specified array have completed.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static MachineTask<Task> WhenAny(params Task[] tasks) =>
-            MachineRuntime.CurrentScheduler.WaitAnyTaskAsync(tasks);
+        public static ActorTask<Task> WhenAny(params Task[] tasks) =>
+            ActorRuntime.CurrentScheduler.WaitAnyTaskAsync(tasks);
 
         /// <summary>
-        /// Creates a <see cref="MachineTask"/> that will complete when any task
+        /// Creates a <see cref="ActorTask"/> that will complete when any task
         /// in the specified enumerable collection have completed.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static MachineTask<Task> WhenAny(IEnumerable<MachineTask> tasks) =>
-            MachineRuntime.CurrentScheduler.WaitAnyTaskAsync(tasks);
+        public static ActorTask<Task> WhenAny(IEnumerable<ActorTask> tasks) =>
+            ActorRuntime.CurrentScheduler.WaitAnyTaskAsync(tasks);
 
         /// <summary>
-        /// Creates a <see cref="MachineTask"/> that will complete when any task
+        /// Creates a <see cref="ActorTask"/> that will complete when any task
         /// in the specified enumerable collection have completed.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static MachineTask<Task> WhenAny(IEnumerable<Task> tasks) =>
-            MachineRuntime.CurrentScheduler.WaitAnyTaskAsync(tasks);
+        public static ActorTask<Task> WhenAny(IEnumerable<Task> tasks) =>
+            ActorRuntime.CurrentScheduler.WaitAnyTaskAsync(tasks);
 
         /// <summary>
-        /// Creates a <see cref="MachineTask"/> that will complete when any task
+        /// Creates a <see cref="ActorTask"/> that will complete when any task
         /// in the specified array have completed.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static MachineTask<Task<TResult>> WhenAny<TResult>(params MachineTask<TResult>[] tasks) =>
-            MachineRuntime.CurrentScheduler.WaitAnyTaskAsync(tasks);
+        public static ActorTask<Task<TResult>> WhenAny<TResult>(params ActorTask<TResult>[] tasks) =>
+            ActorRuntime.CurrentScheduler.WaitAnyTaskAsync(tasks);
 
         /// <summary>
-        /// Creates a <see cref="MachineTask"/> that will complete when any task
+        /// Creates a <see cref="ActorTask"/> that will complete when any task
         /// in the specified array have completed.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static MachineTask<Task<TResult>> WhenAny<TResult>(params Task<TResult>[] tasks) =>
-            MachineRuntime.CurrentScheduler.WaitAnyTaskAsync(tasks);
+        public static ActorTask<Task<TResult>> WhenAny<TResult>(params Task<TResult>[] tasks) =>
+            ActorRuntime.CurrentScheduler.WaitAnyTaskAsync(tasks);
 
         /// <summary>
-        /// Creates a <see cref="MachineTask"/> that will complete when any task
+        /// Creates a <see cref="ActorTask"/> that will complete when any task
         /// in the specified enumerable collection have completed.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static MachineTask<Task<TResult>> WhenAny<TResult>(IEnumerable<MachineTask<TResult>> tasks) =>
-            MachineRuntime.CurrentScheduler.WaitAnyTaskAsync(tasks);
+        public static ActorTask<Task<TResult>> WhenAny<TResult>(IEnumerable<ActorTask<TResult>> tasks) =>
+            ActorRuntime.CurrentScheduler.WaitAnyTaskAsync(tasks);
 
         /// <summary>
-        /// Creates a <see cref="MachineTask"/> that will complete when any task
+        /// Creates a <see cref="ActorTask"/> that will complete when any task
         /// in the specified enumerable collection have completed.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static MachineTask<Task<TResult>> WhenAny<TResult>(IEnumerable<Task<TResult>> tasks) =>
-            MachineRuntime.CurrentScheduler.WaitAnyTaskAsync(tasks);
+        public static ActorTask<Task<TResult>> WhenAny<TResult>(IEnumerable<Task<TResult>> tasks) =>
+            ActorRuntime.CurrentScheduler.WaitAnyTaskAsync(tasks);
 
         /// <summary>
         /// Creates an awaitable that asynchronously yields back to the current context when awaited.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static YieldAwaitable Yield() => new YieldAwaitable(MachineRuntime.CurrentScheduler);
+        public static YieldAwaitable Yield() => new YieldAwaitable(ActorRuntime.CurrentScheduler);
 
         /// <summary>
-        /// Converts the specified <see cref="MachineTask"/> into a <see cref="Task"/>.
+        /// Converts the specified <see cref="ActorTask"/> into a <see cref="Task"/>.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Task ToTask() => this.InternalTask;
@@ -405,7 +405,7 @@ namespace Microsoft.Coyote.Threading
         /// Gets an awaiter for this awaitable.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public virtual MachineTaskAwaiter GetAwaiter() => new MachineTaskAwaiter(this, this.InternalTask);
+        public virtual ActorTaskAwaiter GetAwaiter() => new ActorTaskAwaiter(this, this.InternalTask);
 
         /// <summary>
         /// Ends the wait for the completion of the task.
@@ -427,17 +427,17 @@ namespace Microsoft.Coyote.Threading
             awaiter.UnsafeOnCompleted(continuation);
 
         /// <summary>
-        /// Disposes the <see cref="MachineTask"/>, releasing all of its unmanaged resources.
+        /// Disposes the <see cref="ActorTask"/>, releasing all of its unmanaged resources.
         /// </summary>
         protected virtual void Dispose(bool disposing)
         {
         }
 
         /// <summary>
-        /// Disposes the <see cref="MachineTask"/>, releasing all of its unmanaged resources.
+        /// Disposes the <see cref="ActorTask"/>, releasing all of its unmanaged resources.
         /// </summary>
         /// <remarks>
-        /// Unlike most of the members of <see cref="MachineTask"/>, this method is not thread-safe.
+        /// Unlike most of the members of <see cref="ActorTask"/>, this method is not thread-safe.
         /// </remarks>
         public void Dispose()
         {
@@ -449,12 +449,12 @@ namespace Microsoft.Coyote.Threading
 
     /// <summary>
     /// Provides the capability to execute work asynchronously on a <see cref="TaskScheduler"/> and produce
-    /// a result at some time in the future. During testing, a <see cref="MachineTask"/> executes in the
-    /// scope of a <see cref="Machine"/>, which enables systematic exploration for finding bugs.
+    /// a result at some time in the future. During testing, a <see cref="ActorTask"/> executes in the
+    /// scope of a <see cref="Actor"/>, which enables systematic exploration for finding bugs.
     /// </summary>
     /// <typeparam name="TResult">The type of the produced result.</typeparam>
-    [AsyncMethodBuilder(typeof(AsyncMachineTaskMethodBuilder<>))]
-    public class MachineTask<TResult> : MachineTask
+    [AsyncMethodBuilder(typeof(AsyncActorTaskMethodBuilder<>))]
+    public class ActorTask<TResult> : ActorTask
     {
         /// <summary>
         /// Task that provides access to the completed work.
@@ -467,9 +467,9 @@ namespace Microsoft.Coyote.Threading
         public TResult Result => this.AwaiterTask.Result;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="MachineTask{TResult}"/> class.
+        /// Initializes a new instance of the <see cref="ActorTask{TResult}"/> class.
         /// </summary>
-        internal MachineTask(Task<TResult> task)
+        internal ActorTask(Task<TResult> task)
             : base(task)
         {
         }
@@ -478,8 +478,8 @@ namespace Microsoft.Coyote.Threading
         /// Gets an awaiter for this awaitable.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public new virtual MachineTaskAwaiter<TResult> GetAwaiter() =>
-            new MachineTaskAwaiter<TResult>(this, this.InternalTask as Task<TResult>);
+        public new virtual ActorTaskAwaiter<TResult> GetAwaiter() =>
+            new ActorTaskAwaiter<TResult>(this, this.InternalTask as Task<TResult>);
 
         /// <summary>
         /// Ends the wait for the completion of the task.

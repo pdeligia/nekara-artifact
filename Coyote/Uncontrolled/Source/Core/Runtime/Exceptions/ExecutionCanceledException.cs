@@ -6,8 +6,8 @@
 namespace Microsoft.Coyote.Runtime
 {
     /// <summary>
-    /// The exception that is thrown in a P# machine upon cancellation
-    /// of execution by the P# runtime.
+    /// The exception that is thrown in a Coyote actor upon cancellation
+    /// of execution by the Coyote runtime.
     /// </summary>
     public sealed class ExecutionCanceledException : RuntimeException
     {

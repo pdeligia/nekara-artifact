@@ -14,19 +14,19 @@ using Microsoft.Coyote.Utilities;
 namespace Microsoft.Coyote.TestingServices.Runtime
 {
     /// <summary>
-    /// Implements a queue of events that is used by a serialized machine during testing.
+    /// Implements a queue of events that is used by a serialized actor during testing.
     /// </summary>
-    internal sealed class SerializedMachineEventQueue : IEventQueue
+    internal sealed class SerializedActorEventQueue : IEventQueue
     {
         /// <summary>
-        /// Manages the state of the machine that owns this queue.
+        /// Manages the state of the actor that owns this queue.
         /// </summary>
-        private readonly IMachineStateManager MachineStateManager;
+        private readonly IActorStateManager ActorStateManager;
 
         /// <summary>
-        /// The machine that owns this queue.
+        /// The actor that owns this queue.
         /// </summary>
-        private readonly Machine Machine;
+        private readonly Actor Actor;
 
         /// <summary>
         /// The internal queue that contains events with their metadata.
@@ -67,12 +67,12 @@ namespace Microsoft.Coyote.TestingServices.Runtime
         public bool IsEventRaised => this.RaisedEvent != default;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SerializedMachineEventQueue"/> class.
+        /// Initializes a new instance of the <see cref="SerializedActorEventQueue"/> class.
         /// </summary>
-        internal SerializedMachineEventQueue(IMachineStateManager machineStateManager, Machine machine)
+        internal SerializedActorEventQueue(IActorStateManager actorStateManager, Actor actor)
         {
-            this.MachineStateManager = machineStateManager;
-            this.Machine = machine;
+            this.ActorStateManager = actorStateManager;
+            this.Actor = actor;
             this.Queue = new LinkedList<(Event, Guid, EventInfo)>();
             this.EventWaitTypes = new Dictionary<Type, Func<Event, bool>>();
             this.IsClosed = false;
@@ -92,31 +92,31 @@ namespace Microsoft.Coyote.TestingServices.Runtime
                 (predicate is null || predicate(e)))
             {
                 this.EventWaitTypes.Clear();
-                this.MachineStateManager.OnReceiveEvent(e, opGroupId, info);
+                this.ActorStateManager.OnReceiveEvent(e, opGroupId, info);
                 this.ReceiveCompletionSource.SetResult(e);
                 return EnqueueStatus.EventHandlerRunning;
             }
 
-            this.MachineStateManager.OnEnqueueEvent(e, opGroupId, info);
+            this.ActorStateManager.OnEnqueueEvent(e, opGroupId, info);
             this.Queue.AddLast((e, opGroupId, info));
 
             if (info.Assert >= 0)
             {
                 var eventCount = this.Queue.Count(val => val.e.GetType().Equals(e.GetType()));
-                this.MachineStateManager.Assert(eventCount <= info.Assert,
-                    "There are more than {0} instances of '{1}' in the input queue of machine '{2}'.",
-                    info.Assert, info.EventName, this.Machine.Id);
+                this.ActorStateManager.Assert(eventCount <= info.Assert,
+                    "There are more than {0} instances of '{1}' in the input queue of actor '{2}'.",
+                    info.Assert, info.EventName, this.Actor.Id);
             }
 
             if (info.Assume >= 0)
             {
                 var eventCount = this.Queue.Count(val => val.e.GetType().Equals(e.GetType()));
-                this.MachineStateManager.Assert(eventCount <= info.Assume,
-                    "There are more than {0} instances of '{1}' in the input queue of machine '{2}'.",
-                    info.Assume, info.EventName, this.Machine.Id);
+                this.ActorStateManager.Assert(eventCount <= info.Assume,
+                    "There are more than {0} instances of '{1}' in the input queue of actor '{2}'.",
+                    info.Assume, info.EventName, this.Actor.Id);
             }
 
-            if (!this.MachineStateManager.IsEventHandlerRunning)
+            if (!this.ActorStateManager.IsEventHandlerRunning)
             {
                 if (this.TryDequeueEvent(true).e is null)
                 {
@@ -124,7 +124,7 @@ namespace Microsoft.Coyote.TestingServices.Runtime
                 }
                 else
                 {
-                    this.MachineStateManager.IsEventHandlerRunning = true;
+                    this.ActorStateManager.IsEventHandlerRunning = true;
                     return EnqueueStatus.EventHandlerNotRunning;
                 }
             }
@@ -141,7 +141,7 @@ namespace Microsoft.Coyote.TestingServices.Runtime
             // have priority over the events in the inbox.
             if (this.RaisedEvent != default)
             {
-                if (this.MachineStateManager.IsEventIgnoredInCurrentState(this.RaisedEvent.e, this.RaisedEvent.opGroupId, this.RaisedEvent.info))
+                if (this.ActorStateManager.IsEventIgnoredInCurrentState(this.RaisedEvent.e, this.RaisedEvent.opGroupId, this.RaisedEvent.info))
                 {
                     // TODO: should the user be able to raise an ignored event?
                     // The raised event is ignored in the current state.
@@ -155,10 +155,10 @@ namespace Microsoft.Coyote.TestingServices.Runtime
                 }
             }
 
-            var hasDefaultHandler = this.MachineStateManager.IsDefaultHandlerInstalledInCurrentState();
+            var hasDefaultHandler = this.ActorStateManager.IsDefaultHandlerInstalledInCurrentState();
             if (hasDefaultHandler)
             {
-                this.Machine.Runtime.NotifyDefaultEventHandlerCheck(this.Machine);
+                this.Actor.Runtime.NotifyDefaultEventHandlerCheck(this.Actor);
             }
 
             // Try to dequeue the next event, if there is one.
@@ -173,14 +173,14 @@ namespace Microsoft.Coyote.TestingServices.Runtime
             if (!hasDefaultHandler)
             {
                 // There is no default event handler installed, so do not return an event.
-                this.MachineStateManager.IsEventHandlerRunning = false;
+                this.ActorStateManager.IsEventHandlerRunning = false;
                 return (DequeueStatus.NotAvailable, null, Guid.Empty, null);
             }
 
             // TODO: check op-id of default event.
             // A default event handler exists.
-            var eventOrigin = new EventOriginInfo(this.Machine.Id, this.Machine.GetType().FullName,
-                NameResolver.GetStateNameForLogging(this.Machine.CurrentState));
+            var eventOrigin = new EventOriginInfo(this.Actor.Id, this.Actor.GetType().FullName,
+                NameResolver.GetStateNameForLogging(this.Actor.CurrentState));
             return (DequeueStatus.Default, Default.Event, Guid.Empty, new EventInfo(Default.Event, eventOrigin));
         }
 
@@ -198,7 +198,7 @@ namespace Microsoft.Coyote.TestingServices.Runtime
                 var nextNode = node.Next;
                 var currentEvent = node.Value;
 
-                if (this.MachineStateManager.IsEventIgnoredInCurrentState(currentEvent.e, currentEvent.opGroupId, currentEvent.info))
+                if (this.ActorStateManager.IsEventIgnoredInCurrentState(currentEvent.e, currentEvent.opGroupId, currentEvent.info))
                 {
                     if (!checkOnly)
                     {
@@ -211,7 +211,7 @@ namespace Microsoft.Coyote.TestingServices.Runtime
                 }
 
                 // Skips a deferred event.
-                if (!this.MachineStateManager.IsEventDeferredInCurrentState(currentEvent.e, currentEvent.opGroupId, currentEvent.info))
+                if (!this.ActorStateManager.IsEventDeferredInCurrentState(currentEvent.e, currentEvent.opGroupId, currentEvent.info))
                 {
                     nextAvailableEvent = currentEvent;
                     if (!checkOnly)
@@ -233,11 +233,11 @@ namespace Microsoft.Coyote.TestingServices.Runtime
         /// </summary>
         public void Raise(Event e, Guid opGroupId)
         {
-            var eventOrigin = new EventOriginInfo(this.Machine.Id, this.Machine.GetType().FullName,
-                NameResolver.GetStateNameForLogging(this.Machine.CurrentState));
+            var eventOrigin = new EventOriginInfo(this.Actor.Id, this.Actor.GetType().FullName,
+                NameResolver.GetStateNameForLogging(this.Actor.CurrentState));
             var info = new EventInfo(e, eventOrigin);
             this.RaisedEvent = (e, opGroupId, info);
-            this.MachineStateManager.OnRaiseEvent(e, opGroupId, info);
+            this.ActorStateManager.OnRaiseEvent(e, opGroupId, info);
         }
 
         /// <summary>
@@ -286,7 +286,7 @@ namespace Microsoft.Coyote.TestingServices.Runtime
         /// </summary>
         private Task<Event> ReceiveAsync(Dictionary<Type, Func<Event, bool>> eventWaitTypes)
         {
-            this.Machine.Runtime.NotifyReceiveCalled(this.Machine);
+            this.Actor.Runtime.NotifyReceiveCalled(this.Actor);
 
             (Event e, Guid opGroupId, EventInfo info) receivedEvent = default;
             var node = this.Queue.First;
@@ -308,11 +308,11 @@ namespace Microsoft.Coyote.TestingServices.Runtime
             {
                 this.ReceiveCompletionSource = new TaskCompletionSource<Event>();
                 this.EventWaitTypes = eventWaitTypes;
-                this.MachineStateManager.OnWaitEvent(this.EventWaitTypes.Keys);
+                this.ActorStateManager.OnWaitEvent(this.EventWaitTypes.Keys);
                 return this.ReceiveCompletionSource.Task;
             }
 
-            this.MachineStateManager.OnReceiveEventWithoutWaiting(receivedEvent.e, receivedEvent.opGroupId, receivedEvent.info);
+            this.ActorStateManager.OnReceiveEventWithoutWaiting(receivedEvent.e, receivedEvent.opGroupId, receivedEvent.info);
             return Task.FromResult(receivedEvent.e);
         }
 
@@ -358,7 +358,7 @@ namespace Microsoft.Coyote.TestingServices.Runtime
 
             foreach (var (e, opGroupId, info) in this.Queue)
             {
-                this.MachineStateManager.OnDropEvent(e, opGroupId, info);
+                this.ActorStateManager.OnDropEvent(e, opGroupId, info);
             }
 
             this.Queue.Clear();

@@ -19,9 +19,9 @@ using static System.Runtime.CompilerServices.YieldAwaitable;
 namespace Microsoft.Coyote.TestingServices.Threading
 {
     /// <summary>
-    /// Implements a <see cref="MachineTaskScheduler"/> that is controlled by the runtime during testing.
+    /// Implements a <see cref="ActorTaskScheduler"/> that is controlled by the runtime during testing.
     /// </summary>
-    internal sealed class ControlledMachineTaskScheduler : MachineTaskScheduler
+    internal sealed class ControlledActorTaskScheduler : ActorTaskScheduler
     {
         /// <summary>
         /// The testing runtime that is controlling this scheduler.
@@ -29,9 +29,9 @@ namespace Microsoft.Coyote.TestingServices.Threading
         internal SystematicTestingRuntime Runtime;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ControlledMachineTaskScheduler"/> class.
+        /// Initializes a new instance of the <see cref="ControlledActorTaskScheduler"/> class.
         /// </summary>
-        internal ControlledMachineTaskScheduler(SystematicTestingRuntime runtime)
+        internal ControlledActorTaskScheduler(SystematicTestingRuntime runtime)
             : base()
         {
             this.Runtime = runtime;
@@ -43,8 +43,8 @@ namespace Microsoft.Coyote.TestingServices.Threading
         /// <param name="action">The work to execute asynchronously.</param>
         /// <param name="cancellationToken">Cancellation token that can be used to cancel the work.</param>
         /// <returns>Task that represents the work to be scheduled.</returns>
-        internal override MachineTask RunAsync(Action action, CancellationToken cancellationToken) =>
-            this.Runtime.CreateMachineTask(action, cancellationToken);
+        internal override ActorTask RunAsync(Action action, CancellationToken cancellationToken) =>
+            this.Runtime.CreateActorTask(action, cancellationToken);
 
         /// <summary>
         /// Schedules the specified work to execute asynchronously and returns a task handle for the work.
@@ -52,18 +52,8 @@ namespace Microsoft.Coyote.TestingServices.Threading
         /// <param name="function">The work to execute asynchronously.</param>
         /// <param name="cancellationToken">Cancellation token that can be used to cancel the work.</param>
         /// <returns>Task that represents the work to be scheduled.</returns>
-        internal override MachineTask RunAsync(Func<Task> function, CancellationToken cancellationToken) =>
-            this.Runtime.CreateMachineTask(function, cancellationToken);
-
-        /// <summary>
-        /// Schedules the specified work to execute asynchronously and returns a task handle for the work.
-        /// </summary>
-        /// <typeparam name="TResult">The result type of the task.</typeparam>
-        /// <param name="function">The work to execute asynchronously.</param>
-        /// <param name="cancellationToken">Cancellation token that can be used to cancel the work.</param>
-        /// <returns>Task that represents the work to be scheduled.</returns>
-        internal override MachineTask<TResult> RunAsync<TResult>(Func<TResult> function, CancellationToken cancellationToken) =>
-            this.Runtime.CreateMachineTask(function, cancellationToken);
+        internal override ActorTask RunAsync(Func<Task> function, CancellationToken cancellationToken) =>
+            this.Runtime.CreateActorTask(function, cancellationToken);
 
         /// <summary>
         /// Schedules the specified work to execute asynchronously and returns a task handle for the work.
@@ -72,134 +62,144 @@ namespace Microsoft.Coyote.TestingServices.Threading
         /// <param name="function">The work to execute asynchronously.</param>
         /// <param name="cancellationToken">Cancellation token that can be used to cancel the work.</param>
         /// <returns>Task that represents the work to be scheduled.</returns>
-        internal override MachineTask<TResult> RunAsync<TResult>(Func<Task<TResult>> function,
+        internal override ActorTask<TResult> RunAsync<TResult>(Func<TResult> function, CancellationToken cancellationToken) =>
+            this.Runtime.CreateActorTask(function, cancellationToken);
+
+        /// <summary>
+        /// Schedules the specified work to execute asynchronously and returns a task handle for the work.
+        /// </summary>
+        /// <typeparam name="TResult">The result type of the task.</typeparam>
+        /// <param name="function">The work to execute asynchronously.</param>
+        /// <param name="cancellationToken">Cancellation token that can be used to cancel the work.</param>
+        /// <returns>Task that represents the work to be scheduled.</returns>
+        internal override ActorTask<TResult> RunAsync<TResult>(Func<Task<TResult>> function,
             CancellationToken cancellationToken) =>
-            this.Runtime.CreateMachineTask(function, cancellationToken);
+            this.Runtime.CreateActorTask(function, cancellationToken);
 
         /// <summary>
-        /// Creates a <see cref="MachineTask"/> that completes after a time delay.
+        /// Creates a <see cref="ActorTask"/> that completes after a time delay.
         /// </summary>
         /// <param name="millisecondsDelay">
         /// The number of milliseconds to wait before completing the returned task, or -1 to wait indefinitely.
         /// </param>
         /// <param name="cancellationToken">Cancellation token that can be used to cancel the delay.</param>
         /// <returns>Task that represents the time delay.</returns>
-        internal override MachineTask DelayAsync(int millisecondsDelay, CancellationToken cancellationToken) =>
-            this.Runtime.CreateMachineTask(millisecondsDelay, cancellationToken);
+        internal override ActorTask DelayAsync(int millisecondsDelay, CancellationToken cancellationToken) =>
+            this.Runtime.CreateActorTask(millisecondsDelay, cancellationToken);
 
         /// <summary>
-        /// Creates a <see cref="MachineTask"/> that will complete when all tasks
+        /// Creates a <see cref="ActorTask"/> that will complete when all tasks
         /// in the specified array have completed.
         /// </summary>
         /// <param name="tasks">The tasks to wait for completion.</param>
         /// <returns>Task that represents the completion of all of the specified tasks.</returns>
-        internal override MachineTask WaitAllTasksAsync(params Task[] tasks) =>
+        internal override ActorTask WaitAllTasksAsync(params Task[] tasks) =>
             this.Runtime.WaitAllTasksAsync(tasks);
 
         /// <summary>
-        /// Creates a <see cref="MachineTask"/> that will complete when all tasks
+        /// Creates a <see cref="ActorTask"/> that will complete when all tasks
         /// in the specified enumerable collection have completed.
         /// </summary>
         /// <param name="tasks">The tasks to wait for completion.</param>
         /// <returns>Task that represents the completion of all of the specified tasks.</returns>
-        internal override MachineTask WaitAllTasksAsync(IEnumerable<Task> tasks) =>
+        internal override ActorTask WaitAllTasksAsync(IEnumerable<Task> tasks) =>
             this.Runtime.WaitAllTasksAsync(tasks);
 
         /// <summary>
-        /// Creates a <see cref="MachineTask"/> that will complete when all tasks
+        /// Creates a <see cref="ActorTask"/> that will complete when all tasks
         /// in the specified array have completed.
         /// </summary>
         /// <typeparam name="TResult">The result type of the task.</typeparam>
         /// <param name="tasks">The tasks to wait for completion.</param>
         /// <returns>Task that represents the completion of all of the specified tasks.</returns>
-        internal override MachineTask<TResult[]> WaitAllTasksAsync<TResult>(params Task<TResult>[] tasks) =>
+        internal override ActorTask<TResult[]> WaitAllTasksAsync<TResult>(params Task<TResult>[] tasks) =>
             this.Runtime.WaitAllTasksAsync(tasks);
 
         /// <summary>
-        /// Creates a <see cref="MachineTask"/> that will complete when all tasks
+        /// Creates a <see cref="ActorTask"/> that will complete when all tasks
         /// in the specified enumerable collection have completed.
         /// </summary>
         /// <typeparam name="TResult">The result type of the task.</typeparam>
         /// <param name="tasks">The tasks to wait for completion.</param>
         /// <returns>Task that represents the completion of all of the specified tasks.</returns>
-        internal override MachineTask<TResult[]> WaitAllTasksAsync<TResult>(IEnumerable<Task<TResult>> tasks) =>
+        internal override ActorTask<TResult[]> WaitAllTasksAsync<TResult>(IEnumerable<Task<TResult>> tasks) =>
             this.Runtime.WaitAllTasksAsync(tasks);
 
         /// <summary>
-        /// Creates a <see cref="MachineTask"/> that will complete when any task
+        /// Creates a <see cref="ActorTask"/> that will complete when any task
         /// in the specified array have completed.
         /// </summary>
-        internal override MachineTask<Task> WaitAnyTaskAsync(params MachineTask[] tasks) =>
+        internal override ActorTask<Task> WaitAnyTaskAsync(params ActorTask[] tasks) =>
             this.Runtime.WaitAnyTaskAsync(tasks.Select(t => t.AwaiterTask));
 
         /// <summary>
-        /// Creates a <see cref="MachineTask"/> that will complete when any task
+        /// Creates a <see cref="ActorTask"/> that will complete when any task
         /// in the specified array have completed.
         /// </summary>
-        internal override MachineTask<Task> WaitAnyTaskAsync(params Task[] tasks) =>
+        internal override ActorTask<Task> WaitAnyTaskAsync(params Task[] tasks) =>
             this.Runtime.WaitAnyTaskAsync(tasks);
 
         /// <summary>
-        /// Creates a <see cref="MachineTask"/> that will complete when any task
+        /// Creates a <see cref="ActorTask"/> that will complete when any task
         /// in the specified enumerable collection have completed.
         /// </summary>
-        internal override MachineTask<Task> WaitAnyTaskAsync(IEnumerable<MachineTask> tasks) =>
+        internal override ActorTask<Task> WaitAnyTaskAsync(IEnumerable<ActorTask> tasks) =>
             this.Runtime.WaitAnyTaskAsync(tasks.Select(t => t.AwaiterTask));
 
         /// <summary>
-        /// Creates a <see cref="MachineTask"/> that will complete when any task
+        /// Creates a <see cref="ActorTask"/> that will complete when any task
         /// in the specified enumerable collection have completed.
         /// </summary>
-        internal override MachineTask<Task> WaitAnyTaskAsync(IEnumerable<Task> tasks) =>
+        internal override ActorTask<Task> WaitAnyTaskAsync(IEnumerable<Task> tasks) =>
             this.Runtime.WaitAnyTaskAsync(tasks);
 
         /// <summary>
-        /// Creates a <see cref="MachineTask"/> that will complete when any task
+        /// Creates a <see cref="ActorTask"/> that will complete when any task
         /// in the specified array have completed.
         /// </summary>
-        internal override MachineTask<Task<TResult>> WaitAnyTaskAsync<TResult>(params MachineTask<TResult>[] tasks) =>
+        internal override ActorTask<Task<TResult>> WaitAnyTaskAsync<TResult>(params ActorTask<TResult>[] tasks) =>
             this.Runtime.WaitAnyTaskAsync(tasks.Select(t => t.AwaiterTask));
 
         /// <summary>
-        /// Creates a <see cref="MachineTask"/> that will complete when any task
+        /// Creates a <see cref="ActorTask"/> that will complete when any task
         /// in the specified array have completed.
         /// </summary>
-        internal override MachineTask<Task<TResult>> WaitAnyTaskAsync<TResult>(params Task<TResult>[] tasks) =>
+        internal override ActorTask<Task<TResult>> WaitAnyTaskAsync<TResult>(params Task<TResult>[] tasks) =>
             this.Runtime.WaitAnyTaskAsync(tasks);
 
         /// <summary>
-        /// Creates a <see cref="MachineTask"/> that will complete when any task
+        /// Creates a <see cref="ActorTask"/> that will complete when any task
         /// in the specified enumerable collection have completed.
         /// </summary>
-        internal override MachineTask<Task<TResult>> WaitAnyTaskAsync<TResult>(IEnumerable<MachineTask<TResult>> tasks) =>
+        internal override ActorTask<Task<TResult>> WaitAnyTaskAsync<TResult>(IEnumerable<ActorTask<TResult>> tasks) =>
             this.Runtime.WaitAnyTaskAsync(tasks.Select(t => t.AwaiterTask));
 
         /// <summary>
-        /// Creates a <see cref="MachineTask"/> that will complete when any task
+        /// Creates a <see cref="ActorTask"/> that will complete when any task
         /// in the specified enumerable collection have completed.
         /// </summary>
-        internal override MachineTask<Task<TResult>> WaitAnyTaskAsync<TResult>(IEnumerable<Task<TResult>> tasks) =>
+        internal override ActorTask<Task<TResult>> WaitAnyTaskAsync<TResult>(IEnumerable<Task<TResult>> tasks) =>
             this.Runtime.WaitAnyTaskAsync(tasks);
 
         /// <summary>
-        /// Creates a <see cref="MachineTask"/> associated with a completion source.
+        /// Creates a <see cref="ActorTask"/> associated with a completion source.
         /// </summary>
-        internal override MachineTask CreateCompletionSourceMachineTask(Task task) =>
-            this.Runtime.CreateCompletionMachineTask(task);
+        internal override ActorTask CreateCompletionSourceActorTask(Task task) =>
+            this.Runtime.CreateCompletionActorTask(task);
 
         /// <summary>
-        /// Creates a <see cref="MachineTask{TResult}"/> associated with a completion source.
+        /// Creates a <see cref="ActorTask{TResult}"/> associated with a completion source.
         /// </summary>
-        internal override MachineTask<TResult> CreateCompletionSourceMachineTask<TResult>(Task<TResult> task) =>
-            this.Runtime.CreateCompletionMachineTask(task);
+        internal override ActorTask<TResult> CreateCompletionSourceActorTask<TResult>(Task<TResult> task) =>
+            this.Runtime.CreateCompletionActorTask(task);
 
         /// <summary>
-        /// Creates a mutual exclusion lock that is compatible with <see cref="MachineTask"/> objects.
+        /// Creates a mutual exclusion lock that is compatible with <see cref="ActorTask"/> objects.
         /// </summary>
-        internal override MachineLock CreateLock()
+        internal override ActorLock CreateLock()
         {
-            var id = (ulong)Interlocked.Increment(ref this.MachineLockIdCounter) - 1;
-            return new ControlledMachineLock(this.Runtime, id);
+            var id = (ulong)Interlocked.Increment(ref this.ActorLockIdCounter) - 1;
+            return new ControlledActorLock(this.Runtime, id);
         }
 
         /// <summary>
@@ -207,7 +207,7 @@ namespace Microsoft.Coyote.TestingServices.Threading
         /// </summary>
         internal override void GetYieldResult(YieldAwaiter awaiter)
         {
-            AsyncMachine caller = this.Runtime.GetExecutingMachine<AsyncMachine>();
+            AsyncActor caller = this.Runtime.GetExecutingActor<AsyncActor>();
             this.Runtime.Scheduler.ScheduleNextOperation(AsyncOperationType.Yield, AsyncOperationTarget.Task, caller.Id.Value);
             awaiter.GetResult();
         }
@@ -231,20 +231,20 @@ namespace Microsoft.Coyote.TestingServices.Threading
         {
             try
             {
-                AsyncMachine caller = this.Runtime.GetExecutingMachine<AsyncMachine>();
+                AsyncActor caller = this.Runtime.GetExecutingActor<AsyncActor>();
                 this.Runtime.Assert(caller != null,
-                    "Task with id '{0}' that is not controlled by the P# runtime invoked yield operation.",
+                    "Task with id '{0}' that is not controlled by the Coyote runtime invoked yield operation.",
                     Task.CurrentId.HasValue ? Task.CurrentId.Value.ToString() : "<unknown>");
 
-                if (caller is Machine machine)
+                if (caller is Actor actor)
                 {
-                    this.Runtime.Assert((machine.StateManager as SerializedMachineStateManager).IsInsideMachineTaskHandler,
-                        "Machine '{0}' is executing a yield operation inside a handler that does not return a 'MachineTask'.", caller.Id);
+                    this.Runtime.Assert((actor.StateManager as SerializedActorStateManager).IsInsideActorTaskHandler,
+                        "Actor '{0}' is executing a yield operation inside a handler that does not return a 'ActorTask'.", caller.Id);
                 }
 
-                IO.Debug.WriteLine("<MachineTask> Machine '{0}' is executing a yield operation.", caller.Id);
-                this.Runtime.DispatchWork(new ActionWorkMachine(this.Runtime, continuation), null);
-                IO.Debug.WriteLine("<MachineTask> Machine '{0}' is executing a yield operation.", caller.Id);
+                IO.Debug.WriteLine("<ActorTask> Actor '{0}' is executing a yield operation.", caller.Id);
+                this.Runtime.DispatchWork(new ActionWorkActor(this.Runtime, continuation), null);
+                IO.Debug.WriteLine("<ActorTask> Actor '{0}' is executing a yield operation.", caller.Id);
             }
             catch (ExecutionCanceledException)
             {

@@ -8,9 +8,9 @@ using System;
 namespace Microsoft.Coyote.SharedObjects
 {
     /// <summary>
-    /// A shared register modeled using a state-machine for testing.
+    /// A shared register modeled using a state-actor for testing.
     /// </summary>
-    internal sealed class SharedRegisterMachine<T> : Machine
+    internal sealed class SharedRegisterActor<T> : Actor
         where T : struct
     {
         /// <summary>
@@ -19,17 +19,17 @@ namespace Microsoft.Coyote.SharedObjects
         private T Value;
 
         /// <summary>
-        /// The start state of this machine.
+        /// The start state of this actor.
         /// </summary>
         [Start]
         [OnEntry(nameof(Initialize))]
         [OnEventDoAction(typeof(SharedRegisterEvent), nameof(ProcessEvent))]
-        private class Init : MachineState
+        private class Init : ActorState
         {
         }
 
         /// <summary>
-        /// Initializes the machine.
+        /// Initializes the actor.
         /// </summary>
         private void Initialize()
         {

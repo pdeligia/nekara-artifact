@@ -8,9 +8,9 @@ using System;
 namespace Microsoft.Coyote.Timers
 {
     /// <summary>
-    /// Interface of a timer that can send timeout events to its owner machine.
+    /// Interface of a timer that can send timeout events to its owner actor.
     /// </summary>
-    internal interface IMachineTimer : IDisposable
+    internal interface IActorTimer : IDisposable
     {
         /// <summary>
         /// Stores information about this timer.

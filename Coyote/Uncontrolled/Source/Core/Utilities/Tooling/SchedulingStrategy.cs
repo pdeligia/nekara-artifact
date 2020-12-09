@@ -8,7 +8,7 @@ using System.Runtime.Serialization;
 namespace Microsoft.Coyote.Utilities
 {
     /// <summary>
-    /// P# runtime scheduling strategy.
+    /// Coyote runtime scheduling strategy.
     /// </summary>
     [DataContract]
     public enum SchedulingStrategy

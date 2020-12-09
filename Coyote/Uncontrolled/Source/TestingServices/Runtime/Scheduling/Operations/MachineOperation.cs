@@ -13,24 +13,24 @@ using Microsoft.Coyote.Runtime;
 namespace Microsoft.Coyote.TestingServices.Scheduling
 {
     /// <summary>
-    /// Contains information about a machine operation that can be scheduled.
+    /// Contains information about an actor operation that can be scheduled.
     /// </summary>
-    internal sealed class MachineOperation : IAsyncOperation
+    internal sealed class ActorOperation : IAsyncOperation
     {
         /// <summary>
-        /// The machine that owns this operation.
+        /// The actor that owns this operation.
         /// </summary>
-        internal readonly AsyncMachine Machine;
+        internal readonly AsyncActor Actor;
 
         /// <summary>
         /// Unique id of the source of the operation.
         /// </summary>
-        public ulong SourceId => this.Machine.Id.Value;
+        public ulong SourceId => this.Actor.Id.Value;
 
         /// <summary>
         /// Unique name of the source of the operation.
         /// </summary>
-        public string SourceName => this.Machine.Id.Name;
+        public string SourceName => this.Actor.Id.Name;
 
         /// <summary>
         /// The type of the operation.
@@ -113,15 +113,15 @@ namespace Microsoft.Coyote.TestingServices.Scheduling
         public int FullHashedState { get; internal set; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="MachineOperation"/> class.
+        /// Initializes a new instance of the <see cref="ActorOperation"/> class.
         /// </summary>
-        internal MachineOperation(AsyncMachine machine)
+        internal ActorOperation(AsyncActor actor)
         {
-            this.Machine = machine;
+            this.Actor = actor;
             this.Type = AsyncOperationType.Start;
             this.Status = AsyncOperationStatus.None;
             this.Target = AsyncOperationTarget.Task;
-            this.TargetId = machine.Id.Value;
+            this.TargetId = actor.Id.Value;
             this.JoinDependencies = new HashSet<Task>();
             this.EventDependencies = new HashSet<Type>();
             this.IsActive = false;
@@ -231,7 +231,7 @@ namespace Microsoft.Coyote.TestingServices.Scheduling
         /// </summary>
         public override bool Equals(object obj)
         {
-            if (obj is MachineOperation op)
+            if (obj is ActorOperation op)
             {
                 return this.SourceId == op.SourceId;
             }

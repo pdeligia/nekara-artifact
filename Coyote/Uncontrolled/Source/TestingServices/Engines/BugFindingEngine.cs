@@ -27,7 +27,7 @@ using Microsoft.Coyote.Utilities;
 namespace Microsoft.Coyote.TestingServices
 {
     /// <summary>
-    /// The P# bug-finding engine.
+    /// The Coyote bug-finding engine.
     /// </summary>
     internal sealed class BugFindingEngine : AbstractTestingEngine
     {
@@ -47,7 +47,7 @@ namespace Microsoft.Coyote.TestingServices
         internal string ReproducableTrace { get; private set; }
 
         /// <summary>
-        /// Creates a new P# bug-finding engine.
+        /// Creates a new Coyote bug-finding engine.
         /// </summary>
         internal static BugFindingEngine Create(Configuration configuration, Delegate testMethod)
         {
@@ -55,7 +55,7 @@ namespace Microsoft.Coyote.TestingServices
         }
 
         /// <summary>
-        /// Creates a new P# bug-finding engine.
+        /// Creates a new Coyote bug-finding engine.
         /// </summary>
         internal static BugFindingEngine Create(Configuration configuration)
         {
@@ -63,7 +63,7 @@ namespace Microsoft.Coyote.TestingServices
         }
 
         /// <summary>
-        /// Creates a new P# bug-finding engine.
+        /// Creates a new Coyote bug-finding engine.
         /// </summary>
         internal static BugFindingEngine Create(Configuration configuration, Assembly assembly)
         {
@@ -301,7 +301,7 @@ namespace Microsoft.Coyote.TestingServices
 
                 // Set the current specification checker and threading scheduler.
                 Specification.CurrentChecker = new SpecificationChecker(runtime);
-                MachineRuntime.CurrentScheduler = new ControlledMachineTaskScheduler(runtime);
+                ActorRuntime.CurrentScheduler = new ControlledActorTaskScheduler(runtime);
 
                 if (this.Configuration.EnableDataRaceDetection)
                 {
@@ -320,7 +320,7 @@ namespace Microsoft.Coyote.TestingServices
                     Console.SetError(writer);
                 }
 
-                // Runs the test inside the test-harness machine.
+                // Runs the test inside the test-harness actor.
                 runtime.RunTestHarness(this.TestMethod, this.TestName);
 
                 // Wait for the test to terminate.

@@ -6,7 +6,7 @@
 namespace Microsoft.Coyote.Timers
 {
     /// <summary>
-    /// Defines a timer elapsed event that is sent from a timer to the machine that owns the timer.
+    /// Defines a timer elapsed event that is sent from a timer to the actor that owns the timer.
     /// </summary>
     public class TimerElapsedEvent : Event
     {

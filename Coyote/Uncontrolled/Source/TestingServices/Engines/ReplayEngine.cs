@@ -21,7 +21,7 @@ using Microsoft.Coyote.Utilities;
 namespace Microsoft.Coyote.TestingServices
 {
     /// <summary>
-    /// The P# replay engine.
+    /// The Coyote replay engine.
     /// </summary>
     internal sealed class ReplayEngine : AbstractTestingEngine
     {
@@ -31,7 +31,7 @@ namespace Microsoft.Coyote.TestingServices
         internal string InternalError { get; private set; }
 
         /// <summary>
-        /// Creates a new P# replaying engine.
+        /// Creates a new Coyote replaying engine.
         /// </summary>
         internal static ReplayEngine Create(Configuration configuration)
         {
@@ -40,7 +40,7 @@ namespace Microsoft.Coyote.TestingServices
         }
 
         /// <summary>
-        /// Creates a new P# replaying engine.
+        /// Creates a new Coyote replaying engine.
         /// </summary>
         internal static ReplayEngine Create(Configuration configuration, Assembly assembly)
         {
@@ -49,7 +49,7 @@ namespace Microsoft.Coyote.TestingServices
         }
 
         /// <summary>
-        /// Creates a new P# replaying engine.
+        /// Creates a new Coyote replaying engine.
         /// </summary>
         internal static ReplayEngine Create(Configuration configuration, Delegate testMethod)
         {
@@ -58,7 +58,7 @@ namespace Microsoft.Coyote.TestingServices
         }
 
         /// <summary>
-        /// Creates a new P# replaying engine.
+        /// Creates a new Coyote replaying engine.
         /// </summary>
         internal static ReplayEngine Create(Configuration configuration, Delegate testMethod, string trace)
         {
@@ -131,7 +131,7 @@ namespace Microsoft.Coyote.TestingServices
 
                     // Set the current specification checker and threading scheduler.
                     Specification.CurrentChecker = new SpecificationChecker(runtime);
-                    MachineRuntime.CurrentScheduler = new ControlledMachineTaskScheduler(runtime);
+                    ActorRuntime.CurrentScheduler = new ControlledActorTaskScheduler(runtime);
 
                     // If verbosity is turned off, then intercept the program log, and also redirect
                     // the standard output and error streams into the runtime logger.
@@ -145,7 +145,7 @@ namespace Microsoft.Coyote.TestingServices
                         Console.SetError(writer);
                     }
 
-                    // Runs the test inside the test-harness machine.
+                    // Runs the test inside the test-harness actor.
                     runtime.RunTestHarness(this.TestMethod, this.TestName);
 
                     // Wait for the test to terminate.

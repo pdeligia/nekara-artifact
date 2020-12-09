@@ -9,7 +9,7 @@ using Microsoft.Coyote.IO;
 namespace Microsoft.Coyote.TestingServices
 {
     /// <summary>
-    /// Interface of a P# testing engine.
+    /// Interface of a Coyote testing engine.
     /// </summary>
     public interface ITestingEngine
     {
@@ -24,12 +24,12 @@ namespace Microsoft.Coyote.TestingServices
         IRegisterRuntimeOperation Reporter { get; }
 
         /// <summary>
-        /// Runs the P# testing engine.
+        /// Runs the Coyote testing engine.
         /// </summary>
         ITestingEngine Run();
 
         /// <summary>
-        /// Stops the P# testing engine.
+        /// Stops the Coyote testing engine.
         /// </summary>
         void Stop();
 

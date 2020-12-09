@@ -2,20 +2,17 @@
   <Import Project="..\..\Common\build.props" />
   <Import Project="..\..\Common\key.props" />
   <PropertyGroup>
-    <Description>The P# shared objects library.</Description>
+    <Description>The Coyote shared objects library.</Description>
     <AssemblyName>Microsoft.Coyote.SharedObjects</AssemblyName>
     <RootNamespace>Microsoft.Coyote.SharedObjects</RootNamespace>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <PackageTags>asynchronous;event-driven;state-machines;systematic-testing;dotnet;csharp</PackageTags>
+    <PackageTags>asynchronous;event-driven;state-actors;systematic-testing;dotnet;csharp</PackageTags>
     <CodeAnalysisRuleSet>.\Properties\codeanalysis.ruleset</CodeAnalysisRuleSet>
     <OutputPath>..\..\bin\</OutputPath>
   </PropertyGroup>
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.1</TargetFrameworks>
+    <TargetFrameworks>net5.0</TargetFrameworks>
   </PropertyGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\TestingServices\TestingServices.csproj" />
-  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.1" PrivateAssets="All" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.0.2" PrivateAssets="All" />

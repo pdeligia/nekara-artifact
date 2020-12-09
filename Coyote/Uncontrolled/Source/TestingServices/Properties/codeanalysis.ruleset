@@ -1,4 +1,4 @@
-﻿<RuleSet Name="CoyoteCodeAnalysisRuleSet" Description="The code analysis rules of the P# project." ToolsVersion="10.0">
+﻿<RuleSet Name="CoyoteCodeAnalysisRuleSet" Description="The code analysis rules of the Coyote project." ToolsVersion="10.0">
   <Localization ResourceAssembly="Microsoft.VisualStudio.CodeAnalysis.RuleSets.Strings.dll" ResourceBaseName="Microsoft.VisualStudio.CodeAnalysis.RuleSets.Strings.Localized">
     <Name Resource="CoyoteRuleSet_Name" />
     <Description Resource="CoyoteRuleSet_Description" />

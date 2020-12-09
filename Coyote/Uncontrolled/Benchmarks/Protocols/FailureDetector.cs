@@ -10,13 +10,13 @@ namespace Benchmarks.Protocols
 {
     internal class FailureDetector
     {
-        public static void Execute(IMachineRuntime runtime)
+        public static void Execute(IActorRuntime runtime)
         {
             runtime.RegisterMonitor(typeof(Safety));
-            runtime.CreateMachine(typeof(ClusterManager), new ClusterManager.Config(2));
+            runtime.CreateActor(typeof(ClusterManager), new ClusterManager.Config(2));
         }
 
-        private class ClusterManager : Machine
+        private class ClusterManager : Actor
         {
             internal class Config : Event
             {
@@ -30,9 +30,9 @@ namespace Benchmarks.Protocols
 
             internal class RegisterClient : Event
             {
-                public MachineId Client;
+                public ActorId Client;
 
-                public RegisterClient(MachineId client)
+                public RegisterClient(ActorId client)
                 {
                     this.Client = client;
                 }
@@ -40,45 +40,45 @@ namespace Benchmarks.Protocols
 
             internal class UnregisterClient : Event
             {
-                public MachineId Client;
+                public ActorId Client;
 
-                public UnregisterClient(MachineId client)
+                public UnregisterClient(ActorId client)
                 {
                     this.Client = client;
                 }
             }
 
-            MachineId FDMachine;
-            HashSet<MachineId> Nodes;
+            ActorId FDActor;
+            HashSet<ActorId> Nodes;
             int NumOfNodes;
 
             [Start]
             [OnEntry(nameof(InitOnEntry))]
-            class Init : MachineState { }
+            class Init : ActorState { }
 
             void InitOnEntry()
             {
                 this.NumOfNodes = (this.ReceivedEvent as Config).NumOfNodes;
 
                 // Initializes the nodes.
-                this.Nodes = new HashSet<MachineId>();
+                this.Nodes = new HashSet<ActorId>();
                 for (int i = 0; i < this.NumOfNodes; i++)
                 {
-                    var node = this.CreateMachine(typeof(Node));
+                    var node = this.CreateActor(typeof(Node));
                     this.Nodes.Add(node);
                 }
 
-                this.FDMachine = this.CreateMachine(typeof(FDMachine), new FDMachine.Config(this.Nodes));
-                this.Send(this.FDMachine, new RegisterClient(this.Id));
+                this.FDActor = this.CreateActor(typeof(FDActor), new FDActor.Config(this.Nodes));
+                this.Send(this.FDActor, new RegisterClient(this.Id));
 
                 this.Goto<InjectFailures>();
             }
 
             [OnEntry(nameof(InjectFailuresOnEntry))]
-            class InjectFailures : MachineState { }
+            class InjectFailures : ActorState { }
 
             /// <summary>
-            /// Injects failures (modelled with the special P# event 'halt').
+            /// Injects failures (modelled with the special Coyote event 'halt').
             /// </summary>
             void InjectFailuresOnEntry()
             {
@@ -90,15 +90,15 @@ namespace Benchmarks.Protocols
         }
 
         /// <summary>
-        /// Implementation of a failure detector P# machine.
+        /// Implementation of a failure detector Coyote actor.
         /// </summary>
-        private class FDMachine : Machine
+        private class FDActor : Actor
         {
             internal class Config : Event
             {
-                public HashSet<MachineId> Nodes;
+                public HashSet<ActorId> Nodes;
 
-                public Config(HashSet<MachineId> nodes)
+                public Config(HashSet<ActorId> nodes)
                 {
                     this.Nodes = nodes;
                 }
@@ -111,12 +111,12 @@ namespace Benchmarks.Protocols
             /// <summary>
             /// Nodes to be monitored.
             /// </summary>
-            HashSet<MachineId> Nodes;
+            HashSet<ActorId> Nodes;
 
             /// <summary>
             /// Set of registered clients.
             /// </summary>
-            HashSet<MachineId> Clients;
+            HashSet<ActorId> Clients;
 
             int Round;
 
@@ -128,17 +128,17 @@ namespace Benchmarks.Protocols
             /// <summary>
             /// Set of alive nodes.
             /// </summary>
-            HashSet<MachineId> Alive;
+            HashSet<ActorId> Alive;
 
             /// <summary>
             /// Collected responses in one round.
             /// </summary>
-            HashSet<MachineId> Responses;
+            HashSet<ActorId> Responses;
 
             /// <summary>
-            /// Reference to the timer machine.
+            /// Reference to the timer actor.
             /// </summary>
-            MachineId Timer;
+            ActorId Timer;
 
             protected override int HashedState
             {
@@ -184,16 +184,16 @@ namespace Benchmarks.Protocols
             [OnEventDoAction(typeof(ClusterManager.RegisterClient), nameof(RegisterClientAction))]
             [OnEventDoAction(typeof(ClusterManager.UnregisterClient), nameof(UnregisterClientAction))]
             [OnEventPushState(typeof(Unit), typeof(SendPing))]
-            class Init : MachineState { }
+            class Init : ActorState { }
 
             void InitOnEntry()
             {
                 var nodes = (this.ReceivedEvent as Config).Nodes;
 
-                this.Nodes = new HashSet<MachineId>(nodes);
-                this.Clients = new HashSet<MachineId>();
-                this.Alive = new HashSet<MachineId>();
-                this.Responses = new HashSet<MachineId>();
+                this.Nodes = new HashSet<ActorId>(nodes);
+                this.Clients = new HashSet<ActorId>();
+                this.Alive = new HashSet<ActorId>();
+                this.Responses = new HashSet<ActorId>();
 
                 // Initializes the alive set to contain all available nodes.
                 foreach (var node in this.Nodes)
@@ -202,7 +202,7 @@ namespace Benchmarks.Protocols
                 }
 
                 // Initializes the timer.
-                this.Timer = this.CreateMachine(typeof(Timer), new Timer.Config(this.Id));
+                this.Timer = this.CreateActor(typeof(Timer), new Timer.Config(this.Id));
 
                 // Transitions to the 'SendPing' state after everything has initialized.
                 this.Raise(new Unit());
@@ -228,13 +228,13 @@ namespace Benchmarks.Protocols
             [OnEventPushState(typeof(TimerCancelled), typeof(WaitForCancelResponse))]
             [OnEventDoAction(typeof(Node.Pong), nameof(PongAction))]
             [OnEventDoAction(typeof(Timer.TimeoutEvent), nameof(TimeoutAction))]
-            class SendPing : MachineState { }
+            class SendPing : ActorState { }
 
             void SendPingOnEntry()
             {
                 foreach (var node in this.Nodes)
                 {
-                    // Sends a 'Ping' event to any machine that has not responded.
+                    // Sends a 'Ping' event to any actor that has not responded.
                     if (this.Alive.Contains(node) && !this.Responses.Contains(node))
                     {
                         this.Monitor<Safety>(new Safety.Ping(node));
@@ -244,8 +244,8 @@ namespace Benchmarks.Protocols
 
                 // Starts the timer with a given timeout value. Note that in this sample,
                 // the timeout value is not actually used, because the timer is abstracted
-                // away using P# to enable systematic testing (i.e. timeouts are triggered
-                // nondeterministically). In production, this model timer machine will be
+                // away using Coyote to enable systematic testing (i.e. timeouts are triggered
+                // nondeterministically). In production, this model timer actor will be
                 // replaced by a real timer.
                 this.Send(this.Timer, new Timer.StartTimerEvent(100));
             }
@@ -297,7 +297,7 @@ namespace Benchmarks.Protocols
             [OnEventDoAction(typeof(Timer.CancelSuccess), nameof(CancelSuccessAction))]
             [OnEventDoAction(typeof(Timer.CancelFailure), nameof(CancelFailure))]
             [DeferEvents(typeof(Timer.TimeoutEvent), typeof(Node.Pong))]
-            class WaitForCancelResponse : MachineState { }
+            class WaitForCancelResponse : ActorState { }
 
             void CancelSuccessAction()
             {
@@ -312,7 +312,7 @@ namespace Benchmarks.Protocols
             [OnEntry(nameof(ResetOnEntry))]
             [OnEventGotoState(typeof(Timer.TimeoutEvent), typeof(SendPing))]
             [IgnoreEvents(typeof(Node.Pong))]
-            class Reset : MachineState { }
+            class Reset : ActorState { }
 
             /// <summary>
             /// Prepares the failure detector for the next round.
@@ -336,13 +336,13 @@ namespace Benchmarks.Protocols
             }
         }
 
-        private class Node : Machine
+        private class Node : Actor
         {
             internal class Ping : Event
             {
-                public MachineId Client;
+                public ActorId Client;
 
-                public Ping(MachineId client)
+                public Ping(ActorId client)
                 {
                     this.Client = client;
                 }
@@ -350,9 +350,9 @@ namespace Benchmarks.Protocols
 
             internal class Pong : Event
             {
-                public MachineId Node;
+                public ActorId Node;
 
-                public Pong(MachineId node)
+                public Pong(ActorId node)
                 {
                     this.Node = node;
                 }
@@ -360,7 +360,7 @@ namespace Benchmarks.Protocols
 
             [Start]
             [OnEventDoAction(typeof(Ping), nameof(SendPong))]
-            class WaitPing : MachineState { }
+            class WaitPing : ActorState { }
 
             void SendPong()
             {
@@ -370,13 +370,13 @@ namespace Benchmarks.Protocols
             }
         }
 
-        private class Timer : Machine
+        private class Timer : Actor
         {
             internal class Config : Event
             {
-                public MachineId Target;
+                public ActorId Target;
 
-                public Config(MachineId target)
+                public Config(ActorId target)
                 {
                     this.Target = target;
                 }
@@ -384,7 +384,7 @@ namespace Benchmarks.Protocols
 
             /// <summary>
             /// Although this event accepts a timeout value, because
-            /// this machine models a timer by nondeterministically
+            /// this actor models a timer by nondeterministically
             /// triggering a timeout, this value is not used.
             /// </summary>
             internal class StartTimerEvent : Event
@@ -406,15 +406,15 @@ namespace Benchmarks.Protocols
             /// <summary>
             /// Reference to the owner of the timer.
             /// </summary>
-            MachineId Target;
+            ActorId Target;
 
             [Start]
             [OnEntry(nameof(InitOnEntry))]
-            class Init : MachineState { }
+            class Init : ActorState { }
 
             /// <summary>
             /// When it enters the 'Init' state, the timer receives a reference to
-            /// the target machine, and then transitions to the 'WaitForReq' state.
+            /// the target actor, and then transitions to the 'WaitForReq' state.
             /// </summary>
             void InitOnEntry()
             {
@@ -431,7 +431,7 @@ namespace Benchmarks.Protocols
             /// It transitions to the 'WaitForCancel' state on a 'StartTimerEvent' event.
             [OnEventGotoState(typeof(StartTimerEvent), typeof(WaitForCancel))]
             /// </summary>
-            class WaitForReq : MachineState { }
+            class WaitForReq : ActorState { }
 
             void CancelTimerAction()
             {
@@ -445,7 +445,7 @@ namespace Benchmarks.Protocols
             [OnEventGotoState(typeof(CancelTimerEvent), typeof(WaitForReq), nameof(CancelTimerAction2))]
             [OnEventGotoState(typeof(Default), typeof(WaitForReq), nameof(DefaultAction))]
             /// </summary>
-            class WaitForCancel : MachineState { }
+            class WaitForCancel : ActorState { }
 
             void DefaultAction()
             {
@@ -453,7 +453,7 @@ namespace Benchmarks.Protocols
             }
 
             /// <summary>
-            /// The response to a 'CancelTimer' event is nondeterministic. During testing, P# will
+            /// The response to a 'CancelTimer' event is nondeterministic. During testing, Coyote will
             /// take control of this source of nondeterminism and explore different execution paths.
             ///
             /// Using this approach, we model the race condition between the arrival of a 'CancelTimer'
@@ -461,7 +461,7 @@ namespace Benchmarks.Protocols
             /// </summary>
             void CancelTimerAction2()
             {
-                // A nondeterministic choice that is controlled by the P# runtime during testing.
+                // A nondeterministic choice that is controlled by the Coyote runtime during testing.
                 if (this.Random())
                 {
                     this.Send(this.Target, new CancelSuccess());
@@ -478,9 +478,9 @@ namespace Benchmarks.Protocols
         {
             internal class Ping : Event
             {
-                public MachineId Client;
+                public ActorId Client;
 
-                public Ping(MachineId client)
+                public Ping(ActorId client)
                 {
                     this.Client = client;
                 }
@@ -488,15 +488,15 @@ namespace Benchmarks.Protocols
 
             internal class Pong : Event
             {
-                public MachineId Node;
+                public ActorId Node;
 
-                public Pong(MachineId node)
+                public Pong(ActorId node)
                 {
                     this.Node = node;
                 }
             }
 
-            Dictionary<MachineId, int> Pending;
+            Dictionary<ActorId, int> Pending;
 
             protected override int HashedState
             {
@@ -527,7 +527,7 @@ namespace Benchmarks.Protocols
 
             void InitOnEntry()
             {
-                this.Pending = new Dictionary<MachineId, int>();
+                this.Pending = new Dictionary<ActorId, int>();
             }
 
             void PingAction()

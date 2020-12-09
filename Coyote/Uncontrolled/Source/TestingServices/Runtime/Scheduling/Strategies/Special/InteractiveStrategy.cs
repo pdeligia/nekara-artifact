@@ -58,7 +58,7 @@ namespace Microsoft.Coyote.TestingServices.Scheduling.Strategies
 
             if (enabledOperations.Count == 0)
             {
-                this.Logger.WriteLine(">> No available machines to schedule ...");
+                this.Logger.WriteLine(">> No available actors to schedule ...");
                 return false;
             }
 
@@ -85,14 +85,14 @@ namespace Microsoft.Coyote.TestingServices.Scheduling.Strategies
                     break;
                 }
 
-                this.Logger.WriteLine(">> Available machines to schedule ...");
+                this.Logger.WriteLine(">> Available actors to schedule ...");
                 for (int idx = 0; idx < enabledOperations.Count; idx++)
                 {
                     var op = enabledOperations[idx];
                     this.Logger.WriteLine($">> [{idx}] '{op.SourceName}'");
                 }
 
-                this.Logger.WriteLine($">> Choose machine to schedule [step '{this.ExploredSteps}']");
+                this.Logger.WriteLine($">> Choose actor to schedule [step '{this.ExploredSteps}']");
 
                 var input = Console.ReadLine();
                 if (input.Equals("replay"))

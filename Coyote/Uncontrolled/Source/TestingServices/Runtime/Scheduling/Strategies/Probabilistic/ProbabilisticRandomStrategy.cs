@@ -45,7 +45,7 @@ namespace Microsoft.Coyote.TestingServices.Scheduling.Strategies
 
             if (enabledOperations.Count > 1)
             {
-                if (!this.ShouldCurrentMachineChange() && current.Status is AsyncOperationStatus.Enabled)
+                if (!this.ShouldCurrentActorChange() && current.Status is AsyncOperationStatus.Enabled)
                 {
                     next = current;
                     return true;
@@ -67,7 +67,7 @@ namespace Microsoft.Coyote.TestingServices.Scheduling.Strategies
         /// <summary>
         /// Flip the coin a specified number of times.
         /// </summary>
-        private bool ShouldCurrentMachineChange()
+        private bool ShouldCurrentActorChange()
         {
             for (int idx = 0; idx < this.NumberOfCoinFlips; idx++)
             {

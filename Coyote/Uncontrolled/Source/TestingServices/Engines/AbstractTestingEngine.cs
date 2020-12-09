@@ -26,7 +26,7 @@ using Microsoft.Coyote.Utilities;
 namespace Microsoft.Coyote.TestingServices
 {
     /// <summary>
-    /// The P# abstract testing engine.
+    /// The Coyote abstract testing engine.
     /// </summary>
     internal abstract class AbstractTestingEngine : ITestingEngine
     {
@@ -36,34 +36,34 @@ namespace Microsoft.Coyote.TestingServices
         internal Configuration Configuration;
 
         /// <summary>
-        /// The P# assembly to analyze.
+        /// The Coyote assembly to analyze.
         /// </summary>
         internal Assembly Assembly;
 
         /// <summary>
-        /// The assembly that provides the P# runtime to use
+        /// The assembly that provides the Coyote runtime to use
         /// during testing. If its null, the engine uses the
-        /// default P# testing runtime.
+        /// default Coyote testing runtime.
         /// </summary>
         internal Assembly RuntimeAssembly;
 
         /// <summary>
-        /// The P# test runtime factory method.
+        /// The Coyote test runtime factory method.
         /// </summary>
         internal MethodInfo TestRuntimeFactoryMethod;
 
         /// <summary>
-        /// The P# test initialization method.
+        /// The Coyote test initialization method.
         /// </summary>
         internal MethodInfo TestInitMethod;
 
         /// <summary>
-        /// The P# test dispose method.
+        /// The Coyote test dispose method.
         /// </summary>
         internal MethodInfo TestDisposeMethod;
 
         /// <summary>
-        /// The P# test dispose method per iteration.
+        /// The Coyote test dispose method per iteration.
         /// </summary>
         internal MethodInfo TestIterationDisposeMethod;
 
@@ -363,7 +363,7 @@ namespace Microsoft.Coyote.TestingServices
         }
 
         /// <summary>
-        /// Runs the P# testing engine.
+        /// Runs the Coyote testing engine.
         /// </summary>
         public ITestingEngine Run()
         {
@@ -414,7 +414,7 @@ namespace Microsoft.Coyote.TestingServices
                 }
 
                 Error.ReportAndExit("Exception thrown during testing outside the context of a " +
-                    "machine, possibly in a test method. Please use " +
+                    "actor, possibly in a test method. Please use " +
                     "/debug /v:2 to print more information.");
             }
             catch (Exception ex)
@@ -442,7 +442,7 @@ namespace Microsoft.Coyote.TestingServices
         protected abstract Task CreateTestingTask();
 
         /// <summary>
-        /// Stops the P# testing engine.
+        /// Stops the Coyote testing engine.
         /// </summary>
         public void Stop()
         {
@@ -510,7 +510,7 @@ namespace Microsoft.Coyote.TestingServices
         }
 
         /// <summary>
-        /// Finds the entry point to the P# program.
+        /// Finds the entry point to the Coyote program.
         /// </summary>
         private void FindEntryPoint()
         {
@@ -526,7 +526,7 @@ namespace Microsoft.Coyote.TestingServices
             {
                 if (testMethods.Count > 0)
                 {
-                    var msg = "Cannot detect a P# test method with name " + this.Configuration.TestMethodName +
+                    var msg = "Cannot detect a Coyote test method with name " + this.Configuration.TestMethodName +
                         ". Possible options are: " + Environment.NewLine;
                     foreach (var mi in testMethods)
                     {
@@ -537,13 +537,13 @@ namespace Microsoft.Coyote.TestingServices
                 }
                 else
                 {
-                    Error.ReportAndExit("Cannot detect a P# test method. Use the " +
+                    Error.ReportAndExit("Cannot detect a Coyote test method. Use the " +
                         $"attribute '[{typeof(TestAttribute).FullName}]' to declare a test method.");
                 }
             }
             else if (filteredTestMethods.Count > 1)
             {
-                var msg = "Only one test method to the P# program can " +
+                var msg = "Only one test method to the Coyote program can " +
                     $"be declared with the attribute '{typeof(TestAttribute).FullName}'. " +
                     $"'{testMethods.Count}' test methods were found instead. Provide " +
                     $"/method flag to qualify the test method name you wish to use. " +
@@ -561,12 +561,12 @@ namespace Microsoft.Coyote.TestingServices
             ParameterInfo[] testParams = testMethod.GetParameters();
 
             bool hasExpectedReturnType = (testMethod.ReturnType == typeof(void) &&
-                testMethod.GetCustomAttribute(typeof(AsyncStateMachineAttribute)) == null) ||
-                (testMethod.ReturnType == typeof(MachineTask) &&
-                testMethod.GetCustomAttribute(typeof(AsyncStateMachineAttribute)) != null);
+                testMethod.GetCustomAttribute(typeof(AsyncStateActorAttribute)) == null) ||
+                (testMethod.ReturnType == typeof(ActorTask) &&
+                testMethod.GetCustomAttribute(typeof(AsyncStateActorAttribute)) != null);
             bool hasExpectedParameters = !testMethod.ContainsGenericParameters &&
                 (testParams.Length is 0 ||
-                (testParams.Length is 1 && testParams[0].ParameterType == typeof(IMachineRuntime)));
+                (testParams.Length is 1 && testParams[0].ParameterType == typeof(IActorRuntime)));
 
             if (testMethod.IsAbstract || testMethod.IsVirtual || testMethod.IsConstructor ||
                 !testMethod.IsPublic || !testMethod.IsStatic ||
@@ -577,16 +577,16 @@ namespace Microsoft.Coyote.TestingServices
                     $"  [{typeof(TestAttribute).FullName}]\n" +
                     $"  public static void {testMethod.Name}() {{ ... }}\n\n" +
                     $"  [{typeof(TestAttribute).FullName}]\n" +
-                    $"  public static void {testMethod.Name}(IMachineRuntime runtime) {{ ... await ... }}\n\n" +
+                    $"  public static void {testMethod.Name}(IActorRuntime runtime) {{ ... await ... }}\n\n" +
                     $"  [{typeof(TestAttribute).FullName}]\n" +
-                    $"  public static async MachineTask {testMethod.Name}() {{ ... }}\n\n" +
+                    $"  public static async ActorTask {testMethod.Name}() {{ ... }}\n\n" +
                     $"  [{typeof(TestAttribute).FullName}]\n" +
-                    $"  public static async MachineTask {testMethod.Name}(IMachineRuntime runtime) {{ ... await ... }}");
+                    $"  public static async ActorTask {testMethod.Name}(IActorRuntime runtime) {{ ... await ... }}");
             }
 
             if (testMethod.ReturnType == typeof(void) && testParams.Length == 1)
             {
-                this.TestMethod = Delegate.CreateDelegate(typeof(Action<IMachineRuntime>), testMethod);
+                this.TestMethod = Delegate.CreateDelegate(typeof(Action<IActorRuntime>), testMethod);
             }
             else if (testMethod.ReturnType == typeof(void))
             {
@@ -594,11 +594,11 @@ namespace Microsoft.Coyote.TestingServices
             }
             else if (testParams.Length == 1)
             {
-                this.TestMethod = Delegate.CreateDelegate(typeof(Func<IMachineRuntime, MachineTask>), testMethod);
+                this.TestMethod = Delegate.CreateDelegate(typeof(Func<IActorRuntime, ActorTask>), testMethod);
             }
             else
             {
-                this.TestMethod = Delegate.CreateDelegate(typeof(Func<MachineTask>), testMethod);
+                this.TestMethod = Delegate.CreateDelegate(typeof(Func<ActorTask>), testMethod);
             }
 
             this.TestName = $"{testMethod.DeclaringType}.{testMethod.Name}";
@@ -619,7 +619,7 @@ namespace Microsoft.Coyote.TestingServices
             }
             else if (testMethods.Count > 1)
             {
-                Error.ReportAndExit("Only one test method to the P# program can " +
+                Error.ReportAndExit("Only one test method to the Coyote program can " +
                     $"be declared with the attribute '{attribute.FullName}'. " +
                     $"'{testMethods.Count}' test methods were found instead.");
             }

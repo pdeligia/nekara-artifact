@@ -8,25 +8,25 @@ using System;
 namespace Microsoft.Coyote.Runtime
 {
     /// <summary>
-    /// The exception that is thrown by the P# runtime upon a machine action failure.
+    /// The exception that is thrown by the Coyote runtime upon an actor action failure.
     /// </summary>
-    internal sealed class MachineActionExceptionFilterException : RuntimeException
+    internal sealed class ActorActionExceptionFilterException : RuntimeException
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="MachineActionExceptionFilterException"/> class.
+        /// Initializes a new instance of the <see cref="ActorActionExceptionFilterException"/> class.
         /// </summary>
         /// <param name="message">Message</param>
-        internal MachineActionExceptionFilterException(string message)
+        internal ActorActionExceptionFilterException(string message)
             : base(message)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="MachineActionExceptionFilterException"/> class.
+        /// Initializes a new instance of the <see cref="ActorActionExceptionFilterException"/> class.
         /// </summary>
         /// <param name="message">Message</param>
         /// <param name="innerException">Inner exception</param>
-        internal MachineActionExceptionFilterException(string message, Exception innerException)
+        internal ActorActionExceptionFilterException(string message, Exception innerException)
             : base(message, innerException)
         {
         }

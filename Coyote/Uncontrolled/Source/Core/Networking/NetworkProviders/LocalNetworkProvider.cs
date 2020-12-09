@@ -8,14 +8,14 @@ using System;
 namespace Microsoft.Coyote.Net
 {
     /// <summary>
-    /// The local P# network provider.
+    /// The local Coyote network provider.
     /// </summary>
     internal class LocalNetworkProvider : INetworkProvider
     {
         /// <summary>
-        /// Instance of the P# runtime.
+        /// Instance of the Coyote runtime.
         /// </summary>
-        private readonly IMachineRuntime Runtime;
+        private readonly IActorRuntime Runtime;
 
         /// <summary>
         /// The local endpoint.
@@ -25,28 +25,28 @@ namespace Microsoft.Coyote.Net
         /// <summary>
         /// Initializes a new instance of the <see cref="LocalNetworkProvider"/> class.
         /// </summary>
-        public LocalNetworkProvider(IMachineRuntime runtime)
+        public LocalNetworkProvider(IActorRuntime runtime)
         {
             this.Runtime = runtime;
             this.LocalEndpoint = string.Empty;
         }
 
         /// <summary>
-        /// Creates a new remote machine of the specified type
+        /// Creates a new remote actor of the specified type
         /// and with the specified event. An optional friendly
         /// name can be specified. If the friendly name is null
         /// or the empty string, a default value will be given.
         /// </summary>
-        MachineId INetworkProvider.RemoteCreateMachine(Type type, string friendlyName,
+        ActorId INetworkProvider.RemoteCreateActor(Type type, string friendlyName,
             string endpoint, Event e)
         {
-            return this.Runtime.CreateMachine(type, friendlyName, e);
+            return this.Runtime.CreateActor(type, friendlyName, e);
         }
 
         /// <summary>
-        /// Sends an asynchronous event to a machine.
+        /// Sends an asynchronous event to an actor.
         /// </summary>
-        void INetworkProvider.RemoteSend(MachineId target, Event e)
+        void INetworkProvider.RemoteSend(ActorId target, Event e)
         {
             this.Runtime.SendEvent(target, e);
         }

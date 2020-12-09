@@ -97,16 +97,16 @@ namespace Microsoft.Coyote.TestingServices.Scheduling.Strategies
         /// </summary>
         public virtual bool GetNext(IAsyncOperation current, List<IAsyncOperation> ops, out IAsyncOperation next)
         {
-            var currentMachineIdx = ops.IndexOf(current);
-            var orderedMachines = ops.GetRange(currentMachineIdx, ops.Count - currentMachineIdx);
-            if (currentMachineIdx != 0)
+            var currentActorIdx = ops.IndexOf(current);
+            var orderedActors = ops.GetRange(currentActorIdx, ops.Count - currentActorIdx);
+            if (currentActorIdx != 0)
             {
-                orderedMachines.AddRange(ops.GetRange(0, currentMachineIdx));
+                orderedActors.AddRange(ops.GetRange(0, currentActorIdx));
             }
 
             this.CaptureExecutionStep(current);
 
-            var enabledOperations = orderedMachines.Where(op => op.Status is AsyncOperationStatus.Enabled).ToList();
+            var enabledOperations = orderedActors.Where(op => op.Status is AsyncOperationStatus.Enabled).ToList();
             if (enabledOperations.Count == 0)
             {
                 next = null;

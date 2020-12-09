@@ -7,10 +7,10 @@ namespace Benchmarks.Protocols
 {
     internal class Paxos
     {
-        public static void Execute(IMachineRuntime runtime)
+        public static void Execute(IActorRuntime runtime)
         {
             runtime.RegisterMonitor(typeof(SafetyMonitor));
-            runtime.CreateMachine(typeof(ClusterManager), new ClusterManagerSetupEvent(runtime));
+            runtime.CreateActor(typeof(ClusterManager), new ClusterManagerSetupEvent(runtime));
         }
 
         private class Proposal
@@ -60,7 +60,7 @@ namespace Benchmarks.Protocols
 
         private class AcceptorSetupEvent : Event
         {
-            public AcceptorSetupEvent(string name, Dictionary<string, MachineId> proposers, Dictionary<string, MachineId> learners)
+            public AcceptorSetupEvent(string name, Dictionary<string, ActorId> proposers, Dictionary<string, ActorId> learners)
             {
                 this.Name = name;
                 this.Proposers = proposers;
@@ -69,21 +69,21 @@ namespace Benchmarks.Protocols
 
             public string Name { get; private set; }
 
-            public Dictionary<string, MachineId> Proposers { get; private set; }
+            public Dictionary<string, ActorId> Proposers { get; private set; }
 
-            public Dictionary<string, MachineId> Learners { get; private set; }
+            public Dictionary<string, ActorId> Learners { get; private set; }
         }
 
         private class AcceptRequest : Event
         {
-            public AcceptRequest(MachineId from, Proposal proposal, string value)
+            public AcceptRequest(ActorId from, Proposal proposal, string value)
             {
                 this.From = from;
                 this.Proposal = proposal;
                 this.Value = value;
             }
 
-            public MachineId From { get; private set; }
+            public ActorId From { get; private set; }
 
             public string Value { get; private set; }
 
@@ -92,55 +92,55 @@ namespace Benchmarks.Protocols
 
         private class ClientProposeValueRequest : Event
         {
-            public ClientProposeValueRequest(MachineId from, string value)
+            public ClientProposeValueRequest(ActorId from, string value)
             {
                 this.From = from;
                 this.Value = value;
             }
 
-            public MachineId From { get; private set; }
+            public ActorId From { get; private set; }
 
             public string Value { get; private set; }
         }
 
         private class LearnerSetupEvent : Event
         {
-            public LearnerSetupEvent(string name, Dictionary<string, MachineId> acceptors)
+            public LearnerSetupEvent(string name, Dictionary<string, ActorId> acceptors)
             {
                 this.Name = name;
                 this.Acceptors = acceptors;
             }
 
             public string Name { get; private set; }
-            public Dictionary<string, MachineId> Acceptors { get; private set; }
+            public Dictionary<string, ActorId> Acceptors { get; private set; }
         }
 
         private class ClusterManagerSetupEvent : Event
         {
-            public ClusterManagerSetupEvent(IMachineRuntime runtime)
+            public ClusterManagerSetupEvent(IActorRuntime runtime)
             {
                 this.Runtime = runtime;
             }
 
-            public IMachineRuntime Runtime { get; private set; }
+            public IActorRuntime Runtime { get; private set; }
         }
 
         private class ProposalRequest : Event
         {
-            public ProposalRequest(MachineId from, Proposal proposal)
+            public ProposalRequest(ActorId from, Proposal proposal)
             {
                 this.From = from;
                 this.Proposal = proposal;
             }
 
-            public MachineId From { get; private set; }
+            public ActorId From { get; private set; }
 
             public Proposal Proposal { get; private set; }
         }
 
         private class ProposerInitEvent : Event
         {
-            public ProposerInitEvent(string name, Dictionary<string, MachineId> acceptors)
+            public ProposerInitEvent(string name, Dictionary<string, ActorId> acceptors)
             {
                 this.Name = name;
                 this.Acceptors = acceptors;
@@ -148,19 +148,19 @@ namespace Benchmarks.Protocols
 
             public string Name { get; private set; }
 
-            public Dictionary<string, MachineId> Acceptors { get; private set; }
+            public Dictionary<string, ActorId> Acceptors { get; private set; }
         }
 
         private class ValueAcceptedEvent : Event
         {
-            public ValueAcceptedEvent(MachineId acceptor, Proposal proposal, string value)
+            public ValueAcceptedEvent(ActorId acceptor, Proposal proposal, string value)
             {
                 this.Proposal = proposal;
                 this.Acceptor = acceptor;
                 this.Value = value;
             }
 
-            public MachineId Acceptor { get; private set; }
+            public ActorId Acceptor { get; private set; }
 
             public Proposal Proposal { get; private set; }
 
@@ -174,7 +174,7 @@ namespace Benchmarks.Protocols
         private class ProposalResponse : Event
         {
             public ProposalResponse(
-                MachineId from,
+                ActorId from,
                 Proposal proposal,
                 bool acknowledged,
                 Proposal previouslyAcceptedProposal,
@@ -187,7 +187,7 @@ namespace Benchmarks.Protocols
                 this.PreviouslyAcceptedValue = previouslyAcceptedValue;
             }
 
-            public MachineId From { get; private set; }
+            public ActorId From { get; private set; }
 
             public Proposal Proposal { get; private set; }
 
@@ -198,76 +198,76 @@ namespace Benchmarks.Protocols
             public string PreviouslyAcceptedValue { get; private set; }
         }
 
-        private class ClusterManager : Machine
+        private class ClusterManager : Actor
         {
             private static int numProposers = 3;
             private static int numAcceptors = 5;
             private static int numLearners = 1;
             private static int maxAcceptorFailureCount = 2;
 
-            private static Dictionary<string, MachineId> proposerNameToMachineId;
-            private static Dictionary<string, MachineId> acceptorNameToMachineId;
-            private static Dictionary<string, MachineId> learnerNameToMachineId;
+            private static Dictionary<string, ActorId> proposerNameToActorId;
+            private static Dictionary<string, ActorId> acceptorNameToActorId;
+            private static Dictionary<string, ActorId> learnerNameToActorId;
 
             public void InitOnEntry()
             {
                 var initEvent = (ClusterManagerSetupEvent)ReceivedEvent;
                 var runtime = initEvent.Runtime;
 
-                proposerNameToMachineId = CreateMachineIds(
+                proposerNameToActorId = CreateActorIds(
                     runtime,
                     typeof(Proposer),
                     GetProposerName,
                     numProposers);
 
-                acceptorNameToMachineId = CreateMachineIds(
+                acceptorNameToActorId = CreateActorIds(
                     runtime,
                     typeof(Acceptor),
                     GetAcceptorName,
                     numAcceptors);
 
-                learnerNameToMachineId = CreateMachineIds(
+                learnerNameToActorId = CreateActorIds(
                     runtime,
                     typeof(Learner),
                     GetLearnerName,
                     numLearners);
 
-                foreach (var name in proposerNameToMachineId.Keys)
+                foreach (var name in proposerNameToActorId.Keys)
                 {
-                    runtime.CreateMachine(
-                        proposerNameToMachineId[name],
+                    runtime.CreateActor(
+                        proposerNameToActorId[name],
                         typeof(Proposer),
                         new ProposerInitEvent(
                             name,
-                            acceptorNameToMachineId));
+                            acceptorNameToActorId));
                 }
 
-                foreach (var name in acceptorNameToMachineId.Keys)
+                foreach (var name in acceptorNameToActorId.Keys)
                 {
-                    runtime.CreateMachine(
-                        acceptorNameToMachineId[name],
+                    runtime.CreateActor(
+                        acceptorNameToActorId[name],
                         typeof(Acceptor),
                         new AcceptorSetupEvent(
                             name,
-                            proposerNameToMachineId,
-                            learnerNameToMachineId));
+                            proposerNameToActorId,
+                            learnerNameToActorId));
                 }
 
-                foreach (var name in learnerNameToMachineId.Keys)
+                foreach (var name in learnerNameToActorId.Keys)
                 {
-                    runtime.CreateMachine(
-                        learnerNameToMachineId[name],
+                    runtime.CreateActor(
+                        learnerNameToActorId[name],
                         typeof(Learner),
                         new LearnerSetupEvent(
                             name,
-                            acceptorNameToMachineId));
+                            acceptorNameToActorId));
                 }
 
                 for (int i = 0; i < numProposers; i++)
                 {
                     var proposerName = GetProposerName(i);
                     var value = GetValue(i);
-                    runtime.SendEvent(proposerNameToMachineId[proposerName], new ClientProposeValueRequest(null, value));
+                    runtime.SendEvent(proposerNameToActorId[proposerName], new ClientProposeValueRequest(null, value));
                 }
 
                 int failureCount = 0;
@@ -276,24 +276,24 @@ namespace Benchmarks.Protocols
                     if (Random() && failureCount < maxAcceptorFailureCount)
                     {
                         failureCount++;
-                        Send(acceptorNameToMachineId[GetAcceptorName(i)], new Halt());
+                        Send(acceptorNameToActorId[GetAcceptorName(i)], new Halt());
                     }
                 }
             }
 
-            private static Dictionary<string, MachineId> CreateMachineIds(
-              IMachineRuntime runtime,
-              Type machineType,
-              Func<int, string> machineNameFunc,
-              int numMachines)
+            private static Dictionary<string, ActorId> CreateActorIds(
+              IActorRuntime runtime,
+              Type actorType,
+              Func<int, string> actorNameFunc,
+              int numActors)
             {
-                var result = new Dictionary<string, MachineId>();
+                var result = new Dictionary<string, ActorId>();
 
-                for (int i = 0; i < numMachines; i++)
+                for (int i = 0; i < numActors; i++)
                 {
-                    var name = machineNameFunc(i);
-                    var machineId = runtime.CreateMachineIdFromName(machineType, name);
-                    result[name] = machineId;
+                    var name = actorNameFunc(i);
+                    var actorId = runtime.CreateActorIdFromName(actorType, name);
+                    result[name] = actorId;
                 }
 
                 return result;
@@ -321,24 +321,24 @@ namespace Benchmarks.Protocols
 
             [Start]
             [OnEntry(nameof(InitOnEntry))]
-            internal class Init : MachineState
+            internal class Init : ActorState
             {
             }
         }
 
-        private class Proposer : Machine
+        private class Proposer : Actor
         {
             private string name;
-            private Dictionary<string, MachineId> acceptors;
+            private Dictionary<string, ActorId> acceptors;
 
             private int proposalCounter = 0;
 
             private string value;
             private Proposal currentProposal = null;
-            private HashSet<MachineId> receivedProposalResponses = null;
+            private HashSet<ActorId> receivedProposalResponses = null;
 
-            private Dictionary<MachineId, Proposal> acceptorToPreviouslyAcceptedProposal = new Dictionary<MachineId, Proposal>();
-            private Dictionary<MachineId, string> acceptorToPreviouslyAcceptedValue = new Dictionary<MachineId, string>();
+            private Dictionary<ActorId, Proposal> acceptorToPreviouslyAcceptedProposal = new Dictionary<ActorId, Proposal>();
+            private Dictionary<ActorId, string> acceptorToPreviouslyAcceptedValue = new Dictionary<ActorId, string>();
 
             private bool finalValueChosen = false;
 
@@ -374,7 +374,7 @@ namespace Benchmarks.Protocols
 
                 this.value = request.Value;
                 this.proposalCounter++;
-                this.receivedProposalResponses = new HashSet<MachineId>();
+                this.receivedProposalResponses = new HashSet<ActorId>();
                 this.currentProposal = new Proposal(this.name, proposalCounter);
 
                 foreach (var acceptor in acceptors.Values)
@@ -447,26 +447,26 @@ namespace Benchmarks.Protocols
 
             [Start]
             [OnEntry(nameof(InitOnEntry))]
-            internal class Init : MachineState
+            internal class Init : ActorState
             {
             }
 
             [OnEventDoAction(typeof(ClientProposeValueRequest), nameof(ProposeValueRequestHandler))]
-            internal class Ready : MachineState
+            internal class Ready : ActorState
             {
             }
 
             [OnEventDoAction(typeof(ProposalResponse), nameof(ProposalResponseHandler))]
-            internal class WaitingForAcks : MachineState
+            internal class WaitingForAcks : ActorState
             {
             }
         }
 
-        private class Acceptor : Machine
+        private class Acceptor : Actor
         {
             private string name;
-            private Dictionary<string, MachineId> proposers;
-            private Dictionary<string, MachineId> learners;
+            private Dictionary<string, ActorId> proposers;
+            private Dictionary<string, ActorId> learners;
 
             private Proposal lastAckedProposal;
 
@@ -553,17 +553,17 @@ namespace Benchmarks.Protocols
             [OnEntry(nameof(InitOnEntry))]
             [OnEventDoAction(typeof(ProposalRequest), nameof(ProposalRequestHandler))]
             [OnEventDoAction(typeof(AcceptRequest), nameof(AcceptRequestHandler))]
-            internal class Init : MachineState
+            internal class Init : ActorState
             {
             }
         }
 
-        private class Learner : Machine
+        private class Learner : Actor
         {
             private string name;
-            private Dictionary<string, MachineId> acceptors;
+            private Dictionary<string, ActorId> acceptors;
 
-            private Dictionary<MachineId, Proposal> acceptorToProposalMap = new Dictionary<MachineId, Proposal>();
+            private Dictionary<ActorId, Proposal> acceptorToProposalMap = new Dictionary<ActorId, Proposal>();
             private Dictionary<Proposal, string> proposalToValueMap = new Dictionary<Proposal, string>();
 
             private string learnedValue = null;
@@ -632,7 +632,7 @@ namespace Benchmarks.Protocols
             [Start]
             [OnEntry(nameof(InitOnEntry))]
             [OnEventDoAction(typeof(ValueAcceptedEvent), nameof(ValueAcceptedEventHandler))]
-            internal class Init : MachineState
+            internal class Init : ActorState
             {
             }
         }

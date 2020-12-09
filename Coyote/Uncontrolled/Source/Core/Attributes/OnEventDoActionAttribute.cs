@@ -8,7 +8,7 @@ using System;
 namespace Microsoft.Coyote
 {
     /// <summary>
-    /// Attribute for declaring what action a machine should perform
+    /// Attribute for declaring what action an actor should perform
     /// when it receives an event in a given state.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
