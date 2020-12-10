@@ -22,14 +22,26 @@
 # Write-Host "Running Raft [Coyote]"
 # .\Benchmarks\Coyote\bin\net5.0\Raft.exe
 
-Write-Host "Running ChainReplication [TPL_N]"
-.\Benchmarks\TPL_N\bin\net5.0\ChainReplication.exe
+# Write-Host "Running ChainReplication [TPL_N]"
+# .\Benchmarks\TPL_N\bin\net5.0\ChainReplication.exe
 
-Write-Host "Running FailureDetector [TPL_N]"
-.\Benchmarks\TPL_N\bin\net5.0\FailureDetector.exe
+# Write-Host "Running FailureDetector [TPL_N]"
+# .\Benchmarks\TPL_N\bin\net5.0\FailureDetector.exe
 
-Write-Host "Running Paxos [TPL_N]"
-.\Benchmarks\TPL_N\bin\net5.0\Paxos.exe
+# Write-Host "Running Paxos [TPL_N]"
+# .\Benchmarks\TPL_N\bin\net5.0\Paxos.exe
 
-Write-Host "Running Raft [TPL_N]"
-.\Benchmarks\TPL_N\bin\net5.0\Raft.exe
+# Write-Host "Running Raft [TPL_N]"
+# .\Benchmarks\TPL_N\bin\net5.0\Raft.exe
+
+Write-Host "Running ChainReplication [Coyote_N]"
+.\Benchmarks\Coyote_N\bin\net5.0\ChainReplication.exe
+
+Write-Host "Running FailureDetector [Coyote_N]"
+.\Benchmarks\Coyote_N\bin\net5.0\FailureDetector.exe
+
+Write-Host "Running Paxos [Coyote_N]"
+.\Benchmarks\Coyote_N\bin\net5.0\Paxos.exe
+
+Write-Host "Running Raft [Coyote_N]"
+.\Benchmarks\Coyote_N\bin\net5.0\Raft.exe
