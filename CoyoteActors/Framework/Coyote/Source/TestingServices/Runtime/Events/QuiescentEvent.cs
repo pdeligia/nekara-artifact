@@ -6,7 +6,7 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace Microsoft.Coyote.TestingServices.Runtime
+namespace Microsoft.CoyoteActors.TestingServices.Runtime
 {
     /// <summary>
     /// Signals that an actor has reached quiescence.

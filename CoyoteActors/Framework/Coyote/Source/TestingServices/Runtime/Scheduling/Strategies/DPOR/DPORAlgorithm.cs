@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace Microsoft.Coyote.TestingServices.Scheduling.Strategies.DPOR
+namespace Microsoft.CoyoteActors.TestingServices.Scheduling.Strategies.DPOR
 {
     /// <summary>
     /// The actual DPOR algorithm used by <see cref="DPORStrategy"/>.

@@ -5,7 +5,7 @@
 
 using System;
 
-namespace Microsoft.Coyote
+namespace Microsoft.CoyoteActors
 {
     /// <summary>
     /// Attribute for declaring the entry point to a Coyote program.

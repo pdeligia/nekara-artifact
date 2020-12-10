@@ -12,10 +12,10 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Microsoft.Coyote.IO;
-using Microsoft.Coyote.Timers;
+using Microsoft.CoyoteActors.IO;
+using Microsoft.CoyoteActors.Timers;
 
-namespace Microsoft.Coyote.Runtime
+namespace Microsoft.CoyoteActors.Runtime
 {
     /// <summary>
     /// Runtime for executing actors asynchronously.
@@ -295,12 +295,12 @@ namespace Microsoft.Coyote.Runtime
         internal abstract IActorTimer CreateActorTimer(TimerInfo info, Actor owner);
 
         /// <summary>
-        /// Tries to create a new <see cref="Coyote.Monitor"/> of the specified <see cref="Type"/>.
+        /// Tries to create a new <see cref="CoyoteActors.Monitor"/> of the specified <see cref="Type"/>.
         /// </summary>
         internal abstract void TryCreateMonitor(Type type);
 
         /// <summary>
-        /// Invokes the specified <see cref="Coyote.Monitor"/> with the specified <see cref="Event"/>.
+        /// Invokes the specified <see cref="CoyoteActors.Monitor"/> with the specified <see cref="Event"/>.
         /// </summary>
         internal abstract void Monitor(Type type, AsyncActor sender, Event e);
 

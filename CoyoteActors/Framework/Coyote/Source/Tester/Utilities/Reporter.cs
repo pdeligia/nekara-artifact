@@ -6,10 +6,10 @@
 using System.IO;
 using System.Runtime.Serialization;
 
-using Microsoft.Coyote.IO;
-using Microsoft.Coyote.TestingServices.Coverage;
+using Microsoft.CoyoteActors.IO;
+using Microsoft.CoyoteActors.TestingServices.Coverage;
 
-namespace Microsoft.Coyote.TestingServices
+namespace Microsoft.CoyoteActors.TestingServices
 {
     /// <summary>
     /// The Coyote testing reporter.

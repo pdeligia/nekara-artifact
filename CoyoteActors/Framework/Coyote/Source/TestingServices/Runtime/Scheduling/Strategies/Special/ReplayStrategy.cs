@@ -7,10 +7,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using Microsoft.Coyote.IO;
-using Microsoft.Coyote.TestingServices.Tracing.Schedule;
+using Microsoft.CoyoteActors.IO;
+using Microsoft.CoyoteActors.TestingServices.Tracing.Schedule;
 
-namespace Microsoft.Coyote.TestingServices.Scheduling.Strategies
+namespace Microsoft.CoyoteActors.TestingServices.Scheduling.Strategies
 {
     /// <summary>
     /// Class representing a replaying scheduling strategy.

@@ -5,9 +5,9 @@
 
 using System;
 
-using Microsoft.Coyote.TestingServices.Runtime;
+using Microsoft.CoyoteActors.TestingServices.Runtime;
 
-namespace Microsoft.Coyote.SharedObjects
+namespace Microsoft.CoyoteActors.SharedObjects
 {
     /// <summary>
     /// A wrapper for a shared register modeled using a state-actor for testing.

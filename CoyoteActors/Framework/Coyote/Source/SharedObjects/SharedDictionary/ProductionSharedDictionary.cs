@@ -6,7 +6,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 
-namespace Microsoft.Coyote.SharedObjects
+namespace Microsoft.CoyoteActors.SharedObjects
 {
     /// <summary>
     /// Implements a shared dictionary to be used in production.

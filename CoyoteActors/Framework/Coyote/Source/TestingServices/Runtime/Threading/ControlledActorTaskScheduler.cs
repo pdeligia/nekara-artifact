@@ -9,14 +9,14 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Microsoft.Coyote.Runtime;
-using Microsoft.Coyote.TestingServices.Runtime;
-using Microsoft.Coyote.TestingServices.Scheduling;
-using Microsoft.Coyote.Threading;
+using Microsoft.CoyoteActors.Runtime;
+using Microsoft.CoyoteActors.TestingServices.Runtime;
+using Microsoft.CoyoteActors.TestingServices.Scheduling;
+using Microsoft.CoyoteActors.Threading;
 
 using static System.Runtime.CompilerServices.YieldAwaitable;
 
-namespace Microsoft.Coyote.TestingServices.Threading
+namespace Microsoft.CoyoteActors.TestingServices.Threading
 {
     /// <summary>
     /// Implements a <see cref="ActorTaskScheduler"/> that is controlled by the runtime during testing.

@@ -5,7 +5,7 @@
 
 using System.Runtime.Serialization;
 
-namespace Microsoft.Coyote.Utilities
+namespace Microsoft.CoyoteActors.Utilities
 {
     /// <summary>
     /// Coyote runtime scheduling strategy.

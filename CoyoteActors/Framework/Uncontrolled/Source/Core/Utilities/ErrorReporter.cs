@@ -5,9 +5,9 @@
 
 using System;
 
-using Microsoft.Coyote.IO;
+using Microsoft.CoyoteActors.IO;
 
-namespace Microsoft.Coyote.Utilities
+namespace Microsoft.CoyoteActors.Utilities
 {
     /// <summary>
     /// Reports errors and warnings to the user.

@@ -3,10 +3,10 @@
 // Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------------------------------------------
 
-using Microsoft.Coyote.Runtime;
-using Microsoft.Coyote.TestingServices.Runtime;
+using Microsoft.CoyoteActors.Runtime;
+using Microsoft.CoyoteActors.TestingServices.Runtime;
 
-namespace Microsoft.Coyote.SharedObjects
+namespace Microsoft.CoyoteActors.SharedObjects
 {
     /// <summary>
     /// Shared counter that can be safely shared by multiple Coyote actors.

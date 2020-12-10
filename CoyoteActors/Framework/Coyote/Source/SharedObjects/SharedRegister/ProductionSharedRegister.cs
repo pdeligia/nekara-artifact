@@ -5,7 +5,7 @@
 
 using System;
 
-namespace Microsoft.Coyote.SharedObjects
+namespace Microsoft.CoyoteActors.SharedObjects
 {
     /// <summary>
     /// Implements a shared register to be used in production.

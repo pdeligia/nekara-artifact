@@ -3,9 +3,9 @@
 // Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------------------------------------------
 
-using Microsoft.Coyote.TestingServices.Runtime;
+using Microsoft.CoyoteActors.TestingServices.Runtime;
 
-namespace Microsoft.Coyote.SharedObjects
+namespace Microsoft.CoyoteActors.SharedObjects
 {
     /// <summary>
     /// A wrapper for a shared counter modeled using a state-actor for testing.

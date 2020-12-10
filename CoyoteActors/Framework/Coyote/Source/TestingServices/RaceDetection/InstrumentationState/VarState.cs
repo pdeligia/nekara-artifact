@@ -4,9 +4,9 @@
 // ------------------------------------------------------------------------------------------------
 
 using System.Collections.Generic;
-using Microsoft.Coyote.TestingServices.RaceDetection.Util;
+using Microsoft.CoyoteActors.TestingServices.RaceDetection.Util;
 
-namespace Microsoft.Coyote.TestingServices.RaceDetection.InstrumentationState
+namespace Microsoft.CoyoteActors.TestingServices.RaceDetection.InstrumentationState
 {
     internal class VarState
     {

@@ -7,10 +7,10 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
-using Microsoft.Coyote.IO;
-using Microsoft.Coyote.Runtime;
+using Microsoft.CoyoteActors.IO;
+using Microsoft.CoyoteActors.Runtime;
 
-namespace Microsoft.Coyote
+namespace Microsoft.CoyoteActors
 {
     /// <summary>
     /// Interface of the Coyote runtime. It provides methods for creating and executing actors,

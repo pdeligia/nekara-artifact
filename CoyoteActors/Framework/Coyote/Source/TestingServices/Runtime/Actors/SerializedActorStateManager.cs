@@ -7,10 +7,10 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
-using Microsoft.Coyote.Runtime;
-using Microsoft.Coyote.Threading;
+using Microsoft.CoyoteActors.Runtime;
+using Microsoft.CoyoteActors.Threading;
 
-namespace Microsoft.Coyote.TestingServices.Runtime
+namespace Microsoft.CoyoteActors.TestingServices.Runtime
 {
     /// <summary>
     /// Implements a state manager that is used by a serialized actor during testing.

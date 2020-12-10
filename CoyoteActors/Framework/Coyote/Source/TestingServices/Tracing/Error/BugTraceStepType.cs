@@ -5,7 +5,7 @@
 
 using System.Runtime.Serialization;
 
-namespace Microsoft.Coyote.TestingServices.Tracing.Error
+namespace Microsoft.CoyoteActors.TestingServices.Tracing.Error
 {
     /// <summary>
     /// The bug trace step type.

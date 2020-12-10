@@ -3,7 +3,7 @@
 // Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------------------------------------------
 
-namespace Microsoft.Coyote.Timers
+namespace Microsoft.CoyoteActors.Timers
 {
     /// <summary>
     /// Defines a timer elapsed event that is sent from a timer to the actor that owns the timer.

@@ -5,7 +5,7 @@
 
 using System;
 
-namespace Microsoft.Coyote.SharedObjects
+namespace Microsoft.CoyoteActors.SharedObjects
 {
     /// <summary>
     /// A shared register modeled using a state-actor for testing.

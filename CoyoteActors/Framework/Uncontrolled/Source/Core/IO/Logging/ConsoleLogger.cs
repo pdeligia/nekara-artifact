@@ -5,7 +5,7 @@
 
 using System;
 
-namespace Microsoft.Coyote.IO
+namespace Microsoft.CoyoteActors.IO
 {
     /// <summary>
     /// Logger that writes text to the console.

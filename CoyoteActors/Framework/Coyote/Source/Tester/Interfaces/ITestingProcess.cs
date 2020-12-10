@@ -6,10 +6,10 @@
 #if NET46
 using System.ServiceModel;
 
-using Microsoft.Coyote.TestingServices.Coverage;
+using Microsoft.CoyoteActors.TestingServices.Coverage;
 #endif
 
-namespace Microsoft.Coyote.TestingServices
+namespace Microsoft.CoyoteActors.TestingServices
 {
     /// <summary>
     /// Interface for a remote Coyote testing process.

@@ -4,9 +4,9 @@
 // ------------------------------------------------------------------------------------------------
 
 using System;
-using Microsoft.Coyote.IO;
+using Microsoft.CoyoteActors.IO;
 
-namespace Microsoft.Coyote.TestingServices
+namespace Microsoft.CoyoteActors.TestingServices
 {
     /// <summary>
     /// Interface of a Coyote testing engine.

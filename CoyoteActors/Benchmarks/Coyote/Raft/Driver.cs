@@ -4,10 +4,10 @@ using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using Microsoft.Coyote;
-using Microsoft.Coyote.TestingServices;
+using Microsoft.CoyoteActors;
+using Microsoft.CoyoteActors.TestingServices;
 
-namespace Benchmarks.Protocols
+namespace Benchmarks
 {
     public class Driver
     {

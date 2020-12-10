@@ -6,10 +6,10 @@
 using System;
 using System.Threading.Tasks;
 
-using Microsoft.Coyote.TestingServices.Runtime;
-using Microsoft.Coyote.Threading;
+using Microsoft.CoyoteActors.TestingServices.Runtime;
+using Microsoft.CoyoteActors.Threading;
 
-namespace Microsoft.Coyote.TestingServices.Threading
+namespace Microsoft.CoyoteActors.TestingServices.Threading
 {
     /// <summary>
     /// Implements an actor that can execute an <see cref="Action"/> asynchronously.

@@ -8,9 +8,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-using Microsoft.Coyote.Runtime;
+using Microsoft.CoyoteActors.Runtime;
 
-namespace Microsoft.Coyote.TestingServices.Scheduling
+namespace Microsoft.CoyoteActors.TestingServices.Scheduling
 {
     /// <summary>
     /// Contains information about an actor operation that can be scheduled.

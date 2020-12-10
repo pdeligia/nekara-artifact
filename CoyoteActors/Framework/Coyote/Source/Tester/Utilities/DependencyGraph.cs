@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace Microsoft.Coyote.TestingServices.Utilities
+namespace Microsoft.CoyoteActors.TestingServices.Utilities
 {
     internal static class DependencyGraph
     {

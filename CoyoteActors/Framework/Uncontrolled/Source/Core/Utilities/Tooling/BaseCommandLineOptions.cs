@@ -5,9 +5,9 @@
 
 using System;
 using System.Text.RegularExpressions;
-using Microsoft.Coyote.IO;
+using Microsoft.CoyoteActors.IO;
 
-namespace Microsoft.Coyote.Utilities
+namespace Microsoft.CoyoteActors.Utilities
 {
     /// <summary>
     /// The Coyote base command line options.

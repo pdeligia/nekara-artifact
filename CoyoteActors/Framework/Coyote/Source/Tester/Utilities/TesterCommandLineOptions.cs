@@ -4,10 +4,10 @@
 // ------------------------------------------------------------------------------------------------
 
 using System;
-using Microsoft.Coyote.IO;
-using Microsoft.Coyote.TestingServices.Scheduling.Strategies;
+using Microsoft.CoyoteActors.IO;
+using Microsoft.CoyoteActors.TestingServices.Scheduling.Strategies;
 
-namespace Microsoft.Coyote.Utilities
+namespace Microsoft.CoyoteActors.Utilities
 {
     public sealed class TesterCommandLineOptions : BaseCommandLineOptions
     {

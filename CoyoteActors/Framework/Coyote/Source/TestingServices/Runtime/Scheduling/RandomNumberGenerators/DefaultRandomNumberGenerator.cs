@@ -5,7 +5,7 @@
 
 using System;
 
-namespace Microsoft.Coyote.TestingServices.Scheduling
+namespace Microsoft.CoyoteActors.TestingServices.Scheduling
 {
     /// <summary>
     /// Default random number generator that uses the <see cref="System.Random"/> generator.

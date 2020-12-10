@@ -5,7 +5,7 @@
 
 using System;
 
-namespace Microsoft.Coyote.SharedObjects
+namespace Microsoft.CoyoteActors.SharedObjects
 {
     /// <summary>
     /// Interface of a shared register.

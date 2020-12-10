@@ -5,7 +5,7 @@
 
 using System;
 
-namespace Microsoft.Coyote
+namespace Microsoft.CoyoteActors
 {
 #pragma warning disable SA1402 // FileMayOnlyContainASingleType
     /// <summary>

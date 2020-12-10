@@ -6,7 +6,7 @@
 using System.IO;
 using System.Text;
 
-namespace Microsoft.Coyote.IO
+namespace Microsoft.CoyoteActors.IO
 {
     /// <summary>
     /// Text writer that writes to the specified logger.

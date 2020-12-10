@@ -7,9 +7,9 @@ using System;
 using System.Reflection;
 using System.Threading.Tasks;
 
-using Microsoft.Coyote.Threading;
+using Microsoft.CoyoteActors.Threading;
 
-namespace Microsoft.Coyote.Runtime
+namespace Microsoft.CoyoteActors.Runtime
 {
     /// <summary>
     /// A actor handler that has been cached for performance optimization.

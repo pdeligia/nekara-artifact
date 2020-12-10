@@ -7,9 +7,9 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Text;
 
-using Microsoft.Coyote.Utilities;
+using Microsoft.CoyoteActors.Utilities;
 
-namespace Microsoft.Coyote.TestingServices
+namespace Microsoft.CoyoteActors.TestingServices
 {
     /// <summary>
     /// The Coyote testing process factory.

@@ -5,7 +5,7 @@
 
 using System.Threading;
 
-namespace Microsoft.Coyote.SharedObjects
+namespace Microsoft.CoyoteActors.SharedObjects
 {
     /// <summary>
     /// Implements a shared counter to be used in production.

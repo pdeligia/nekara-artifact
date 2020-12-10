@@ -5,9 +5,9 @@
 
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using Microsoft.Coyote;
+using Microsoft.CoyoteActors;
 
-namespace Benchmarks.Protocols
+namespace Benchmarks
 {
     internal class FailureDetector
     {

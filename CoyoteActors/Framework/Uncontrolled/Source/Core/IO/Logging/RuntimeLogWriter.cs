@@ -5,10 +5,10 @@
 
 using System;
 
-using Microsoft.Coyote.Timers;
-using Microsoft.Coyote.Utilities;
+using Microsoft.CoyoteActors.Timers;
+using Microsoft.CoyoteActors.Utilities;
 
-namespace Microsoft.Coyote.IO
+namespace Microsoft.CoyoteActors.IO
 {
     /// <summary>
     /// Default implementation of a log writer that logs runtime

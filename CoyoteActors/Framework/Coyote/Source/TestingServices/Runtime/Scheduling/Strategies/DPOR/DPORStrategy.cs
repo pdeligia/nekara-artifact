@@ -6,9 +6,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 
-using Microsoft.Coyote.TestingServices.Scheduling.Strategies.DPOR;
+using Microsoft.CoyoteActors.TestingServices.Scheduling.Strategies.DPOR;
 
-namespace Microsoft.Coyote.TestingServices.Scheduling.Strategies
+namespace Microsoft.CoyoteActors.TestingServices.Scheduling.Strategies
 {
     /// <summary>
     /// Dynamic partial-order reduction (DPOR) scheduling strategy.

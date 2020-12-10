@@ -5,7 +5,7 @@
 
 using System;
 
-namespace Microsoft.Coyote.IO
+namespace Microsoft.CoyoteActors.IO
 {
     /// <summary>
     /// Interface of the runtime logger.

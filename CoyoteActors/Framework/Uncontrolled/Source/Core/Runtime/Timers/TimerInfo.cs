@@ -5,7 +5,7 @@
 
 using System;
 
-namespace Microsoft.Coyote.Timers
+namespace Microsoft.CoyoteActors.Timers
 {
     /// <summary>
     /// Stores information about a timer that can send timeout events to its owner actor.

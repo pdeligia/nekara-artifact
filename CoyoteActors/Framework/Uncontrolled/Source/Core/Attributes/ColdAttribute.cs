@@ -5,7 +5,7 @@
 
 using System;
 
-namespace Microsoft.Coyote
+namespace Microsoft.CoyoteActors
 {
     /// <summary>
     /// Attribute for checking liveness properties in monitors.

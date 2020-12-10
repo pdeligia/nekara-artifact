@@ -11,12 +11,12 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Microsoft.Coyote.Runtime;
-using Microsoft.Coyote.TestingServices.Timers;
-using Microsoft.Coyote.Threading;
-using Microsoft.Coyote.Timers;
+using Microsoft.CoyoteActors.Runtime;
+using Microsoft.CoyoteActors.TestingServices.Timers;
+using Microsoft.CoyoteActors.Threading;
+using Microsoft.CoyoteActors.Timers;
 
-namespace Microsoft.Coyote.TestingServices.Runtime
+namespace Microsoft.CoyoteActors.TestingServices.Runtime
 {
     /// <summary>
     /// Runtime for testing an actor in isolation.
@@ -378,7 +378,7 @@ namespace Microsoft.Coyote.TestingServices.Runtime
         }
 
         /// <summary>
-        /// Tries to create a new <see cref="Coyote.Monitor"/> of the specified <see cref="Type"/>.
+        /// Tries to create a new <see cref="CoyoteActors.Monitor"/> of the specified <see cref="Type"/>.
         /// </summary>
         internal override void TryCreateMonitor(Type type)
         {
@@ -386,7 +386,7 @@ namespace Microsoft.Coyote.TestingServices.Runtime
         }
 
         /// <summary>
-        /// Invokes the specified <see cref="Coyote.Monitor"/> with the specified <see cref="Event"/>.
+        /// Invokes the specified <see cref="CoyoteActors.Monitor"/> with the specified <see cref="Event"/>.
         /// </summary>
         internal override void Monitor(Type type, AsyncActor sender, Event e)
         {

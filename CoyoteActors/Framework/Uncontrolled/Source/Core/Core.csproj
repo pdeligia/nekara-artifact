@@ -3,7 +3,7 @@
   <Import Project="..\..\Common\key.props" />
   <PropertyGroup>
     <Description>The Coyote framework core libraries and runtime.</Description>
-    <AssemblyName>Microsoft.Coyote</AssemblyName>
+    <AssemblyName>Microsoft.Coyote.Actors</AssemblyName>
     <RootNamespace>Microsoft.Coyote</RootNamespace>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageTags>coyote;state-actors;asynchronous;event-driven;dotnet;csharp</PackageTags>

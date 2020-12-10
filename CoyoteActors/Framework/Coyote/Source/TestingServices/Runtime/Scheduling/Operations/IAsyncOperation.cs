@@ -3,7 +3,7 @@
 // Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------------------------------------------
 
-namespace Microsoft.Coyote.TestingServices.Scheduling
+namespace Microsoft.CoyoteActors.TestingServices.Scheduling
 {
     /// <summary>
     /// Interface of an asynchronous operation that can be scheduled during testing.

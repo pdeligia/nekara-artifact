@@ -6,7 +6,7 @@
     <OutputType>Exe</OutputType>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.Coyote">
+    <Reference Include="Microsoft.Coyote.Actors">
       <HintPath>..\..\..\Framework\Uncontrolled\bin\net5.0\Microsoft.Coyote.dll</HintPath>
     </Reference>
   </ItemGroup>

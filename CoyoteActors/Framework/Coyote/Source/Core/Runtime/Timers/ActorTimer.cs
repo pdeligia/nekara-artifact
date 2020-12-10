@@ -6,7 +6,7 @@
 using System;
 using System.Threading;
 
-namespace Microsoft.Coyote.Timers
+namespace Microsoft.CoyoteActors.Timers
 {
     /// <summary>
     /// A timer that can send timeout events to its owner actor.

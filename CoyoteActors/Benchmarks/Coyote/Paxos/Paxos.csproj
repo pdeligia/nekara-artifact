@@ -6,8 +6,8 @@
     <OutputType>Exe</OutputType>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.Coyote">
-      <HintPath>..\..\..\Framework\Coyote\bin\net5.0\Microsoft.Coyote.dll</HintPath>
+    <Reference Include="Microsoft.Coyote.Actors">
+      <HintPath>..\..\..\Framework\Coyote\bin\net5.0\Microsoft.Coyote.Actors.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Coyote.TestingServices">
       <HintPath>..\..\..\Framework\Coyote\bin\net5.0\Microsoft.Coyote.TestingServices.dll</HintPath>

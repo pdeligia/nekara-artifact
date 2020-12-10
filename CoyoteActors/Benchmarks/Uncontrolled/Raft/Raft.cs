@@ -2,9 +2,9 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
-using Microsoft.Coyote;
+using Microsoft.CoyoteActors;
 
-namespace Benchmarks.Protocols
+namespace Benchmarks
 {
     internal class Raft
     {
@@ -1190,7 +1190,7 @@ namespace Benchmarks.Protocols
             class Inactive : ActorState { }
         }
 
-        private class SafetyMonitor : Microsoft.Coyote.Monitor
+        private class SafetyMonitor : Microsoft.CoyoteActors.Monitor
         {
             internal class NotifyLeaderElected : Event
             {
