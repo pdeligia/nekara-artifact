@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>ChainReplication</AssemblyName>
+    <TargetFrameworks>net5.0</TargetFrameworks>
+    <OutputPath>..\bin\</OutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Coyote">
+      <HintPath>..\..\..\Framework\Uncontrolled\bin\net5.0\Microsoft.Coyote.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>
