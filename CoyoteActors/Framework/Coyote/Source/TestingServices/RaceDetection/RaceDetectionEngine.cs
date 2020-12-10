@@ -12,7 +12,7 @@ using Microsoft.CoyoteActors.TestingServices.RaceDetection.InstrumentationState;
 using Microsoft.CoyoteActors.TestingServices.RaceDetection.Util;
 using Microsoft.CoyoteActors.TestingServices.Runtime;
 
-using InstrActorState = Microsoft.Coyote.TestingServices.RaceDetection.InstrumentationState.ActorState;
+using InstrActorState = Microsoft.CoyoteActors.TestingServices.RaceDetection.InstrumentationState.ActorState;
 
 namespace Microsoft.CoyoteActors.TestingServices.RaceDetection
 {

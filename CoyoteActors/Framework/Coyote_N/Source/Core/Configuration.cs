@@ -453,7 +453,7 @@ namespace Microsoft.CoyoteActors
             this.TestingRuntimeAssembly = string.Empty;
             this.TestMethodName = string.Empty;
 
-            this.SchedulingStrategy = SchedulingStrategy.ProbabilisticRandom;
+            this.SchedulingStrategy = SchedulingStrategy.PCT;
             this.AbstractionLevel = AbstractionLevel.Default;
             this.SchedulingIterations = 1;
             this.SchedulingSeed = null;
@@ -468,7 +468,7 @@ namespace Microsoft.CoyoteActors
             this.TestingSchedulerProcessId = -1;
             this.TestingProcessId = 0;
             this.ConsiderDepthBoundHitAsBug = false;
-            this.PrioritySwitchBound = 0;
+            this.PrioritySwitchBound = 10;
             this.DelayBound = 0;
             this.CoinFlipBound = 3;
             this.TimeoutDelay = 1;
