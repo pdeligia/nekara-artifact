@@ -3,6 +3,7 @@
     <AssemblyName>Raft</AssemblyName>
     <TargetFrameworks>net5.0</TargetFrameworks>
     <OutputPath>..\bin\</OutputPath>
+    <OutputType>Exe</OutputType>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Coyote">

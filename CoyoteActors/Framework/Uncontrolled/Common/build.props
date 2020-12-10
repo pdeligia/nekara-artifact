@@ -5,7 +5,7 @@
     <Product>Coyote</Product>
     <Company>Microsoft Corporation</Company>
     <Copyright>Copyright © Microsoft Corporation. All rights reserved.</Copyright>
-    <RepositoryUrl>https://github.com/p-org/Coyote</RepositoryUrl>
+    <RepositoryUrl>https://github.com/microsoft/Coyote</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">

@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Microsoft.Coyote;
 
@@ -13,6 +16,12 @@ namespace Benchmarks.Protocols
             Paxos.Execute(runtime);
         }
 
+        public class Results
+        {
+            public double BuggyIterations { get; set; }
+            public int States { get; set; }
+        }
+
         public static async Task Main()
         {
             var config = Configuration.Create();
@@ -21,8 +30,9 @@ namespace Benchmarks.Protocols
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
+            int iterations = 10000;
             int bugsFound = 0;
-            for (int i = 0; i < 100000; i++)
+            for (int i = 1; i <= iterations; i++)
             {
                 var runtime = CoyoteRuntime.Create(config);
                 Test_Paxos(runtime);
@@ -45,6 +55,15 @@ namespace Benchmarks.Protocols
 
             stopwatch.Stop();
             Console.WriteLine($"... Found {bugsFound} bugs in {stopwatch.Elapsed.TotalMilliseconds}ms");
+
+            var fileName = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..",
+              "paxos_uncontrolled.json");
+            var results = JsonSerializer.Serialize(new Results()
+            {
+                BuggyIterations = Paxos.BugsFound / (double)iterations,
+                States = Paxos.States.Count
+            });
+            File.WriteAllText(fileName, results);
         }
     }
 }
