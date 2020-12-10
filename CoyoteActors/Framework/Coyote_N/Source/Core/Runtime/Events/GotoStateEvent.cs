@@ -6,7 +6,7 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace Microsoft.Coyote
+namespace Microsoft.CoyoteActors
 {
     /// <summary>
     /// The goto state event.

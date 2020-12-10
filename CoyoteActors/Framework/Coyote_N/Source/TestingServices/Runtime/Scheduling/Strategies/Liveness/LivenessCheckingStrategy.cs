@@ -6,7 +6,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Microsoft.Coyote.TestingServices.Scheduling.Strategies
+namespace Microsoft.CoyoteActors.TestingServices.Scheduling.Strategies
 {
     /// <summary>
     /// Abstract strategy for detecting liveness property violations. It

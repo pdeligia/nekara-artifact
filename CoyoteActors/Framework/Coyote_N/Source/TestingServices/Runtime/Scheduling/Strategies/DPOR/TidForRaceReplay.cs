@@ -5,7 +5,7 @@
 
 using System.Collections.Generic;
 
-namespace Microsoft.Coyote.TestingServices.Scheduling.Strategies.DPOR
+namespace Microsoft.CoyoteActors.TestingServices.Scheduling.Strategies.DPOR
 {
     /// <summary>
     /// Stores a thread id for replaying a race.

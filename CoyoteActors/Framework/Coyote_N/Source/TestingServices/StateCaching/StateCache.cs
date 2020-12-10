@@ -5,12 +5,12 @@
 
 using System.Collections.Generic;
 
-using Microsoft.Coyote.IO;
-using Microsoft.Coyote.TestingServices.Runtime;
-using Microsoft.Coyote.TestingServices.Tracing.Schedule;
-using Microsoft.Coyote.Utilities;
+using Microsoft.CoyoteActors.IO;
+using Microsoft.CoyoteActors.TestingServices.Runtime;
+using Microsoft.CoyoteActors.TestingServices.Tracing.Schedule;
+using Microsoft.CoyoteActors.Utilities;
 
-namespace Microsoft.Coyote.TestingServices.StateCaching
+namespace Microsoft.CoyoteActors.TestingServices.StateCaching
 {
     /// <summary>
     /// Class implementing a state cache.

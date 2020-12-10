@@ -18,7 +18,7 @@
 # dotnet .\packages\microsoft.coyote.test\1.2.2\lib\net5.0\coyote.dll rewrite .\Benchmarks\TPL_N\tpl.nekara.json
 
 dotnet build .\Framework\Coyote_N\Coyote.sln
-# dotnet build .\Benchmarks\Coyote_N\ChainReplication\ChainReplication.csproj
-# dotnet build .\Benchmarks\Coyote_N\FailureDetector\FailureDetector.csproj
-# dotnet build .\Benchmarks\Coyote_N\Paxos\Paxos.csproj
-# dotnet build .\Benchmarks\Coyote_N\Raft\Raft.csproj
+dotnet build .\Benchmarks\Coyote_N\ChainReplication\ChainReplication.csproj
+dotnet build .\Benchmarks\Coyote_N\FailureDetector\FailureDetector.csproj
+dotnet build .\Benchmarks\Coyote_N\Paxos\Paxos.csproj
+dotnet build .\Benchmarks\Coyote_N\Raft\Raft.csproj

@@ -6,7 +6,7 @@
 using System;
 using System.Globalization;
 
-namespace Microsoft.Coyote.IO
+namespace Microsoft.CoyoteActors.IO
 {
     /// <summary>
     /// Static class implementing error reporting methods.

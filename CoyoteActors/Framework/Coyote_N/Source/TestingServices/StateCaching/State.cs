@@ -5,9 +5,9 @@
 
 using System.Collections.Generic;
 
-using Microsoft.Coyote.IO;
+using Microsoft.CoyoteActors.IO;
 
-namespace Microsoft.Coyote.TestingServices.StateCaching
+namespace Microsoft.CoyoteActors.TestingServices.StateCaching
 {
     /// <summary>
     /// Represents a snapshot of the program state.

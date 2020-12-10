@@ -3,9 +3,9 @@
 // Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------------------------------------------
 
-using Microsoft.Coyote.Threading;
+using Microsoft.CoyoteActors.Threading;
 
-namespace Microsoft.Coyote.TestingServices.Threading
+namespace Microsoft.CoyoteActors.TestingServices.Threading
 {
     /// <summary>
     /// Specifies the type of a <see cref="ActorTask"/>.

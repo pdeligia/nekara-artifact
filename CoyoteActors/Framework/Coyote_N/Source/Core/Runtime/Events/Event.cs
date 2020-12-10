@@ -5,7 +5,7 @@
 
 using System.Runtime.Serialization;
 
-namespace Microsoft.Coyote
+namespace Microsoft.CoyoteActors
 {
     /// <summary>
     /// Abstract class representing an event.

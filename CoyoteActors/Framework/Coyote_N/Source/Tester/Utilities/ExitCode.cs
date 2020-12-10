@@ -3,7 +3,7 @@
 // Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------------------------------------------
 
-namespace Microsoft.Coyote.TestingServices
+namespace Microsoft.CoyoteActors.TestingServices
 {
     /// <summary>
     /// The exit code returned by the tester.

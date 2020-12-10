@@ -8,9 +8,9 @@ using System.Globalization;
 using System.Runtime.Serialization;
 using System.Threading;
 
-using Microsoft.Coyote.Runtime;
+using Microsoft.CoyoteActors.Runtime;
 
-namespace Microsoft.Coyote
+namespace Microsoft.CoyoteActors
 {
     /// <summary>
     /// Unique actor id.

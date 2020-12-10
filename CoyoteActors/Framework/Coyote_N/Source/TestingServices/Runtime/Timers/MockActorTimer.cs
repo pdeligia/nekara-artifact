@@ -3,9 +3,9 @@
 // Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------------------------------------------
 
-using Microsoft.Coyote.Timers;
+using Microsoft.CoyoteActors.Timers;
 
-namespace Microsoft.Coyote.TestingServices.Timers
+namespace Microsoft.CoyoteActors.TestingServices.Timers
 {
     /// <summary>
     /// A mock timer that replaces <see cref="ActorTimer"/> during testing.

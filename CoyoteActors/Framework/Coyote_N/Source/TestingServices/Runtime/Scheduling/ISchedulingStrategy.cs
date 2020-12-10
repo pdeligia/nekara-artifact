@@ -5,7 +5,7 @@
 
 using System.Collections.Generic;
 
-namespace Microsoft.Coyote.TestingServices.Scheduling.Strategies
+namespace Microsoft.CoyoteActors.TestingServices.Scheduling.Strategies
 {
     /// <summary>
     /// Interface of an asynchronous operation scheduling strategy.

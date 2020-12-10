@@ -7,7 +7,7 @@ using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
-namespace Microsoft.Coyote.TestingServices.RaceDetection.Util
+namespace Microsoft.CoyoteActors.TestingServices.RaceDetection.Util
 {
     /// <summary>
     /// The epochs used by the FastTrack algorithm.

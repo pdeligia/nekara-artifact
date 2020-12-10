@@ -5,7 +5,7 @@
 
 using System;
 
-namespace Microsoft.Coyote.Runtime
+namespace Microsoft.CoyoteActors.Runtime
 {
     /// <summary>
     /// Defines a push state transition.

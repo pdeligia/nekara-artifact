@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
-namespace Microsoft.Coyote.Runtime
+namespace Microsoft.CoyoteActors.Runtime
 {
     /// <summary>
     /// Factory for creating actors.

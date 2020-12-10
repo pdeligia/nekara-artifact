@@ -5,7 +5,7 @@
 
 using System.Diagnostics;
 
-namespace Microsoft.Coyote.Utilities
+namespace Microsoft.CoyoteActors.Utilities
 {
     /// <summary>
     /// The Coyote profiler.

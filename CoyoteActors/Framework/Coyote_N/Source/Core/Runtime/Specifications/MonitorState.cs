@@ -7,9 +7,9 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-using Microsoft.Coyote.Runtime;
+using Microsoft.CoyoteActors.Runtime;
 
-namespace Microsoft.Coyote
+namespace Microsoft.CoyoteActors
 {
     /// <summary>
     /// Abstract class representing a state of a Coyote monitor.

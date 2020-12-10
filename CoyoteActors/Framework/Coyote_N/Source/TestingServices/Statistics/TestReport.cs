@@ -7,9 +7,9 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Text;
 
-using Microsoft.Coyote.TestingServices.Coverage;
+using Microsoft.CoyoteActors.TestingServices.Coverage;
 
-namespace Microsoft.Coyote.TestingServices
+namespace Microsoft.CoyoteActors.TestingServices
 {
     /// <summary>
     /// Class implementing the Coyote test report.
@@ -46,6 +46,12 @@ namespace Microsoft.Coyote.TestingServices
         /// </summary>
         [DataMember]
         public int NumOfFoundBugs { get; internal set; }
+
+        /// <summary>
+        /// Number of visited states.
+        /// </summary>
+        [DataMember]
+        public int NumOfStates { get; internal set; }
 
         /// <summary>
         /// Set of unique bug reports.
@@ -119,6 +125,7 @@ namespace Microsoft.Coyote.TestingServices
             this.NumOfExploredFairSchedules = 0;
             this.NumOfExploredUnfairSchedules = 0;
             this.NumOfFoundBugs = 0;
+            this.NumOfStates = 0;
             this.BugReports = new HashSet<string>();
 
             this.MinExploredFairSteps = -1;
@@ -150,6 +157,7 @@ namespace Microsoft.Coyote.TestingServices
                 this.CoverageInfo.Merge(testReport.CoverageInfo);
 
                 this.NumOfFoundBugs += testReport.NumOfFoundBugs;
+                this.NumOfStates = testReport.NumOfStates;
 
                 this.BugReports.UnionWith(testReport.BugReports);
 

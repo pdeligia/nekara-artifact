@@ -7,12 +7,12 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
-using Microsoft.Coyote.Runtime;
-using Microsoft.Coyote.TestingServices.Runtime;
-using Microsoft.Coyote.TestingServices.Scheduling;
-using Microsoft.Coyote.Threading;
+using Microsoft.CoyoteActors.Runtime;
+using Microsoft.CoyoteActors.TestingServices.Runtime;
+using Microsoft.CoyoteActors.TestingServices.Scheduling;
+using Microsoft.CoyoteActors.Threading;
 
-namespace Microsoft.Coyote.TestingServices.Threading
+namespace Microsoft.CoyoteActors.TestingServices.Threading
 {
     /// <summary>
     /// A <see cref="ActorTask"/> that is controlled by the runtime scheduler.

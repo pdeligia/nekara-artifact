@@ -3,7 +3,7 @@
 // Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------------------------------------------
 
-namespace Microsoft.Coyote.Utilities
+namespace Microsoft.CoyoteActors.Utilities
 {
     /// <summary>
     /// Determine the level of abstraction used during exploration.

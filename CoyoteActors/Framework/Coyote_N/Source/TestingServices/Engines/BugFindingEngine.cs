@@ -13,18 +13,18 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-using Microsoft.Coyote.IO;
-using Microsoft.Coyote.Runtime;
-using Microsoft.Coyote.TestingServices.RaceDetection;
-using Microsoft.Coyote.TestingServices.Runtime;
-using Microsoft.Coyote.TestingServices.Specifications;
-using Microsoft.Coyote.TestingServices.Threading;
-using Microsoft.Coyote.TestingServices.Tracing.Error;
-using Microsoft.Coyote.TestingServices.Tracing.Schedule;
-using Microsoft.Coyote.Threading;
-using Microsoft.Coyote.Utilities;
+using Microsoft.CoyoteActors.IO;
+using Microsoft.CoyoteActors.Runtime;
+using Microsoft.CoyoteActors.TestingServices.RaceDetection;
+using Microsoft.CoyoteActors.TestingServices.Runtime;
+using Microsoft.CoyoteActors.TestingServices.Specifications;
+using Microsoft.CoyoteActors.TestingServices.Threading;
+using Microsoft.CoyoteActors.TestingServices.Tracing.Error;
+using Microsoft.CoyoteActors.TestingServices.Tracing.Schedule;
+using Microsoft.CoyoteActors.Threading;
+using Microsoft.CoyoteActors.Utilities;
 
-namespace Microsoft.Coyote.TestingServices
+namespace Microsoft.CoyoteActors.TestingServices
 {
     /// <summary>
     /// The Coyote bug-finding engine.

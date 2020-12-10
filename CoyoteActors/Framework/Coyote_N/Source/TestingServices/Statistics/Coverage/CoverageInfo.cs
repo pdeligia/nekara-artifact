@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-namespace Microsoft.Coyote.TestingServices.Coverage
+namespace Microsoft.CoyoteActors.TestingServices.Coverage
 {
     /// <summary>
     /// Class for storing coverage-specific data

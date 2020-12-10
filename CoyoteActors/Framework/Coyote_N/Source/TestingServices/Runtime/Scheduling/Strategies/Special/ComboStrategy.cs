@@ -5,7 +5,7 @@
 
 using System.Collections.Generic;
 
-namespace Microsoft.Coyote.TestingServices.Scheduling.Strategies
+namespace Microsoft.CoyoteActors.TestingServices.Scheduling.Strategies
 {
     /// <summary>
     /// This strategy combines two given strategies, using them to schedule

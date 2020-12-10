@@ -6,9 +6,9 @@
 using System.Globalization;
 using System.Runtime.CompilerServices;
 
-using Microsoft.Coyote.Runtime;
+using Microsoft.CoyoteActors.Runtime;
 
-namespace Microsoft.Coyote
+namespace Microsoft.CoyoteActors
 {
     /// <summary>
     /// Provides methods for writing specifications and interacting

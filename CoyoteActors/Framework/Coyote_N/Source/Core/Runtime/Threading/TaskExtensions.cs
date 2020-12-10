@@ -5,7 +5,7 @@
 
 using System.Threading.Tasks;
 
-namespace Microsoft.Coyote.Threading
+namespace Microsoft.CoyoteActors.Threading
 {
     /// <summary>
     /// Extension methods for <see cref="Task"/> and <see cref="Task{TResult}"/> objects.

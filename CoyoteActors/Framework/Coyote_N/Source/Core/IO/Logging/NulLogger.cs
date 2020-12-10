@@ -3,7 +3,7 @@
 // Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------------------------------------------
 
-namespace Microsoft.Coyote.IO
+namespace Microsoft.CoyoteActors.IO
 {
     /// <summary>
     /// Logger that disposes all written text.

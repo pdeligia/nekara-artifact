@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.Serialization;
 
-namespace Microsoft.Coyote.TestingServices.Tracing.Error
+namespace Microsoft.CoyoteActors.TestingServices.Tracing.Error
 {
     /// <summary>
     /// Class implementing a Coyote bug trace. A trace is a

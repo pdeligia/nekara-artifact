@@ -3,9 +3,9 @@
 // Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------------------------------------------
 
-using Microsoft.Coyote.Utilities;
+using Microsoft.CoyoteActors.Utilities;
 
-namespace Microsoft.Coyote.TestingServices
+namespace Microsoft.CoyoteActors.TestingServices
 {
     /// <summary>
     /// The Coyote testing portfolio.

@@ -9,9 +9,9 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading;
 
-using Microsoft.Coyote.IO;
+using Microsoft.CoyoteActors.IO;
 
-namespace Microsoft.Coyote.TestingServices
+namespace Microsoft.CoyoteActors.TestingServices
 {
     /// <summary>
     /// Monitors the program being tested for code coverage.

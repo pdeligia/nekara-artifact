@@ -12,10 +12,10 @@ using System.ServiceModel;
 using System.ServiceModel.Description;
 #endif
 
-using Microsoft.Coyote.IO;
-using Microsoft.Coyote.Utilities;
+using Microsoft.CoyoteActors.IO;
+using Microsoft.CoyoteActors.Utilities;
 
-namespace Microsoft.Coyote.TestingServices
+namespace Microsoft.CoyoteActors.TestingServices
 {
     /// <summary>
     /// The Coyote testing process scheduler.

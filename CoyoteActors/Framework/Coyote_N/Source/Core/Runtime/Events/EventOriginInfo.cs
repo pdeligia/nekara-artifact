@@ -5,7 +5,7 @@
 
 using System.Runtime.Serialization;
 
-namespace Microsoft.Coyote.Runtime
+namespace Microsoft.CoyoteActors.Runtime
 {
     /// <summary>
     /// Contains the origin information of an <see cref="Event"/>.

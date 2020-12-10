@@ -5,7 +5,7 @@
 
 using System;
 
-namespace Microsoft.Coyote.Runtime
+namespace Microsoft.CoyoteActors.Runtime
 {
     /// <summary>
     /// The exception that is thrown by the Coyote runtime upon assertion failure.

@@ -7,7 +7,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Globalization;
 
-namespace Microsoft.Coyote.Utilities
+namespace Microsoft.CoyoteActors.Utilities
 {
     /// <summary>
     /// Utility class for resolving names.

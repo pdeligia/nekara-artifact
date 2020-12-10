@@ -11,17 +11,17 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
-using Microsoft.Coyote.IO;
-using Microsoft.Coyote.Runtime;
-using Microsoft.Coyote.TestingServices.Runtime;
-using Microsoft.Coyote.TestingServices.Scheduling.Strategies;
-using Microsoft.Coyote.TestingServices.Tracing.Schedule;
-using Microsoft.Coyote.Utilities;
+using Microsoft.CoyoteActors.IO;
+using Microsoft.CoyoteActors.Runtime;
+using Microsoft.CoyoteActors.TestingServices.Runtime;
+using Microsoft.CoyoteActors.TestingServices.Scheduling.Strategies;
+using Microsoft.CoyoteActors.TestingServices.Tracing.Schedule;
+using Microsoft.CoyoteActors.Utilities;
 
 #pragma warning disable CA1822
 #pragma warning disable SA1300 // Element must begin with upper-case letter
 #pragma warning disable SA1005 // Single line comments must begin with single space
-namespace Microsoft.Coyote.TestingServices.Scheduling
+namespace Microsoft.CoyoteActors.TestingServices.Scheduling
 {
     /// <summary>
     /// Provides methods for controlling the schedule of asynchronous operations.
@@ -74,6 +74,11 @@ namespace Microsoft.Coyote.TestingServices.Scheduling
         /// The currently scheduled asynchronous operation.
         /// </summary>
         internal ActorOperation ScheduledOperation { get; private set; }
+
+        /// <summary>
+        /// The set of hashed states.
+        /// </summary>
+        private static readonly HashSet<int> HashedStates = new HashSet<int>();
 
         /// <summary>
         /// Number of scheduled steps.
@@ -246,11 +251,13 @@ namespace Microsoft.Coyote.TestingServices.Scheduling
             this.CheckIfSchedulingStepsBoundIsReached();
 
             // Update the current execution state.
+            var states = this.Runtime.GetHashedExecutionState(AbstractionLevel.Custom);
             ((this.Strategy as TemperatureCheckingStrategy).SchedulingStrategy as RandomStrategy).
                 CaptureExecutionStep(this.Runtime.GetHashedExecutionState(AbstractionLevel.Default),
                 this.Runtime.GetHashedExecutionState(AbstractionLevel.InboxOnly),
-                this.Runtime.GetHashedExecutionState(AbstractionLevel.Custom),
+                states,
                 this.Runtime.GetHashedExecutionState(AbstractionLevel.Full));
+            HashedStates.Add(states);
 
             if (!this.OperationMap.Values.Any(op => op.Status == AsyncOperationStatus.Enabled))
             {
@@ -297,11 +304,13 @@ namespace Microsoft.Coyote.TestingServices.Scheduling
             this.CheckIfSchedulingStepsBoundIsReached();
 
             // Update the current execution state.
+            var states = this.Runtime.GetHashedExecutionState(AbstractionLevel.Custom);
             ((this.Strategy as TemperatureCheckingStrategy).SchedulingStrategy as RandomStrategy).
                 CaptureExecutionStep(this.Runtime.GetHashedExecutionState(AbstractionLevel.Default),
                 this.Runtime.GetHashedExecutionState(AbstractionLevel.InboxOnly),
-                this.Runtime.GetHashedExecutionState(AbstractionLevel.Custom),
+                states,
                 this.Runtime.GetHashedExecutionState(AbstractionLevel.Full));
+            HashedStates.Add(states);
 
             maxValue = 2;
             bool choice = Convert.ToBoolean(next_boolean(SchedulerPtr));
@@ -336,11 +345,13 @@ namespace Microsoft.Coyote.TestingServices.Scheduling
             this.CheckIfSchedulingStepsBoundIsReached();
 
             // Update the current execution state.
+            var states = this.Runtime.GetHashedExecutionState(AbstractionLevel.Custom);
             ((this.Strategy as TemperatureCheckingStrategy).SchedulingStrategy as RandomStrategy).
                 CaptureExecutionStep(this.Runtime.GetHashedExecutionState(AbstractionLevel.Default),
                 this.Runtime.GetHashedExecutionState(AbstractionLevel.InboxOnly),
-                this.Runtime.GetHashedExecutionState(AbstractionLevel.Custom),
+                states,
                 this.Runtime.GetHashedExecutionState(AbstractionLevel.Full));
+            HashedStates.Add(states);
 
             int choice = next_integer(SchedulerPtr, (ulong)maxValue);
             //Console.WriteLine($"next_integer {choice}");
@@ -430,6 +441,7 @@ namespace Microsoft.Coyote.TestingServices.Scheduling
         {
             TestReport report = new TestReport(this.Configuration);
 
+            report.NumOfStates = HashedStates.Count;
             if (this.BugFound)
             {
                 report.NumOfFoundBugs++;

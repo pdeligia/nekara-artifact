@@ -6,10 +6,10 @@
 using System;
 using System.ComponentModel;
 
-using Microsoft.Coyote.IO;
-using Microsoft.Coyote.Utilities;
+using Microsoft.CoyoteActors.IO;
+using Microsoft.CoyoteActors.Utilities;
 
-namespace Microsoft.Coyote.Runtime
+namespace Microsoft.CoyoteActors.Runtime
 {
     /// <summary>
     /// Implements an actor that can execute asynchronously.

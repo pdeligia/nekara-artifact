@@ -13,11 +13,11 @@ using System.IO;
 #if NET46
 using System.Linq;
 
-using Microsoft.Coyote.IO;
-using Microsoft.Coyote.TestingServices.Utilities;
+using Microsoft.CoyoteActors.IO;
+using Microsoft.CoyoteActors.TestingServices.Utilities;
 #endif
 
-namespace Microsoft.Coyote.TestingServices
+namespace Microsoft.CoyoteActors.TestingServices
 {
     /// <summary>
     /// Instruments a binary for code coverage.

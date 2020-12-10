@@ -14,13 +14,13 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Microsoft.Coyote.IO;
-using Microsoft.Coyote.Runtime;
-using Microsoft.Coyote.Threading;
-using Microsoft.Coyote.Timers;
-using Microsoft.Coyote.Utilities;
+using Microsoft.CoyoteActors.IO;
+using Microsoft.CoyoteActors.Runtime;
+using Microsoft.CoyoteActors.Threading;
+using Microsoft.CoyoteActors.Timers;
+using Microsoft.CoyoteActors.Utilities;
 
-namespace Microsoft.Coyote
+namespace Microsoft.CoyoteActors
 {
     /// <summary>
     /// Implements an asynchronous communicating state actor. Inherit from this class

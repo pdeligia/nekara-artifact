@@ -3,9 +3,9 @@
 // Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------------------------------------------
 
-using Microsoft.Coyote.TestingServices.StateCaching;
+using Microsoft.CoyoteActors.TestingServices.StateCaching;
 
-namespace Microsoft.Coyote.TestingServices.Tracing.Schedule
+namespace Microsoft.CoyoteActors.TestingServices.Tracing.Schedule
 {
     /// <summary>
     /// Class implementing a Coyote program schedule step.

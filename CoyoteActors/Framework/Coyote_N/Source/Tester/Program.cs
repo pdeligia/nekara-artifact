@@ -5,11 +5,11 @@
 
 using System;
 
-using Microsoft.Coyote.IO;
-using Microsoft.Coyote.TestingServices;
-using Microsoft.Coyote.Utilities;
+using Microsoft.CoyoteActors.IO;
+using Microsoft.CoyoteActors.TestingServices;
+using Microsoft.CoyoteActors.Utilities;
 
-namespace Microsoft.Coyote
+namespace Microsoft.CoyoteActors
 {
     /// <summary>
     /// The Coyote tester.

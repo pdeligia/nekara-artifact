@@ -7,7 +7,7 @@ using System;
 using System.Diagnostics;
 using System.Text;
 
-namespace Microsoft.Coyote.TestingServices.RaceDetection.Util
+namespace Microsoft.CoyoteActors.TestingServices.RaceDetection.Util
 {
     /// <summary>
     /// The class representing vector clocks.

@@ -6,7 +6,7 @@
 using System;
 using System.IO;
 
-namespace Microsoft.Coyote.IO
+namespace Microsoft.CoyoteActors.IO
 {
     /// <summary>
     /// Thread safe logger that writes text in-memory.

@@ -5,7 +5,7 @@
 
 using System.Runtime.Serialization;
 
-namespace Microsoft.Coyote.TestingServices.Coverage
+namespace Microsoft.CoyoteActors.TestingServices.Coverage
 {
     /// <summary>
     /// Specifies a program transition.

@@ -8,10 +8,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-using Microsoft.Coyote.Runtime;
-using Microsoft.Coyote.Utilities;
+using Microsoft.CoyoteActors.Runtime;
+using Microsoft.CoyoteActors.Utilities;
 
-namespace Microsoft.Coyote.TestingServices.Runtime
+namespace Microsoft.CoyoteActors.TestingServices.Runtime
 {
     /// <summary>
     /// Implements a queue of events that is used by a serialized actor during testing.

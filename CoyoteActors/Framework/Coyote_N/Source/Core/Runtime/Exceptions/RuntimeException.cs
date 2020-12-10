@@ -6,7 +6,7 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace Microsoft.Coyote.Runtime
+namespace Microsoft.CoyoteActors.Runtime
 {
     /// <summary>
     /// An exception that is thrown by the Coyote runtime.

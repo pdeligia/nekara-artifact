@@ -9,9 +9,9 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Microsoft.Coyote.Runtime;
+using Microsoft.CoyoteActors.Runtime;
 
-namespace Microsoft.Coyote.Threading
+namespace Microsoft.CoyoteActors.Threading
 {
     /// <summary>
     /// A mutual exclusion lock that can be acquired asynchronously

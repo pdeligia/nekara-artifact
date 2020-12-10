@@ -7,7 +7,7 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
-namespace Microsoft.Coyote.Threading
+namespace Microsoft.CoyoteActors.Threading
 {
     /// <summary>
     /// Implements a <see cref="ActorTask"/> awaiter.

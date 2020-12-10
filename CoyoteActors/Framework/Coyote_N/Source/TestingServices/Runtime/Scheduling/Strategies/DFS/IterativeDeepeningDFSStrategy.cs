@@ -3,9 +3,9 @@
 // Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------------------------------------------
 
-using Microsoft.Coyote.IO;
+using Microsoft.CoyoteActors.IO;
 
-namespace Microsoft.Coyote.TestingServices.Scheduling.Strategies
+namespace Microsoft.CoyoteActors.TestingServices.Scheduling.Strategies
 {
     /// <summary>
     /// A depth-first search scheduling strategy that uses iterative deepening.

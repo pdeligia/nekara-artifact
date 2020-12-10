@@ -5,7 +5,7 @@
 
 using System;
 
-namespace Microsoft.Coyote.Net
+namespace Microsoft.CoyoteActors.Net
 {
     /// <summary>
     /// Interface for a Coyote network provider.

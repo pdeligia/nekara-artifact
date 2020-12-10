@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 using static System.Runtime.CompilerServices.YieldAwaitable;
 
-namespace Microsoft.Coyote.Threading
+namespace Microsoft.CoyoteActors.Threading
 {
     /// <summary>
     /// Schedules the execution of actor tasks on a <see cref="TaskScheduler"/>.

@@ -5,7 +5,7 @@
 
 using System;
 
-namespace Microsoft.Coyote
+namespace Microsoft.CoyoteActors
 {
     /// <summary>
     /// Attribute for declaring what events should be deferred in

@@ -3,11 +3,11 @@
 // Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------------------------------------------
 
-using Microsoft.Coyote.IO;
-using Microsoft.Coyote.TestingServices.RaceDetection.Util;
+using Microsoft.CoyoteActors.IO;
+using Microsoft.CoyoteActors.TestingServices.RaceDetection.Util;
 using static System.Diagnostics.Debug;
 
-namespace Microsoft.Coyote.TestingServices.RaceDetection.InstrumentationState
+namespace Microsoft.CoyoteActors.TestingServices.RaceDetection.InstrumentationState
 {
     internal class ActorState
     {

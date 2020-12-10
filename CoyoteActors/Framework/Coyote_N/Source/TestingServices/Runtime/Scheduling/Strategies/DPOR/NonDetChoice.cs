@@ -3,7 +3,7 @@
 // Licensed under the MIT License (MIT). See License.txt in the repo root for license information.
 // ------------------------------------------------------------------------------------------------
 
-namespace Microsoft.Coyote.TestingServices.Scheduling.Strategies.DPOR
+namespace Microsoft.CoyoteActors.TestingServices.Scheduling.Strategies.DPOR
 {
     /// <summary>
     /// Stores the outcome of a nondetereminstic (nondet) choice.

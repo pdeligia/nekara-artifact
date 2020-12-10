@@ -15,15 +15,15 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Microsoft.Coyote.IO;
-using Microsoft.Coyote.TestingServices.Runtime;
-using Microsoft.Coyote.TestingServices.Scheduling;
-using Microsoft.Coyote.TestingServices.Scheduling.Strategies;
-using Microsoft.Coyote.TestingServices.Tracing.Schedule;
-using Microsoft.Coyote.Threading;
-using Microsoft.Coyote.Utilities;
+using Microsoft.CoyoteActors.IO;
+using Microsoft.CoyoteActors.TestingServices.Runtime;
+using Microsoft.CoyoteActors.TestingServices.Scheduling;
+using Microsoft.CoyoteActors.TestingServices.Scheduling.Strategies;
+using Microsoft.CoyoteActors.TestingServices.Tracing.Schedule;
+using Microsoft.CoyoteActors.Threading;
+using Microsoft.CoyoteActors.Utilities;
 
-namespace Microsoft.Coyote.TestingServices
+namespace Microsoft.CoyoteActors.TestingServices
 {
     /// <summary>
     /// The Coyote abstract testing engine.

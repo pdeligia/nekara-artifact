@@ -7,10 +7,10 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-using Microsoft.Coyote.IO;
-using Microsoft.Coyote.Utilities;
+using Microsoft.CoyoteActors.IO;
+using Microsoft.CoyoteActors.Utilities;
 
-namespace Microsoft.Coyote
+namespace Microsoft.CoyoteActors
 {
 #pragma warning disable CA1724 // Type names should not match namespaces
     /// <summary>
@@ -453,7 +453,7 @@ namespace Microsoft.Coyote
             this.TestingRuntimeAssembly = string.Empty;
             this.TestMethodName = string.Empty;
 
-            this.SchedulingStrategy = SchedulingStrategy.Random;
+            this.SchedulingStrategy = SchedulingStrategy.ProbabilisticRandom;
             this.AbstractionLevel = AbstractionLevel.Default;
             this.SchedulingIterations = 1;
             this.SchedulingSeed = null;
@@ -470,7 +470,7 @@ namespace Microsoft.Coyote
             this.ConsiderDepthBoundHitAsBug = false;
             this.PrioritySwitchBound = 0;
             this.DelayBound = 0;
-            this.CoinFlipBound = 0;
+            this.CoinFlipBound = 3;
             this.TimeoutDelay = 1;
             this.SafetyPrefixBound = 0;
 

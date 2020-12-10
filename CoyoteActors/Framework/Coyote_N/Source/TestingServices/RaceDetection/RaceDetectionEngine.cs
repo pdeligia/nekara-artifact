@@ -7,14 +7,14 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
-using Microsoft.Coyote.IO;
-using Microsoft.Coyote.TestingServices.RaceDetection.InstrumentationState;
-using Microsoft.Coyote.TestingServices.RaceDetection.Util;
-using Microsoft.Coyote.TestingServices.Runtime;
+using Microsoft.CoyoteActors.IO;
+using Microsoft.CoyoteActors.TestingServices.RaceDetection.InstrumentationState;
+using Microsoft.CoyoteActors.TestingServices.RaceDetection.Util;
+using Microsoft.CoyoteActors.TestingServices.Runtime;
 
-using InstrActorState = Microsoft.Coyote.TestingServices.RaceDetection.InstrumentationState.ActorState;
+using InstrActorState = Microsoft.CoyoteActors.TestingServices.RaceDetection.InstrumentationState.ActorState;
 
-namespace Microsoft.Coyote.TestingServices.RaceDetection
+namespace Microsoft.CoyoteActors.TestingServices.RaceDetection
 {
     internal class RaceDetectionEngine : IRegisterRuntimeOperation
     {

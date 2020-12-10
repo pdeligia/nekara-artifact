@@ -12,20 +12,20 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Microsoft.Coyote.Runtime;
-using Microsoft.Coyote.TestingServices.Coverage;
-using Microsoft.Coyote.TestingServices.Scheduling;
-using Microsoft.Coyote.TestingServices.Scheduling.Strategies;
-using Microsoft.Coyote.TestingServices.StateCaching;
-using Microsoft.Coyote.TestingServices.Threading;
-using Microsoft.Coyote.TestingServices.Timers;
-using Microsoft.Coyote.TestingServices.Tracing.Error;
-using Microsoft.Coyote.TestingServices.Tracing.Schedule;
-using Microsoft.Coyote.Threading;
-using Microsoft.Coyote.Timers;
-using Microsoft.Coyote.Utilities;
+using Microsoft.CoyoteActors.Runtime;
+using Microsoft.CoyoteActors.TestingServices.Coverage;
+using Microsoft.CoyoteActors.TestingServices.Scheduling;
+using Microsoft.CoyoteActors.TestingServices.Scheduling.Strategies;
+using Microsoft.CoyoteActors.TestingServices.StateCaching;
+using Microsoft.CoyoteActors.TestingServices.Threading;
+using Microsoft.CoyoteActors.TestingServices.Timers;
+using Microsoft.CoyoteActors.TestingServices.Tracing.Error;
+using Microsoft.CoyoteActors.TestingServices.Tracing.Schedule;
+using Microsoft.CoyoteActors.Threading;
+using Microsoft.CoyoteActors.Timers;
+using Microsoft.CoyoteActors.Utilities;
 
-namespace Microsoft.Coyote.TestingServices.Runtime
+namespace Microsoft.CoyoteActors.TestingServices.Runtime
 {
     /// <summary>
     /// Runtime for systematically testing actors by controlling the scheduler.

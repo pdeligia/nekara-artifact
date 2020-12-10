@@ -5,7 +5,7 @@
 
 using System.Collections.Generic;
 
-namespace Microsoft.Coyote.TestingServices.Scheduling.Strategies.DPOR
+namespace Microsoft.CoyoteActors.TestingServices.Scheduling.Strategies.DPOR
 {
     /// <summary>
     /// Task entry stored on the stack of a depth-first search to track which tasks existed

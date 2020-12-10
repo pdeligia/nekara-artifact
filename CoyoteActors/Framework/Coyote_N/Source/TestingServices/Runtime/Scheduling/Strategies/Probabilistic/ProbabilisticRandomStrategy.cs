@@ -6,7 +6,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Microsoft.Coyote.TestingServices.Scheduling.Strategies
+namespace Microsoft.CoyoteActors.TestingServices.Scheduling.Strategies
 {
     /// <summary>
     /// A randomized scheduling strategy with increased probability

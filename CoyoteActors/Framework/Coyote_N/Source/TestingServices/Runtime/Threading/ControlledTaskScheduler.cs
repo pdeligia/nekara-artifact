@@ -9,11 +9,11 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Microsoft.Coyote.Runtime;
-using Microsoft.Coyote.TestingServices.Runtime;
-using Microsoft.Coyote.TestingServices.Scheduling;
+using Microsoft.CoyoteActors.Runtime;
+using Microsoft.CoyoteActors.TestingServices.Runtime;
+using Microsoft.CoyoteActors.TestingServices.Scheduling;
 
-namespace Microsoft.Coyote.TestingServices.Threading
+namespace Microsoft.CoyoteActors.TestingServices.Threading
 {
     /// <summary>
     /// A task scheduler that can be controlled during testing.

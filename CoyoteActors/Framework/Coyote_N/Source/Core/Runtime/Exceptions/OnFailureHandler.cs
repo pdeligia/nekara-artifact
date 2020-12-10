@@ -5,7 +5,7 @@
 
 using System;
 
-namespace Microsoft.Coyote.Runtime
+namespace Microsoft.CoyoteActors.Runtime
 {
     /// <summary>
     /// Handles the <see cref="IActorRuntime.OnFailure"/> event.

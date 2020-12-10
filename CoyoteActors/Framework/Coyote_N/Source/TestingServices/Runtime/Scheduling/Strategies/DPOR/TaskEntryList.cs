@@ -8,7 +8,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
-namespace Microsoft.Coyote.TestingServices.Scheduling.Strategies.DPOR
+namespace Microsoft.CoyoteActors.TestingServices.Scheduling.Strategies.DPOR
 {
     /// <summary>
     /// The elements of the <see cref="Stack"/> used by <see cref="DPORStrategy"/>. Stores

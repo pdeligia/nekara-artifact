@@ -5,9 +5,9 @@
 
 using System.Threading;
 
-using Microsoft.Coyote.TestingServices.Runtime;
+using Microsoft.CoyoteActors.TestingServices.Runtime;
 
-namespace Microsoft.Coyote.TestingServices.Threading
+namespace Microsoft.CoyoteActors.TestingServices.Threading
 {
     /// <summary>
     /// A <see cref="SynchronizationContext"/> that can be controlled during testing.
