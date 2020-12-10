@@ -48,6 +48,12 @@ namespace Microsoft.Coyote.TestingServices
         public int NumOfFoundBugs { get; internal set; }
 
         /// <summary>
+        /// Number of visited states.
+        /// </summary>
+        [DataMember]
+        public int NumOfStates { get; internal set; }
+
+        /// <summary>
         /// Set of unique bug reports.
         /// </summary>
         [DataMember]
@@ -119,6 +125,7 @@ namespace Microsoft.Coyote.TestingServices
             this.NumOfExploredFairSchedules = 0;
             this.NumOfExploredUnfairSchedules = 0;
             this.NumOfFoundBugs = 0;
+            this.NumOfStates = 0;
             this.BugReports = new HashSet<string>();
 
             this.MinExploredFairSteps = -1;
@@ -150,6 +157,7 @@ namespace Microsoft.Coyote.TestingServices
                 this.CoverageInfo.Merge(testReport.CoverageInfo);
 
                 this.NumOfFoundBugs += testReport.NumOfFoundBugs;
+                this.NumOfStates = testReport.NumOfStates;
 
                 this.BugReports.UnionWith(testReport.BugReports);
 

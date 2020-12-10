@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>Raft</AssemblyName>
+    <TargetFrameworks>net5.0</TargetFrameworks>
+    <OutputPath>..\bin\</OutputPath>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Coyote">
+      <HintPath>..\..\..\Framework\Coyote\bin\net5.0\Microsoft.Coyote.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Coyote.TestingServices">
+      <HintPath>..\..\..\Framework\Coyote\bin\net5.0\Microsoft.Coyote.TestingServices.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>

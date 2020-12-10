@@ -69,6 +69,11 @@ namespace Microsoft.Coyote.TestingServices.Scheduling
         internal ActorOperation ScheduledOperation { get; private set; }
 
         /// <summary>
+        /// The set of hashed states.
+        /// </summary>
+        private static readonly HashSet<int> HashedStates = new HashSet<int>();
+
+        /// <summary>
         /// Number of scheduled steps.
         /// </summary>
         internal int ScheduledSteps => this.Strategy.GetScheduledSteps();
@@ -139,6 +144,7 @@ namespace Microsoft.Coyote.TestingServices.Scheduling
             current.InboxOnlyHashedState = this.Runtime.GetHashedExecutionState(AbstractionLevel.InboxOnly);
             current.CustomHashedState = this.Runtime.GetHashedExecutionState(AbstractionLevel.Custom);
             current.FullHashedState = this.Runtime.GetHashedExecutionState(AbstractionLevel.Full);
+            HashedStates.Add(current.CustomHashedState);
 
             // Try enable any operation that is currently waiting, but has
             // its dependencies already satisfied.
@@ -221,6 +227,7 @@ namespace Microsoft.Coyote.TestingServices.Scheduling
             this.ScheduledOperation.InboxOnlyHashedState = this.Runtime.GetHashedExecutionState(AbstractionLevel.InboxOnly);
             this.ScheduledOperation.CustomHashedState = this.Runtime.GetHashedExecutionState(AbstractionLevel.Custom);
             this.ScheduledOperation.FullHashedState = this.Runtime.GetHashedExecutionState(AbstractionLevel.Full);
+            HashedStates.Add(this.ScheduledOperation.CustomHashedState);
 
             if (!this.Strategy.GetNextBooleanChoice(this.ScheduledOperation, maxValue, out bool choice))
             {
@@ -257,6 +264,7 @@ namespace Microsoft.Coyote.TestingServices.Scheduling
             this.ScheduledOperation.InboxOnlyHashedState = this.Runtime.GetHashedExecutionState(AbstractionLevel.InboxOnly);
             this.ScheduledOperation.CustomHashedState = this.Runtime.GetHashedExecutionState(AbstractionLevel.Custom);
             this.ScheduledOperation.FullHashedState = this.Runtime.GetHashedExecutionState(AbstractionLevel.Full);
+            HashedStates.Add(this.ScheduledOperation.CustomHashedState);
 
             if (!this.Strategy.GetNextIntegerChoice(this.ScheduledOperation, maxValue, out int choice))
             {
@@ -392,6 +400,7 @@ namespace Microsoft.Coyote.TestingServices.Scheduling
         {
             TestReport report = new TestReport(this.Configuration);
 
+            report.NumOfStates = HashedStates.Count;
             if (this.BugFound)
             {
                 report.NumOfFoundBugs++;
