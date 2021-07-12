@@ -3,8 +3,6 @@
 
 FROM ubuntu:18.04
 
-ARG BUILD_TYPE=Release
-
 RUN echo "APT::Acquire::Retries \"5\";" | tee /etc/apt/apt.conf.d/80-retries
 
 # Install prerequisites.
@@ -21,4 +19,5 @@ RUN apt-get update; \
   apt-get update && \
   apt-get install -y dotnet-sdk-5.0
 
-RUN bash CoyoteActors/build.sh
+RUN pwd
+RUN ls

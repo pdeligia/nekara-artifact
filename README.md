@@ -86,6 +86,8 @@ You should now be connected to the container and able to see the workspace as in
 
 ![VS Code Connected](Images\vs-code-connected.png)
 
+**Note:** If the bash terminal in the lower right panel does not appear, then select `Terminal` on the top panel and then select `New Terminal` (or use the keyboard shortcut ``Ctrl + Shift + ` ``).
+
 Now you are ready to [run the artifact](#running-the-artifact)!
 
 ## Running the artifact
