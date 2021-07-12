@@ -13,7 +13,7 @@ if [ "$MODE" == "build" ]; then
   git submodule sync --recursive
   git submodule update --init --recursive
   bash ${THIS_DIR}/Nekara/scripts/build.sh
-  # bash ${THIS_DIR}/CoyoteActors/artifact.sh build
+  bash ${THIS_DIR}/CoyoteActors/artifact.sh build
 elif [ "$MODE" == "run" ]; then
   bash ${THIS_DIR}/CoyoteActors/artifact.sh run
 else
