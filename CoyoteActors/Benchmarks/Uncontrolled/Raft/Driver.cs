@@ -57,7 +57,7 @@ namespace Benchmarks
             Console.WriteLine($"... Found {bugsFound} bugs in {stopwatch.Elapsed.TotalMilliseconds}ms");
 
             var fileName = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..",
-              "raft_uncontrolled.json");
+              "results", "raft_uncontrolled.json");
             var results = JsonSerializer.Serialize(new Results()
             {
                 BuggyIterations = Raft.BugsFound / (double)iterations,

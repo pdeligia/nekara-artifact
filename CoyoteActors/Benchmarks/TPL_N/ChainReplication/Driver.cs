@@ -42,7 +42,7 @@ namespace Benchmarks
             Console.WriteLine($"... Found {ChainReplication.BugsFound} bugs in {stopwatch.Elapsed.TotalMilliseconds}ms");
 
             var fileName = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..",
-              "chainreplication_tpl_nekara.json");
+              "results", "chainreplication_tpl_nekara.json");
             var results = JsonSerializer.Serialize(new Results()
             {
                 BuggyIterations = ChainReplication.BugsFound / (double)config.TestingIterations,

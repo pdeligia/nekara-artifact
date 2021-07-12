@@ -96,9 +96,14 @@ Now you are ready to [run the artifact](#running-the-artifact)!
 
 ## Running the artifact
 
-To build the artifact, run the following command (which might take a few minutes to complete) from
+To build the artifact, run the following command (which can take several minutes to complete) from
 the root `nekara-artifact` directory:
 ```
-bash build.sh
-docker image build . -t nekara-artifact:build
+bash artifact.sh build
+```
+
+To run the artifact experiments, run the following command (which can take several minutes to
+complete) from the root `nekara-artifact` directory:
+```
+bash artifact.sh run
 ```

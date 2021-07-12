@@ -57,7 +57,7 @@ namespace Benchmarks
             Console.WriteLine($"... Found {bugsFound} bugs in {stopwatch.Elapsed.TotalMilliseconds}ms");
 
             var fileName = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..",
-              "paxos_uncontrolled.json");
+              "results", "paxos_uncontrolled.json");
             var results = JsonSerializer.Serialize(new Results()
             {
                 BuggyIterations = Paxos.BugsFound / (double)iterations,

@@ -40,7 +40,7 @@ namespace Benchmarks
             Console.WriteLine($"... Found {tester.TestReport.NumOfFoundBugs} bugs in {stopwatch.Elapsed.TotalMilliseconds}ms");
 
             var fileName = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..",
-              "chainreplication_coyote.json");
+              "results", "chainreplication_coyote.json");
             var results = JsonSerializer.Serialize(new Results()
             {
                 BuggyIterations = tester.TestReport.NumOfFoundBugs / (double)config.SchedulingIterations,

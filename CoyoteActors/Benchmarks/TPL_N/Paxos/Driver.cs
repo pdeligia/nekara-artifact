@@ -42,7 +42,7 @@ namespace Benchmarks
             Console.WriteLine($"... Found {Paxos.BugsFound} bugs in {stopwatch.Elapsed.TotalMilliseconds}ms");
 
             var fileName = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..",
-              "paxos_tpl_nekara.json");
+              "results", "paxos_tpl_nekara.json");
             var results = JsonSerializer.Serialize(new Results()
             {
                 BuggyIterations = Paxos.BugsFound / (double)config.TestingIterations,

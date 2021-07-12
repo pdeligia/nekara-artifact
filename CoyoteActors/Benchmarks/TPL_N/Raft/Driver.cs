@@ -42,7 +42,7 @@ namespace Benchmarks
             Console.WriteLine($"... Found {Raft.BugsFound} bugs in {stopwatch.Elapsed.TotalMilliseconds}ms");
 
             var fileName = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..",
-              "raft_tpl_nekara.json");
+              "results", "raft_tpl_nekara.json");
             var results = JsonSerializer.Serialize(new Results()
             {
                 BuggyIterations = Raft.BugsFound / (double)config.TestingIterations,

@@ -42,7 +42,7 @@ namespace Benchmarks
             Console.WriteLine($"... Found {FailureDetector.BugsFound} bugs in {stopwatch.Elapsed.TotalMilliseconds}ms");
 
             var fileName = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..",
-              "failuredetector_tpl_nekara.json");
+              "results", "failuredetector_tpl_nekara.json");
             var results = JsonSerializer.Serialize(new Results()
             {
                 BuggyIterations = FailureDetector.BugsFound / (double)config.TestingIterations,
