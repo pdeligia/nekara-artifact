@@ -792,7 +792,12 @@ namespace Microsoft.CoyoteActors.TestingServices
         /// </summary>
         private void SetRandomNumberGenerator()
         {
-            int seed = this.Configuration.SchedulingSeed ?? DateTime.Now.Millisecond;
+            if (this.Configuration.SchedulingSeed is null)
+            {
+                this.Configuration.SchedulingSeed = DateTime.Now.Millisecond;
+            }
+
+            int seed = this.Configuration.SchedulingSeed.Value;
             this.RandomNumberGenerator = new DefaultRandomNumberGenerator(seed);
         }
 
