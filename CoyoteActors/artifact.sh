@@ -10,8 +10,6 @@ MODE=$1
 THIS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 
 if [ "$MODE" == "build" ]; then
-  cp ${THIS_DIR}/../Nekara/build/src/libcoyote.so ${THIS_DIR}/Framework/Coyote_N/External/libcoyote.so
-
   # dotnet build ${THIS_DIR}/Framework/Uncontrolled/Coyote.sln
   # dotnet build ${THIS_DIR}/Benchmarks/Uncontrolled/ChainReplication/ChainReplication.csproj
   # dotnet build ${THIS_DIR}/Benchmarks/Uncontrolled/FailureDetector/FailureDetector.csproj
@@ -76,14 +74,14 @@ elif [ "$MODE" == "run" ]; then
   echo "Running ChainReplication [Coyote_N]"
   dotnet ${THIS_DIR}/Benchmarks/Coyote_N/bin/net5.0/ChainReplication.dll
 
-  echo "Running FailureDetector [Coyote_N]"
-  dotnet ${THIS_DIR}/Benchmarks/Coyote_N/bin/net5.0/FailureDetector.dll
+  # echo "Running FailureDetector [Coyote_N]"
+  # dotnet ${THIS_DIR}/Benchmarks/Coyote_N/bin/net5.0/FailureDetector.dll
 
-  echo "Running Paxos [Coyote_N]"
-  dotnet ${THIS_DIR}/Benchmarks/Coyote_N/bin/net5.0/Paxos.dll
+  # echo "Running Paxos [Coyote_N]"
+  # dotnet ${THIS_DIR}/Benchmarks/Coyote_N/bin/net5.0/Paxos.dll
 
-  echo "Running Raft [Coyote_N]"
-  dotnet ${THIS_DIR}/Benchmarks/Coyote_N/bin/net5.0/Raft.dll
+  # echo "Running Raft [Coyote_N]"
+  # dotnet ${THIS_DIR}/Benchmarks/Coyote_N/bin/net5.0/Raft.dll
 else
   echo "Error: mode parameter is missing; please choose 'build' or 'run'."
   exit 1
