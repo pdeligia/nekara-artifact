@@ -136,64 +136,64 @@ namespace Microsoft.CoyoteActors.TestingServices.Scheduling
             //this.Mirror = new ScheduleTrace(scheduleDump);
         }
 
-        [DllImport("coyote.dll")]
+        [DllImport("libcoyote.so")]
         private static extern IntPtr create_scheduler();
 
-        [DllImport("coyote.dll")]
+        [DllImport("libcoyote.so")]
         private static extern IntPtr create_scheduler_with_random_strategy(ulong seed);
 
-        [DllImport("coyote.dll")]
+        [DllImport("libcoyote.so")]
         private static extern IntPtr create_scheduler_with_pct_strategy(ulong seed, ulong bound);
 
-        [DllImport("coyote.dll")]
+        [DllImport("libcoyote.so")]
         private static extern int attach(IntPtr scheduler);
 
-        [DllImport("coyote.dll")]
+        [DllImport("libcoyote.so")]
         private static extern int detach(IntPtr scheduler);
 
-        [DllImport("coyote.dll")]
+        [DllImport("libcoyote.so")]
         private static extern int create_operation(IntPtr scheduler, ulong operation_id);
 
-        [DllImport("coyote.dll")]
+        [DllImport("libcoyote.so")]
         private static extern int start_operation(IntPtr scheduler, ulong operation_id);
 
-        [DllImport("coyote.dll")]
+        [DllImport("libcoyote.so")]
         private static extern int join_operation(IntPtr scheduler, ulong operation_id);
 
-        [DllImport("coyote.dll")]
+        [DllImport("libcoyote.so")]
         private static extern int complete_operation(IntPtr scheduler, ulong operation_id);
 
-        [DllImport("coyote.dll")]
+        [DllImport("libcoyote.so")]
         private static extern int create_resource(IntPtr scheduler, ulong resource_id);
 
-        [DllImport("coyote.dll")]
+        [DllImport("libcoyote.so")]
         private static extern int wait_resource(IntPtr scheduler, ulong resource_id);
 
-        [DllImport("coyote.dll")]
+        [DllImport("libcoyote.so")]
         private static extern int signal_resource(IntPtr scheduler, ulong resource_id);
 
-        [DllImport("coyote.dll")]
+        [DllImport("libcoyote.so")]
         private static extern int delete_resource(IntPtr scheduler, ulong resource_id);
 
-        [DllImport("coyote.dll")]
+        [DllImport("libcoyote.so")]
         private static extern int schedule_next(IntPtr scheduler);
 
-        [DllImport("coyote.dll")]
+        [DllImport("libcoyote.so")]
         private static extern int next_boolean(IntPtr scheduler);
 
-        [DllImport("coyote.dll")]
+        [DllImport("libcoyote.so")]
         private static extern int next_integer(IntPtr scheduler);
 
-        [DllImport("coyote.dll")]
+        [DllImport("libcoyote.so")]
         private static extern int next_integer(IntPtr scheduler, ulong max_value);
 
-        [DllImport("coyote.dll")]
+        [DllImport("libcoyote.so")]
         private static extern int scheduled_operation_id(IntPtr scheduler);
 
-        [DllImport("coyote.dll")]
+        [DllImport("libcoyote.so")]
         private static extern int random_seed(IntPtr scheduler);
 
-        [DllImport("coyote.dll")]
+        [DllImport("libcoyote.so")]
         private static extern int dispose_scheduler(IntPtr scheduler);
 
         internal int CreateOperation(ActorOperation op) => create_operation(SchedulerPtr, op.Actor.Id.Value);
