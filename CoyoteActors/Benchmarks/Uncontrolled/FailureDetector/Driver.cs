@@ -19,10 +19,9 @@ namespace Benchmarks
         public class Results
         {
             public double BuggyIterations { get; set; }
-            public int States { get; set; }
         }
 
-        public static async Task Main()
+        public static async Task Main(string[] args)
         {
             var config = Configuration.Create();
             config.EnableMonitorsInProduction = true;
@@ -30,7 +29,7 @@ namespace Benchmarks
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            int iterations = 10000;
+            int iterations = int.Parse(args[0]);
             int bugsFound = 0;
             for (int i = 1; i <= iterations; i++)
             {
@@ -57,11 +56,10 @@ namespace Benchmarks
             Console.WriteLine($"... Found {bugsFound} bugs in {stopwatch.Elapsed.TotalMilliseconds}ms");
 
             var fileName = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..",
-              "results", "failuredetector_uncontrolled.json");
+              "Results", "failuredetector_uncontrolled.json");
             var results = JsonSerializer.Serialize(new Results()
             {
-                BuggyIterations = FailureDetector.BugsFound / (double)iterations,
-                States = FailureDetector.States.Count
+                BuggyIterations = FailureDetector.BugsFound / (double)iterations
             });
             File.WriteAllText(fileName, results);
         }

@@ -6,6 +6,7 @@
 set -e
 
 MODE=$1
+RUNS=$2
 
 THIS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 
@@ -35,6 +36,7 @@ if [ "$MODE" == "build" ]; then
   # dotnet build ${THIS_DIR}/Benchmarks/Coyote_N/Paxos/Paxos.csproj
   # dotnet build ${THIS_DIR}/Benchmarks/Coyote_N/Raft/Raft.csproj
 elif [ "$MODE" == "run" ]; then
+  mkdir -p ${THIS_DIR}/Results
 # echo "Running ChainReplication [Uncontrolled]"
 # dotnet ${THIS_DIR}/Benchmarks/Uncontrolled/bin/net5.0/ChainReplication.dll
 
@@ -72,7 +74,7 @@ elif [ "$MODE" == "run" ]; then
 # dotnet ${THIS_DIR}/Benchmarks/TPL_N/bin/net5.0/Raft.dll
 
   echo "Running ChainReplication [Coyote_N]"
-  dotnet ${THIS_DIR}/Benchmarks/Coyote_N/bin/net5.0/ChainReplication.dll
+  dotnet ${THIS_DIR}/Benchmarks/Coyote_N/bin/net5.0/ChainReplication.dll $RUNS
 
   # echo "Running FailureDetector [Coyote_N]"
   # dotnet ${THIS_DIR}/Benchmarks/Coyote_N/bin/net5.0/FailureDetector.dll

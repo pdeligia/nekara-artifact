@@ -65,10 +65,6 @@ Code.
 
 ![VS Code Extension](Images/vs-code-remote-containers-extension.png)
 
-With the "Remote - Containers" extension installed, you will see a new status bar item at the far left.
-
-![VS Code Extension Installed](https://code.visualstudio.com/assets/docs/remote/containers-tutorial/remote-status-bar.png)
-
 Next, connect to the Docker container in VS Code by using this
 [link](https://open.vscode.dev/pdeligia/nekara-artifact) and selecting the "Clone repo in container
 volume" option (see highlighted button on the right side in the image below).
@@ -101,9 +97,46 @@ the root `nekara-artifact` directory:
 ```
 bash artifact.sh build
 ```
+You are now ready to reproduce the non-proprietary experiments from the paper!
 
-To run the artifact experiments, run the following command (which can take several minutes to
+### Experiment: Memcached (Table II)
+
+### Experiment: Coyote (Table VI)
+To run the artifact experiments for comparing systematic testing with Nekara against the original
+Coyote (Table VI in the paper), run the following command (which can take several minutes to
 complete) from the root `nekara-artifact` directory:
 ```
-bash artifact.sh run
+bash artifact.sh run coyote 1000
 ```
+
+**Note:** The above command only runs `1000` iterations to allow faster completion. To run the full
+`10000` iterations similar to the paper, change the value to `10000` (or just ignore the value, by
+default the script will run `10000`).
+
+The results from running the above command can be found in the `CoyoteActors/Results` directory.
+There you will see multiple JSON files, one for each experiment. Each JSON file is named as
+`benchmark_target` where benchmark is a benchmark name from TABLE VI (for example
+`ChainReplication`) and target is one of `Coyote`, `Coyote_N` and `TPL_N` (the last two are
+instrumented with Nekara, as explained in the paper).
+
+For example, you will see the following JSON file:
+```json
+// chainreplication_coyote.json
+{"BuggyIterations":0.0001,"Time":375190.2749}
+```
+
+The name of the file corresponds to the `ChainReplication` benchmark run and the `Coyote` target.
+The JSON contents are the following:
+- `BuggyIterations`, which is the % of the iterations (i.e. runs) that were buggy, in this case out
+  of `10000` test iterations uncovered a bug in the benchmark.
+- `Time`, which is the time in seconds it took to to run all the iterations in the benchmark.
+
+**Note 1:** due to nondeterminism in the concurrent execution, as well as variations in the
+underlying OS scheduler and machine that Docker is running, some variation in the results from the
+paper is totally normal and expected. However, the overall trend should be similar to the paper, and
+this is what running these experiments showcases.
+
+**Note 2:** If you run less test iterations than the paper (which by default run `10000`) then it is
+very likely that the bug-finding ability of some targets might regress (e.g. if a bug is found
+1/10000 times, it might not be found unless you run the experiment multiple times). This is normal
+and expected.

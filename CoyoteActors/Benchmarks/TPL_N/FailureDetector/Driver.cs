@@ -22,14 +22,13 @@ namespace Benchmarks
         public class Results
         {
             public double BuggyIterations { get; set; }
-            public int States { get; set; }
             public double Time { get; set; }
         }
 
-        public static void Main()
+        public static void Main(string[] args)
         {
             var config = Microsoft.Coyote.Configuration.Create()
-              .WithTestingIterations(10000)
+              .WithTestingIterations(int.Parse(args[0]))
               .WithProbabilisticStrategy(3);
 
             Stopwatch stopwatch = new Stopwatch();
@@ -42,12 +41,11 @@ namespace Benchmarks
             Console.WriteLine($"... Found {FailureDetector.BugsFound} bugs in {stopwatch.Elapsed.TotalMilliseconds}ms");
 
             var fileName = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..",
-              "results", "failuredetector_tpl_nekara.json");
+              "Results", "failuredetector_tpl_nekara.json");
             var results = JsonSerializer.Serialize(new Results()
             {
                 BuggyIterations = FailureDetector.BugsFound / (double)config.TestingIterations,
-                States = FailureDetector.States.Count,
-                Time = stopwatch.Elapsed.TotalMilliseconds
+                Time = stopwatch.Elapsed.TotalMilliseconds * 0.001
             });
             File.WriteAllText(fileName, results);
         }
