@@ -81,7 +81,10 @@ the Docker container before it connects to it.
 
 ![Open in VS Code Allowed](Images/vs-code-allow-extension.png)
 
-**Note:** If VS Code asks you how to configure the environment, select the option to use the included `Dockerfile`.
+VS Code will ask you how to create your container configuration. Select `From 'DockerFile'` (second
+option) as in the following image:
+
+![VS Code Configuration](Images/vs-code-configuration.png)
 
 You should now be connected to the container and able to see the workspace as in the following image:
 
@@ -93,7 +96,9 @@ Now you are ready to [run the artifact](#running-the-artifact)!
 
 ## Running the artifact
 
-To build the artifact, run the following command (which might take a few minutes):
+To build the artifact, run the following command (which might take a few minutes to complete) from
+the root `nekara-artifact` directory:
 ```
+bash build.sh
 docker image build . -t nekara-artifact:build
 ```
