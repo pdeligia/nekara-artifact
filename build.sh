@@ -7,4 +7,4 @@ set -exo pipefail
 
 THIS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 
-${THIS_DIR}/CoyoteActors/build.sh
+bash ${THIS_DIR}/CoyoteActors/build.sh
