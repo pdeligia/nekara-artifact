@@ -63,7 +63,7 @@ Docker container. This can be done by clicking
 [here](vscode:extension/ms-vscode-remote.remote-containers) which will open up the extension in VS
 Code.
 
-![VS Code Extension](Images\vs-code-remote-containers-extension.png)
+![VS Code Extension](Images/vs-code-remote-containers-extension.png)
 
 With the "Remote - Containers" extension installed, you will see a new status bar item at the far left.
 
@@ -73,18 +73,19 @@ Next, connect to the Docker container in VS Code by using this
 [link](https://open.vscode.dev/pdeligia/nekara-artifact) and selecting the "Clone repo in container
 volume" option (see highlighted button on the right side in the image below).
 
-![Open in VS Code](Images\vs-code-open-repo.png)
+![Open in VS Code](Images/vs-code-open-repo.png)
 
 If your browser asks you to allow the site to open VS Code, press allow or open. Next, VS Code will
-ask you if you allow the extension to open the URI, press Open.
+ask you if you allow the extension to open the URI, press Open. It can take several minutes to build
+the Docker container before it connects to it.
 
-![Open in VS Code Allowed](Images\vs-code-allow-extension.png)
+![Open in VS Code Allowed](Images/vs-code-allow-extension.png)
 
 **Note:** If VS Code asks you how to configure the environment, select the option to use the included `Dockerfile`.
 
 You should now be connected to the container and able to see the workspace as in the following image:
 
-![VS Code Connected](Images\vs-code-connected.png)
+![VS Code Connected](Images/vs-code-connected.png)
 
 **Note:** If the bash terminal in the lower right panel does not appear, then select `Terminal` on the top panel and then select `New Terminal` (or use the keyboard shortcut ``Ctrl + Shift + ` ``).
 
