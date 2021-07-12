@@ -7,9 +7,9 @@ The artifact is packaged as a Docker image that runs Ubuntu 18.04. It uses the "
 feature of GitHub that allows GitHub repositories to easily open in VS Code using a Docker
 container. This allows you to both run experiments, but also edit the artifact code, on a pre-setup
 dev environment with ease from your local machine. We will guide you through the process of setting
-this up for your machine [here](#Prerequisites).
+this up for your machine [here](#prerequisites).
 
-## Setting up the artifact dev environment
+## Setting up the dev environment
 
 ### Installing and running Docker
 
@@ -63,13 +63,32 @@ Docker container. This can be done by clicking
 [here](vscode:extension/ms-vscode-remote.remote-containers) which will open up the extension in VS
 Code.
 
-![VS Code Extension](https://code.visualstudio.com/assets/docs/remote/containers-tutorial/containers-extension.png)
+![VS Code Extension](Images\vs-code-remote-containers-extension.png)
 
 With the "Remote - Containers" extension installed, you will see a new status bar item at the far left.
 
 ![VS Code Extension Installed](https://code.visualstudio.com/assets/docs/remote/containers-tutorial/remote-status-bar.png)
 
-## Building the artifact
+Next, connect to the Docker container in VS Code by using this
+[link](https://open.vscode.dev/pdeligia/nekara-artifact) and selecting the "Clone repo in container
+volume" option (see highlighted button on the right side in the image below).
+
+![Open in VS Code](Images\vs-code-open-repo.png)
+
+If your browser asks you to allow the site to open VS Code, press allow or open. Next, VS Code will
+ask you if you allow the extension to open the URI, press Open.
+
+![Open in VS Code Allowed](Images\vs-code-allow-extension.png)
+
+**Note:** If VS Code asks you how to configure the environment, select the option to use the included `Dockerfile`.
+
+You should now be connected to the container and able to see the workspace as in the following image:
+
+![VS Code Connected](Images\vs-code-connected.png)
+
+Now you are ready to [run the artifact](#running-the-artifact)!
+
+## Running the artifact
 
 To build the artifact, run the following command (which might take a few minutes):
 ```
