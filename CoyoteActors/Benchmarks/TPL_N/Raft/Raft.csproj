@@ -9,6 +9,6 @@
     <Reference Include="Microsoft.Coyote.Actors">
       <HintPath>..\..\..\Framework\TPL_N\bin\net5.0\Microsoft.Coyote.Actors.dll</HintPath>
     </Reference>
-    <PackageReference Include="Microsoft.Coyote.Test" Version="1.2.3" />
+    <PackageReference Include="Microsoft.Coyote.Test" Version="1.3.0" />
   </ItemGroup>
 </Project>
