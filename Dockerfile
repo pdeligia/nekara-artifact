@@ -18,3 +18,9 @@ RUN apt-get update; \
   apt-get install -y apt-transport-https && \
   apt-get update && \
   apt-get install -y dotnet-sdk-5.0
+
+# Install CMake.
+RUN curl --retry 5 --retry-connrefused https://cmake.org/files/v3.15/cmake-3.15.7-Linux-x86_64.sh -o cmake.sh && \
+    chmod +x cmake.sh && \
+    ./cmake.sh --prefix=/usr --exclude-subdir --skip-license && \
+    rm cmake.sh
