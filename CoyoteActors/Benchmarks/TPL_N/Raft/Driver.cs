@@ -44,7 +44,7 @@ namespace Benchmarks
               "Results", "raft_tpl_nekara.json");
             var results = JsonSerializer.Serialize(new Results()
             {
-                BuggyIterations = Raft.BugsFound / (double)config.TestingIterations,
+                BuggyIterations = (Raft.BugsFound / (double)config.TestingIterations) * 100,
                 Time = stopwatch.Elapsed.TotalMilliseconds * 0.001
             });
             File.WriteAllText(fileName, results);

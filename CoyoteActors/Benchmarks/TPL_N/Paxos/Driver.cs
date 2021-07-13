@@ -44,7 +44,7 @@ namespace Benchmarks
               "Results", "paxos_tpl_nekara.json");
             var results = JsonSerializer.Serialize(new Results()
             {
-                BuggyIterations = Paxos.BugsFound / (double)config.TestingIterations,
+                BuggyIterations = (Paxos.BugsFound / (double)config.TestingIterations) * 100,
                 Time = stopwatch.Elapsed.TotalMilliseconds * 0.001
             });
             File.WriteAllText(fileName, results);

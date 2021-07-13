@@ -44,7 +44,7 @@ namespace Benchmarks
               "Results", "failuredetector_tpl_nekara.json");
             var results = JsonSerializer.Serialize(new Results()
             {
-                BuggyIterations = FailureDetector.BugsFound / (double)config.TestingIterations,
+                BuggyIterations = (FailureDetector.BugsFound / (double)config.TestingIterations) * 100,
                 Time = stopwatch.Elapsed.TotalMilliseconds * 0.001
             });
             File.WriteAllText(fileName, results);

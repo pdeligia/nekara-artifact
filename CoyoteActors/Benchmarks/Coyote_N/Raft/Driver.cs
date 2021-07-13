@@ -42,7 +42,7 @@ namespace Benchmarks
               "Results", "raft_coyote_nekara.json");
             var results = JsonSerializer.Serialize(new Results()
             {
-                BuggyIterations = tester.TestReport.NumOfFoundBugs / (double)config.SchedulingIterations,
+                BuggyIterations = (tester.TestReport.NumOfFoundBugs / (double)config.SchedulingIterations) * 100,
                 Time = stopwatch.Elapsed.TotalMilliseconds * 0.001
             });
             File.WriteAllText(fileName, results);
