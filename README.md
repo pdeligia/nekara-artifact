@@ -5,8 +5,8 @@ Concurrency Testing".
 
 ## Overview of the artifact
 
-This artifact includes code and scripts for building and running the following **4 non-proprietary
-experiments** from the paper:
+This artifact includes source code and scripts for building and running the following
+**non-proprietary experiments** from the paper:
 - Finding bugs with Nekara in [Memcached](https://www.memcached.org/) (see Table II in page 5).
 - Comparison of systematic testing with Nekara against [Coyote](https://github.com/microsoft/Coyote)
   on the [Coyote Actors](https://microsoft.github.io/coyote/#concepts/actors/overview/) programming
