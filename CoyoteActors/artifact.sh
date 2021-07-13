@@ -32,17 +32,17 @@ if [ "$MODE" == "build" ]; then
 elif [ "$MODE" == "run" ]; then
   mkdir -p ${THIS_DIR}/Results
 
-  echo "Running ChainReplication [TPL_N]"
-  dotnet ${THIS_DIR}/Benchmarks/TPL_N/bin/net5.0/ChainReplication.dll $RUNS
+  echo "Running ChainReplication [Coyote]"
+  dotnet ${THIS_DIR}/Benchmarks/Coyote/bin/net5.0/ChainReplication.dll $RUNS
 
-  echo "Running FailureDetector [TPL_N]"
-  dotnet ${THIS_DIR}/Benchmarks/TPL_N/bin/net5.0/FailureDetector.dll $RUNS
+  echo "Running FailureDetector [Coyote]"
+  dotnet ${THIS_DIR}/Benchmarks/Coyote/bin/net5.0/FailureDetector.dll $RUNS
 
-  echo "Running Paxos [TPL_N]"
-  dotnet ${THIS_DIR}/Benchmarks/TPL_N/bin/net5.0/Paxos.dll $RUNS
+  echo "Running Paxos [Coyote]"
+  dotnet ${THIS_DIR}/Benchmarks/Coyote/bin/net5.0/Paxos.dll $RUNS
 
-  echo "Running Raft [TPL_N]"
-  dotnet ${THIS_DIR}/Benchmarks/TPL_N/bin/net5.0/Raft.dll $RUNS
+  echo "Running Raft [Coyote]"
+  dotnet ${THIS_DIR}/Benchmarks/Coyote/bin/net5.0/Raft.dll $RUNS
 
   echo "Running ChainReplication [Coyote_N]"
   dotnet ${THIS_DIR}/Benchmarks/Coyote_N/bin/net5.0/ChainReplication.dll $RUNS
@@ -56,17 +56,17 @@ elif [ "$MODE" == "run" ]; then
   echo "Running Raft [Coyote_N]"
   dotnet ${THIS_DIR}/Benchmarks/Coyote_N/bin/net5.0/Raft.dll $RUNS
 
-  echo "Running ChainReplication [Coyote]"
-  dotnet ${THIS_DIR}/Benchmarks/Coyote/bin/net5.0/ChainReplication.dll $RUNS
+  echo "Running ChainReplication [TPL_N]"
+  dotnet ${THIS_DIR}/Benchmarks/TPL_N/bin/net5.0/ChainReplication.dll $RUNS
 
-  echo "Running FailureDetector [Coyote]"
-  dotnet ${THIS_DIR}/Benchmarks/Coyote/bin/net5.0/FailureDetector.dll $RUNS
+  echo "Running FailureDetector [TPL_N]"
+  dotnet ${THIS_DIR}/Benchmarks/TPL_N/bin/net5.0/FailureDetector.dll $RUNS
 
-  echo "Running Paxos [Coyote]"
-  dotnet ${THIS_DIR}/Benchmarks/Coyote/bin/net5.0/Paxos.dll $RUNS
+  echo "Running Paxos [TPL_N]"
+  dotnet ${THIS_DIR}/Benchmarks/TPL_N/bin/net5.0/Paxos.dll $RUNS
 
-  echo "Running Raft [Coyote]"
-  dotnet ${THIS_DIR}/Benchmarks/Coyote/bin/net5.0/Raft.dll $RUNS
+  echo "Running Raft [TPL_N]"
+  dotnet ${THIS_DIR}/Benchmarks/TPL_N/bin/net5.0/Raft.dll $RUNS
 else
   echo "Error: mode parameter is missing; please choose 'build' or 'run'."
   exit 1
