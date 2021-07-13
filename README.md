@@ -3,6 +3,29 @@
 This repository contains the artifact for the "Nekara: Generalized Concurrency Testing" paper that
 was accepted in ASE 2021.
 
+## Overview of the artifact
+
+This artifact includes the following **4 non-proprietary experiments** from the paper:
+- Finding bugs with Nekara in [Memcached](https://www.memcached.org/) (see Table II in page 5).
+- Comparison of systematic testing with Nekara against [Coyote](https://github.com/microsoft/Coyote)
+  on the [Coyote Actors](https://microsoft.github.io/coyote/#concepts/actors/overview/) programming
+  model (see Table VI in page 9).
+- Reproducing bugs found by [TSVD](https://github.com/microsoft/TSVD) (see Table VII in page 10).
+- Reproducing bugs found by [Maple](http://web.eecs.umich.edu/~nsatish/papers/OOPSLA-12-Maple.pdf)
+  (see Table VII in page 10).
+
+**Note:** The following 3 experiments from the paper were not included because they require (1)
+proprietary Microsoft-internal systems in the case of the CSCS and ECSS, and (2) an earlier internal
+branch of [Verona](https://github.com/microsoft/verona) (i.e. Zevio in the anonymized version of the
+paper) that has not been open-sourced yet.
+
+**Optional:** [Nekara](https://github.com/microsoft/coyote-scheduler), which is open sourced under
+the name `coyote-scheduler`, can be used stand-alone outside the scope of this artifact. To do so,
+clone its [repository](https://github.com/microsoft/coyote-scheduler) and follow the build
+instructions in the repository README.md. You can find small examples of how to use Nekara for
+instrumenting C++ code
+[here](https://github.com/microsoft/coyote-scheduler/tree/main/test/integration).
+
 ## Setting up the artifact dev environment
 
 The artifact is packaged as a Docker image that runs Ubuntu 18.04. It uses the "Open in VS Code"
@@ -86,26 +109,17 @@ the root `nekara-artifact` directory:
 ```
 bash artifact.sh build
 ```
-You are now ready to reproduce the non-proprietary experiments from the paper!
 
-This artifact includes the **4 non-proprietary experiments** from the paper:
-- Finding bugs with Nekara in [Memcached](https://www.memcached.org/) (see Table II in page 5).
-- Comparison of systematic testing with Nekara against [Coyote](https://github.com/microsoft/Coyote)
-  on the [Coyote Actors](https://microsoft.github.io/coyote/#concepts/actors/overview/) programming
-  model (see Table VI in page 9).
-- Reproducing bugs found by [TSVD](https://github.com/microsoft/TSVD) (see Table VII in page 10).
-- Reproducing bugs found by [Maple](http://web.eecs.umich.edu/~nsatish/papers/OOPSLA-12-Maple.pdf)
-  (see Table VII in page 10).
-
-**Note:** The following 3 experiments from the paper were not included because they require (1)
-proprietary Microsoft-internal systems in the case of the CSCS and ECSS, and (2) an earlier internal
-branch of [Verona](https://github.com/microsoft/verona) (i.e. Zevio in the anonymized version of the
-paper) that has not been open-sourced yet.
+The script will first build [Nekara](https://github.com/microsoft/coyote-scheduler), which is open
+sourced under the name `coyote-scheduler`, and then builds the non-proprietary benchmarks from the
+paper.
 
 Below we will give instructions on how to run each experiment, and what results you should get. For
 more details in what each experiment is doing, please read the corresponding section in the paper.
 
 ### Experiment #1: Memcached (Table II)
+
+You can find the code for this experiment ...
 
 To run the artifact experiments for finding bugs in Memcached using Nekara (see Table II in page 5
 of the paper), run the following command (which can take several minutes to complete) from the root
@@ -115,6 +129,24 @@ bash artifact.sh run memcached
 ```
 
 ### Experiment #2: Coyote (Table VI)
+
+You can find the code for this experiment [here](CoyoteActors). This directory contains the
+ `Benchmarks` directory, which contains the code for the benchmarks: there are 3 directories,
+ `Coyote`, `Coyote_N` and `TPL_N`, for each target that is evaluated in the table) as well as the
+ `Framework` directory (which contains 3 directories, similarly, each with the code of each target,
+ `Coyote`, `Coyote_N` and `TPL_N`).
+
+The core of the Nekara instrumentation for `Coyote_N` can be found in
+[OperationScheduler.cs](CoyoteActors/Framework/Coyote_N/Source/TestingServices/Runtime/Scheduling/OperationScheduler.cs).
+In this file, you can see all the imported (from C++ to C#, using P/Invoke) Nekara operations, for
+example:
+```csharp
+[DllImport("libcoyote.so")]
+private static extern int create_operation(IntPtr scheduler, ulong operation_id);
+```
+
+You can find more details on each of these three targets and the
+overall experiment in the Section VII-a of the paper.
 
 To run the artifact experiments for comparing systematic testing with Nekara against Coyote on the
 Coyote Actors programming model (see Table VI in page 9 of the paper), run the following command
@@ -155,6 +187,8 @@ what running these experiments showcases.
 
 ### Experiment #3: TSVD (Table VII)
 
+You can find the code for this experiment ...
+
 To run the artifact experiments for reproducing bugs found by TSVD (see Table VII in page 10 of the
 paper), run the following command (which can take several minutes to complete) from the root
 `nekara-artifact` directory:
@@ -163,6 +197,8 @@ bash artifact.sh run tsvd
 ```
 
 ### Experiment #4: Maple (Table VII)
+
+You can find the code for this experiment ...
 
 To run the artifact experiments for reproducing bugs found by Maple (see Table VII in page 10 of the
 paper), run the following command (which can take several minutes to complete) from the root
