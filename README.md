@@ -95,7 +95,7 @@ This artifact includes the **4 non-proprietary experiments** from the paper:
 - Reproducing bugs found by [Maple](http://web.eecs.umich.edu/~nsatish/papers/OOPSLA-12-Maple.pdf)
   (see Table VII in page 10).
 
-**Note:** The following 3 experiments from the paper were not included because (1) they require
+**Note:** The following 3 experiments from the paper were not included because they require (1)
 proprietary Microsoft-internal systems in the case of the CSCS and ECSS, and (2) an earlier internal
 branch of [Verona](https://github.com/microsoft/verona) (i.e. Zevio in the anonymized version of the
 paper) that has not been open-sourced yet.
