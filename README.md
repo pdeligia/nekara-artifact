@@ -39,20 +39,7 @@ You should see something like the following output:
 Docker version 20.10.7, build f0df350
 ```
 
-Before proceeding to the build instructions, make sure to login to your Docker account, which is
-required by Docker to authenticate and build images. Please create a new Docker account if you do
-not have one already. You can either login using the Docker Desktop GUI or by running the following
-command from your terminal (which will ask for your username and password):
-```
-docker login
-```
-
-You should see the following output:
-```
-Login Succeeded
-```
-
-### Installing VS Code and required extensions
+### Installing VS Code and required extension
 
 Now that you installed Docker, proceed to install the latest [VS
 Code](https://code.visualstudio.com/), which is available for Windows, Linux and macOS. This can be
@@ -71,18 +58,18 @@ volume" option (see highlighted button on the right side in the image below).
 
 ![Open in VS Code](Images/vs-code-open-repo.png)
 
-If your browser asks you to allow the site to open VS Code, press allow or open. Next, VS Code will
-ask you if you allow the extension to open the URI, press Open. It can take several minutes to build
-the Docker container before it connects to it.
-
-![Open in VS Code Allowed](Images/vs-code-allow-extension.png)
+**Note:** If your browser asks you if you want to allow the website to open VS Code, press allow or open.
+Next, if VS Code asks you if you want to allow the extension to open the URI, then press Open again.
 
 VS Code will ask you how to create your container configuration. Select `From 'DockerFile'` (second
 option) as in the following image:
 
 ![VS Code Configuration](Images/vs-code-configuration.png)
 
-You should now be connected to the container and able to see the workspace as in the following image:
+It can take several minutes to build the Docker container before it connects to it.
+
+Once it finishes, you should now be connected to the container and able to see the workspace and an
+open terminal:
 
 ![VS Code Connected](Images/vs-code-connected.png)
 
@@ -99,12 +86,21 @@ bash artifact.sh build
 ```
 You are now ready to reproduce the non-proprietary experiments from the paper!
 
-This artifact includes the 3 non-proprietary experiments from the paper:
-- Finding bugs with Nekara in Memcached (see Table II in page 5).
-- Comparison of systematic testing with Nekara against the original Coyote (see Table VI in page 9).
-- Reproducing bugs found with TSVD and Maple (see Table VII in page 10).
+This artifact includes the **4 non-proprietary experiments** from the paper:
+- Finding bugs with Nekara in [Memcached](https://www.memcached.org/) (see Table II in page 5).
+- Comparison of systematic testing with Nekara against [Coyote](https://github.com/microsoft/Coyote)
+  on the [Coyote Actors](https://microsoft.github.io/coyote/#concepts/actors/overview/) programming
+  model (see Table VI in page 9).
+- Reproducing bugs found by [TSVD](https://github.com/microsoft/TSVD) (see Table VII in page 10).
+- Reproducing bugs found by [Maple](http://web.eecs.umich.edu/~nsatish/papers/OOPSLA-12-Maple.pdf)
+  (see Table VII in page 10).
 
-Below we will give instructions on how to run each experiment, and what results you will get. For
+**Note:** The following 3 experiments from the paper were not included because (1) they require
+proprietary Microsoft-internal systems in the case of the CSCS and ECSS, and (2) an earlier internal
+branch of [Verona](https://github.com/microsoft/verona) (i.e. Zevio in the anonymized version of the
+paper) that has not been open-sourced yet.
+
+Below we will give instructions on how to run each experiment, and what results you should get. For
 more details in what each experiment is doing, please read the corresponding section in the paper.
 
 ### Experiment #1: Memcached (Table II)
@@ -118,9 +114,9 @@ bash artifact.sh run memcached
 
 ### Experiment #2: Coyote (Table VI)
 
-To run the artifact experiments for comparing systematic testing with Nekara against the original
-Coyote (see Table VI in page 9 of the paper), run the following command (which can take several
-minutes to complete) from the root `nekara-artifact` directory:
+To run the artifact experiments for comparing systematic testing with Nekara against Coyote on the
+Coyote Actors programming model (see Table VI in page 9 of the paper), run the following command
+(which can take several minutes to complete) from the root `nekara-artifact` directory:
 ```
 bash artifact.sh run coyote 10000
 ```
@@ -155,11 +151,40 @@ OS scheduler and machine that Docker is running, some variation in the results f
 totally normal and expected. However, the overall trend should be similar to the paper, and this is
 what running these experiments showcases.
 
-### Experiment #3:  TSVD and Maple (Table VII)
+### Experiment #3: TSVD (Table VII)
 
-To run the artifact experiments for reproducing bugs found by TSVD and Maple (see Table VII in page
-10 of the paper), run the following command (which can take several minutes to complete) from the
-root `nekara-artifact` directory:
+To run the artifact experiments for reproducing bugs found by TSVD (see Table VII in page 10 of the
+paper), run the following command (which can take several minutes to complete) from the root
+`nekara-artifact` directory:
 ```
-bash artifact.sh run tsvd-maple
+bash artifact.sh run tsvd
+```
+
+### Experiment #4: Maple (Table VII)
+
+To run the artifact experiments for reproducing bugs found by Maple (see Table VII in page 10 of the
+paper), run the following command (which can take several minutes to complete) from the root
+`nekara-artifact` directory:
+```
+bash artifact.sh run maple
+```
+
+## Troubleshooting
+
+### Issue authenticating to Docker
+It is unlikely, but if opening the GitHub repository on a VS Code Docker container fails with a
+Docker authentication error, then you can fix this by logging in your Docker account (please create
+one, if you do not have one already). You can either login using the Docker Desktop GUI or by
+running the following command from your terminal (which will ask for your username and password):
+```bash
+docker login
+# Login Succeeded
+```
+
+### The device run out of memory
+If you get an error that the device run out of memory while building the Docker container after opening the GitHub repository in VS Code, then it is likely that you can fix this by clearing up Docker images and your Docker cache. You can do this by running:
+```bash
+docker system prune
+docker images
+docker rmi $IMAGE_ID
 ```

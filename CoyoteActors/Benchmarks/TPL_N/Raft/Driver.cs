@@ -28,7 +28,7 @@ namespace Benchmarks
         public static void Main(string[] args)
         {
             var config = Microsoft.Coyote.Configuration.Create()
-              .WithTestingIterations(int.Parse(args[0]))
+              .WithTestingIterations(uint.Parse(args[0]))
               .WithProbabilisticStrategy(3);
 
             Stopwatch stopwatch = new Stopwatch();
