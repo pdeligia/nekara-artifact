@@ -3,13 +3,13 @@
 This repository contains the artifact for the "Nekara: Generalized Concurrency Testing" paper that
 was accepted in ASE 2021.
 
+## Setting up the artifact dev environment
+
 The artifact is packaged as a Docker image that runs Ubuntu 18.04. It uses the "Open in VS Code"
 feature of GitHub that allows GitHub repositories to easily open in VS Code using a Docker
 container. This allows you to both run experiments, but also edit the artifact code, on a pre-setup
 dev environment with ease from your local machine. We will guide you through the process of setting
 this up for your machine [here](#prerequisites).
-
-## Setting up the dev environment
 
 ### Installing and running Docker
 
@@ -51,6 +51,8 @@ Docker container. This can be done by clicking
 Code.
 
 ![VS Code Extension](Images/vs-code-remote-containers-extension.png)
+
+### Opening the artifact in VS Code
 
 Next, connect to the Docker container in VS Code by using this
 [link](https://open.vscode.dev/pdeligia/nekara-artifact) and selecting the "Clone repo in container
