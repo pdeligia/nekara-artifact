@@ -16,9 +16,9 @@ from the paper:
   (see Table VII in page 10).
 
 **Note:** The following 3 experiments from the paper were not included because they require (1)
-proprietary Microsoft-internal systems in the case of the CSCS and ECSS, and (2) an earlier internal
-branch of [Verona](https://github.com/microsoft/verona) (i.e. Zevio in the anonymized version of the
-paper) that has not been open-sourced yet.
+proprietary Microsoft-internal systems in the case of the CSCS and ECSS, and (2) an earlier branch
+of [Verona](https://github.com/microsoft/verona) (i.e. Zevio in the anonymized version of the paper)
+that is internal and has not been open-sourced yet.
 
 **Optional:** [Nekara](https://github.com/microsoft/coyote-scheduler), which is open sourced under
 the name `coyote-scheduler`, can be used stand-alone outside the scope of this artifact. To do so,
