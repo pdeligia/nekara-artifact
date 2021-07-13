@@ -99,19 +99,38 @@ bash artifact.sh build
 ```
 You are now ready to reproduce the non-proprietary experiments from the paper!
 
-### Experiment: Memcached (Table II)
+This artifact includes the 3 non-proprietary experiments from the paper:
+- Finding bugs with Nekara in Memcached (see Table II in page 5).
+- Comparison of systematic testing with Nekara against the original Coyote (see Table VI in page 9).
+- Reproducing bugs found with TSVD and Maple (see Table VII in page 10).
 
-### Experiment: Coyote (Table VI)
+Below we will give instructions on how to run each experiment, and what results you will get. For
+more details in what each experiment is doing, please read the corresponding section in the paper.
+
+### Experiment #1: Memcached (Table II)
+
+To run the artifact experiments for finding bugs in Memcached using Nekara (see Table II in page 5
+of the paper), run the following command (which can take several minutes to complete) from the root
+`nekara-artifact` directory:
+```
+bash artifact.sh run memcached
+```
+
+### Experiment #2: Coyote (Table VI)
+
 To run the artifact experiments for comparing systematic testing with Nekara against the original
-Coyote (Table VI in the paper), run the following command (which can take several minutes to
-complete) from the root `nekara-artifact` directory:
+Coyote (see Table VI in page 9 of the paper), run the following command (which can take several
+minutes to complete) from the root `nekara-artifact` directory:
 ```
-bash artifact.sh run coyote 1000
+bash artifact.sh run coyote 10000
 ```
 
-**Note:** The above command only runs `1000` iterations to allow faster completion. To run the full
-`10000` iterations similar to the paper, change the value to `10000` (or just ignore the value, by
-default the script will run `10000`).
+**Note:** If the above command is taking too long on your machine, you can reduce the test
+iterations (i.e. runs) by changing the `10000` value to a smaller value such as `1000`. This will
+complete the experiments much faster, but if you run less than the `10000` test iterations than we
+run for the paper experiments then it is very likely that the bug-finding ability of Nekara or
+Coyote might regress (e.g. if a bug is found 1/10000 times, it might not be found unless you run the
+experiment more times). This is normal and expected due to concurrency/scheduling nondeterminism.
 
 The results from running the above command can be found in the `CoyoteActors/Results` directory.
 There you will see multiple JSON files, one for each experiment. Each JSON file is named as
@@ -128,15 +147,19 @@ For example, you will see the following JSON file:
 The name of the file corresponds to the `ChainReplication` benchmark run and the `Coyote` target.
 The JSON contents are the following:
 - `BuggyIterations`, which is the % of the iterations (i.e. runs) that were buggy, in this case out
-  of `10000` test iterations uncovered a bug in the benchmark.
+  of `10000` test iterations, Coyote uncovered the bug once in the benchmark.
 - `Time`, which is the time in seconds it took to to run all the iterations in the benchmark.
 
-**Note 1:** due to nondeterminism in the concurrent execution, as well as variations in the
-underlying OS scheduler and machine that Docker is running, some variation in the results from the
-paper is totally normal and expected. However, the overall trend should be similar to the paper, and
-this is what running these experiments showcases.
+**Note:** due to nondeterminism in the concurrent execution, as well as variations in the underlying
+OS scheduler and machine that Docker is running, some variation in the results from the paper is
+totally normal and expected. However, the overall trend should be similar to the paper, and this is
+what running these experiments showcases.
 
-**Note 2:** If you run less test iterations than the paper (which by default run `10000`) then it is
-very likely that the bug-finding ability of some targets might regress (e.g. if a bug is found
-1/10000 times, it might not be found unless you run the experiment multiple times). This is normal
-and expected.
+### Experiment #3:  TSVD and Maple (Table VII)
+
+To run the artifact experiments for reproducing bugs found by TSVD and Maple (see Table VII in page
+10 of the paper), run the following command (which can take several minutes to complete) from the
+root `nekara-artifact` directory:
+```
+bash artifact.sh run tsvd-maple
+```
