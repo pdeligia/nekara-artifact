@@ -39,7 +39,7 @@ namespace Benchmarks
             Console.WriteLine($"... Found {tester.TestReport.NumOfFoundBugs} bugs in {stopwatch.Elapsed.TotalMilliseconds}ms");
 
             var fileName = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..",
-              "Results", "paxos_coyote.json");
+              "Results", "paxos_coyote_nekara.json");
             var results = JsonSerializer.Serialize(new Results()
             {
                 BuggyIterations = tester.TestReport.NumOfFoundBugs / (double)config.SchedulingIterations,
