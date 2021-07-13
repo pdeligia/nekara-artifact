@@ -1,7 +1,7 @@
 # Nekara: Generalized Concurrency Testing (Artifact)
 
-This repository contains the artifact for the "Nekara: Generalized Concurrency Testing" paper that
-was accepted in ASE 2021.
+This repository contains the artifact accompanying the ASE 2021 paper "Nekara: Generalized
+Concurrency Testing".
 
 ## Overview of the artifact
 
