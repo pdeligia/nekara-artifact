@@ -98,7 +98,8 @@ open terminal:
 
 ![VS Code Connected](Images/vs-code-connected.png)
 
-**Note:** If the bash terminal in the lower right panel does not appear, then select `Terminal` on the top panel and then select `New Terminal` (or use the keyboard shortcut ``Ctrl + Shift + ` ``).
+**Note:** If the bash terminal in the lower right panel does not appear, then select `Terminal` on
+the top panel and then select `New Terminal` (or use the keyboard shortcut ``Ctrl + Shift + ` ``).
 
 Now you are ready to [run the artifact](#running-the-artifact)!
 
@@ -121,8 +122,8 @@ more details in what each experiment is doing, please read the corresponding sec
 
 You can find the code for this experiment ...
 
-To run the artifact experiments for finding bugs in Memcached using Nekara (see Table II in page 5
-of the paper), run the following command (which can take several minutes to complete) from the root
+To run the experiments for finding bugs in Memcached using Nekara (see Table II in page 5 of the
+paper) invoke the following command (which can take several minutes to complete) from the root
 `nekara-artifact` directory:
 ```
 bash artifact.sh run memcached
@@ -130,37 +131,55 @@ bash artifact.sh run memcached
 
 ### Experiment #2: Coyote (Table VI)
 
-You can find the code for this experiment [here](CoyoteActors). This directory contains the
- `Benchmarks` directory, which contains the code for the benchmarks: there are 3 directories,
- `Coyote`, `Coyote_N` and `TPL_N`, for each target that is evaluated in the table) as well as the
- `Framework` directory (which contains 3 directories, similarly, each with the code of each target,
- `Coyote`, `Coyote_N` and `TPL_N`).
+This experiment compares systematic testing on three versions of the [Coyote
+Actors](https://microsoft.github.io/coyote/#concepts/actors/overview/) programming model (see Table
+VI in page 9 of the paper):
 
-The core of the Nekara instrumentation for `Coyote_N` can be found in
-[OperationScheduler.cs](CoyoteActors/Framework/Coyote_N/Source/TestingServices/Runtime/Scheduling/OperationScheduler.cs).
-In this file, you can see all the imported (from C++ to C#, using P/Invoke) Nekara operations, for
-example:
-```csharp
-[DllImport("libcoyote.so")]
-private static extern int create_operation(IntPtr scheduler, ulong operation_id);
-```
+- `Coyote` is the original version of Coyote, using its built-in systematic testing engine for
+  running the experiments. The code for this version is [here](CoyoteActors/Framework/Coyote). The
+  core of the systematic testing scheduling logic can be found in the
+  [OperationScheduler.cs](CoyoteActors/Framework/Coyote/Source/TestingServices/Runtime/Scheduling/OperationScheduler.cs)
+  file.
 
-You can find more details on each of these three targets and the
-overall experiment in the Section VII-a of the paper.
+- `Coyote_N` is a version of Coyote instrumented directly with Nekara. The code for this version is
+  [here](CoyoteActors/Framework/Coyote_N). You can find the Nekara instrumentation in the
+  [OperationScheduler.cs](CoyoteActors/Framework/Coyote_N/Source/TestingServices/Runtime/Scheduling/OperationScheduler.cs)
+  file, which contains the core systematic testing scheduling logic. Here you can also find all the
+  imported (from C++ to C#, using P/Invoke) Nekara operations used throughout this file, for
+  example:
+  ```csharp
+  [DllImport("libcoyote.so")]
+  private static extern int create_operation(IntPtr scheduler, ulong operation_id);
+  ```
+  The rest of the Coyote code (outside this file) is mostly unmodified, showing how easy it was to
+  replace the original systematic testing of Coyote with Nekara.
 
-To run the artifact experiments for comparing systematic testing with Nekara against Coyote on the
-Coyote Actors programming model (see Table VI in page 9 of the paper), run the following command
-(which can take several minutes to complete) from the root `nekara-artifact` directory:
+- `TPL_N` is a version of Coyote where the underlying task-based code of the Coyote runtime is
+  instrumented by Nekara using a drop-in-replacement version of the [Task Parallel
+  Library](https://docs.microsoft.com/en-us/dotnet/standard/parallel-programming/task-parallel-library-tpl)
+  of C#. The code for this version is [here](CoyoteActors/Framework/TPL_N).
+
+You can also find the code for each benchmark (`ChainReplication`, `FailureDetector`, `Paxos` and
+`Raft`) in [this](CoyoteActors/Benchmarks) directory. To streamline the experiment there are 3
+copies of each benchmark, one for each of the above three versions of Coyote. Each version contains
+a `Driver.cs` file with the entry point to the benchmark using the corresponding version of Coyote.
+
+You can read more details about the experiment, the three Coyote versions, and the results that we
+got in Section VII-a of the paper.
+
+To run the experiments invoke the following command (which can take several hours to complete,
+depending on your machine) from the root `nekara-artifact` directory:
 ```
 bash artifact.sh run coyote 10000
 ```
 
 **Note:** If the above command is taking too long on your machine, you can reduce the test
-iterations (i.e. runs) by changing the `10000` value to a smaller value such as `1000`. This will
-complete the experiments much faster, but if you run less than the `10000` test iterations than we
-run for the paper experiments then it is very likely that the bug-finding ability of Nekara or
-Coyote might regress (e.g. if a bug is found 1/10000 times, it might not be found unless you run the
-experiment more times). This is normal and expected due to concurrency/scheduling nondeterminism.
+iterations (i.e. runs) by changing the `10000` value to a smaller value such as `100` or `1000`.
+This will complete the experiments much faster, but if you run less than the `10000` test iterations
+than we run for the paper experiments then it is very likely that the bug-finding ability of Nekara
+or Coyote might regress for some benchmarks (e.g. if a bug is found 1/10000 times, it might not be
+found unless you run the experiment more times). This is normal and expected due to
+concurrency/scheduling nondeterminism.
 
 The results from running the above command can be found in the `CoyoteActors/Results` directory.
 There you will see multiple JSON files, one for each experiment. Each JSON file is named as
@@ -189,8 +208,8 @@ what running these experiments showcases.
 
 You can find the code for this experiment ...
 
-To run the artifact experiments for reproducing bugs found by TSVD (see Table VII in page 10 of the
-paper), run the following command (which can take several minutes to complete) from the root
+To run the experiments for reproducing bugs found by TSVD (see Table VII in page 10 of the paper)
+invoke the following command (which can take several minutes to complete) from the root
 `nekara-artifact` directory:
 ```
 bash artifact.sh run tsvd
@@ -200,8 +219,8 @@ bash artifact.sh run tsvd
 
 You can find the code for this experiment ...
 
-To run the artifact experiments for reproducing bugs found by Maple (see Table VII in page 10 of the
-paper), run the following command (which can take several minutes to complete) from the root
+To run the experiments for reproducing bugs found by Maple (see Table VII in page 10 of the paper)
+invoke the following command (which can take several minutes to complete) from the root
 `nekara-artifact` directory:
 ```
 bash artifact.sh run maple
