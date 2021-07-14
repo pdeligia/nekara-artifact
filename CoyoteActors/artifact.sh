@@ -22,7 +22,7 @@ if [ "$MODE" == "build" ]; then
   dotnet build ${THIS_DIR}/Benchmarks/TPL_N/FailureDetector/FailureDetector.csproj
   dotnet build ${THIS_DIR}/Benchmarks/TPL_N/Paxos/Paxos.csproj
   dotnet build ${THIS_DIR}/Benchmarks/TPL_N/Raft/Raft.csproj
-  dotnet ${THIS_DIR}/packages/microsoft.coyote.test/1.3.0/lib/net5.0/coyote.dll rewrite ${THIS_DIR}/Benchmarks/TPL_N/tpl.nekara.json
+  dotnet ${THIS_DIR}/packages/microsoft.coyote.test/1.2.2/lib/net5.0/coyote.dll rewrite ${THIS_DIR}/Benchmarks/TPL_N/tpl.nekara.json
 
   dotnet build ${THIS_DIR}/Framework/Coyote_N/Coyote.sln
   dotnet build ${THIS_DIR}/Benchmarks/Coyote_N/ChainReplication/ChainReplication.csproj
@@ -32,29 +32,29 @@ if [ "$MODE" == "build" ]; then
 elif [ "$MODE" == "run" ]; then
   mkdir -p ${THIS_DIR}/Results
 
-  echo "Running ChainReplication [Coyote]"
-  dotnet ${THIS_DIR}/Benchmarks/Coyote/bin/net5.0/ChainReplication.dll $RUNS
+  # echo "Running ChainReplication [Coyote]"
+  # dotnet ${THIS_DIR}/Benchmarks/Coyote/bin/net5.0/ChainReplication.dll $RUNS
 
-  echo "Running FailureDetector [Coyote]"
-  dotnet ${THIS_DIR}/Benchmarks/Coyote/bin/net5.0/FailureDetector.dll $RUNS
+  # echo "Running FailureDetector [Coyote]"
+  # dotnet ${THIS_DIR}/Benchmarks/Coyote/bin/net5.0/FailureDetector.dll $RUNS
 
-  echo "Running Paxos [Coyote]"
-  dotnet ${THIS_DIR}/Benchmarks/Coyote/bin/net5.0/Paxos.dll $RUNS
+  # echo "Running Paxos [Coyote]"
+  # dotnet ${THIS_DIR}/Benchmarks/Coyote/bin/net5.0/Paxos.dll $RUNS
 
-  echo "Running Raft [Coyote]"
-  dotnet ${THIS_DIR}/Benchmarks/Coyote/bin/net5.0/Raft.dll $RUNS
+  # echo "Running Raft [Coyote]"
+  # dotnet ${THIS_DIR}/Benchmarks/Coyote/bin/net5.0/Raft.dll $RUNS
 
-  echo "Running ChainReplication [Coyote_N]"
-  dotnet ${THIS_DIR}/Benchmarks/Coyote_N/bin/net5.0/ChainReplication.dll $RUNS
+  # echo "Running ChainReplication [Coyote_N]"
+  # dotnet ${THIS_DIR}/Benchmarks/Coyote_N/bin/net5.0/ChainReplication.dll $RUNS
 
-  echo "Running FailureDetector [Coyote_N]"
-  dotnet ${THIS_DIR}/Benchmarks/Coyote_N/bin/net5.0/FailureDetector.dll $RUNS
+  # echo "Running FailureDetector [Coyote_N]"
+  # dotnet ${THIS_DIR}/Benchmarks/Coyote_N/bin/net5.0/FailureDetector.dll $RUNS
 
-  echo "Running Paxos [Coyote_N]"
-  dotnet ${THIS_DIR}/Benchmarks/Coyote_N/bin/net5.0/Paxos.dll $RUNS
+  # echo "Running Paxos [Coyote_N]"
+  # dotnet ${THIS_DIR}/Benchmarks/Coyote_N/bin/net5.0/Paxos.dll $RUNS
 
-  echo "Running Raft [Coyote_N]"
-  dotnet ${THIS_DIR}/Benchmarks/Coyote_N/bin/net5.0/Raft.dll $RUNS
+  # echo "Running Raft [Coyote_N]"
+  # dotnet ${THIS_DIR}/Benchmarks/Coyote_N/bin/net5.0/Raft.dll $RUNS
 
   echo "Running ChainReplication [TPL_N]"
   dotnet ${THIS_DIR}/Benchmarks/TPL_N/bin/net5.0/ChainReplication.dll $RUNS

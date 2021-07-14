@@ -168,7 +168,7 @@ a `Driver.cs` file with the entry point to the benchmark using the corresponding
 You can read more details about the experiment, the three Coyote versions, and the results that we
 got in Section VII-a of the paper.
 
-To run the experiments invoke the following command (which can take several hours to complete,
+To run the experiments invoke the following command (which can take several minutes to complete,
 depending on your machine) from the root `nekara-artifact` directory:
 ```
 bash artifact.sh run coyote 10000
