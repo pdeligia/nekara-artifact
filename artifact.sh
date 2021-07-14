@@ -14,12 +14,8 @@ if [ "$EXPERIMENT" == "memcached" ]; then
   ...
 elif [ "$EXPERIMENT" == "coyote" ]; then
   bash ${THIS_DIR}/CoyoteActors/artifact.sh run $RUNS
-elif [ "$EXPERIMENT" == "tsvd" ]; then
-  ...
-elif [ "$EXPERIMENT" == "maple" ]; then
-  ...
 else
-  echo "Error: unknown experiment; please choose 'memcached', 'coyote', 'tsvd' or 'maple'."
+  echo "Error: unknown experiment; please choose 'memcached' or 'coyote'."
   exit 1
 fi
 
