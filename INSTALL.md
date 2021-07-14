@@ -189,12 +189,12 @@ artifact users who might have access to a Windows machine with the .NET Framewor
 
 Assumming you have access to such Windows environment, to build the benchmarks, open the following
 solution files (`.sln`) using the Visual Studio IDE and select "Build Solution":
-- [DateTimeExtensions.sln](TSVD/Benchmarks/DateTimeExtensions/DateTimeExtensions.sln)
-- [Radical.sln](TSVD/Benchmarks/Radical/Radical.sln)
-- [System.Linq.Dynamic.sln](TSVD/Benchmarks/System.Linq.Dynamic/Src/System.Linq.Dynamic.sln)
-- [Thunderstruck.sln](TSVD/Benchmarks/Thunderstruck/Thunderstruck.sln)
-- [kubernetes-client.sln](TSVD/Benchmarks/kubernetes-client/kubernetes-client.sln)
-- [FluentAssertions.sln](TSVD/Benchmarks/fluentassertions/FluentAssertions.sln)
+- [DateTimeExtensions.sln](TSVD/DateTimeExtensions/DateTimeExtensions.sln)
+- [Radical.sln](TSVD/Radical/Radical.sln)
+- [System.Linq.Dynamic.sln](TSVD/System.Linq.Dynamic/Src/System.Linq.Dynamic.sln)
+- [Thunderstruck.sln](TSVD/Thunderstruck/Thunderstruck.sln)
+- [kubernetes-client.sln](TSVD/kubernetes-client/kubernetes-client.sln)
+- [FluentAssertions.sln](TSVD/fluentassertions/FluentAssertions.sln)
 
 Once each benchmark is built, you can manually run them as follows:
 **TODO:** 
