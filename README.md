@@ -20,36 +20,32 @@ described in the paper.
 
 ## Contents of the artifact
 
-The artifact includes source code and scripts for automatically running a subset of the experiments
-presented in the paper. This subset was selected using the following two practical criteria:
-- The corresponding benchmarks must be publicly available as open-source (and not be proprietary
-  and/or closed-source).
-- It must be possible to build and run the corresponding benchmarks on a Linux container (and not
-  only on a proprietary OS such as Windows and macOS) so that they can be easily and widely
-  distributed.
+The artifact includes source code and scripts for automatically building and running the
+non-proprietary experiments presented in the paper.
 
-With the above two criteria in mind, the following experiments (and corresponding benchmarks) were
-included in this artifact:
+The following experiments (and corresponding benchmarks) are included and fully-automated:
 - Finding bugs with Nekara in [Memcached](https://github.com/memcached/memcached) (see Table II in
-  page 5). Memcached is available as open-source on GitHub, is written in C and can build and run on
-  the artifact's Linux container.
+  page 5).
 - Comparison of systematic testing with Nekara against [Coyote](https://github.com/microsoft/Coyote)
   on the [Coyote Actors](https://microsoft.github.io/coyote/#concepts/actors/overview/) programming
-  model (see Table VI in page 9). Coyote is available as open-source on GitHub and is written in C#
-  and .NET Core, which makes it available cross-platform, including on the artifact's Linux
-  container.
-
-Based on the above selection criteria, the following experiments and benchmarks could not be included:
-- Finding bugs in [Verona](https://github.com/microsoft/verona) (i.e. Zevio in the anonymized
-  version of the paper, pages 5-6). The experiment uses an earlier branch of Verona that is
-  Microsoft-internal and has not been open-sourced yet.
-- Finding bugs in CSCS and ECSS (see Section VI-A and VI-B in pages 7-9). These systems are
-  proprietary and Microsoft-internal.
-- Reproducing bugs found by [TSVD](https://github.com/microsoft/TSVD) (see Table VII in page 10).
-  These benchmarks use the legacy .NET Framework which is only available on Windows machines.
+  model (see Table VI in page 9).
 - Reproducing bugs found by [Maple](http://web.eecs.umich.edu/~nsatish/papers/OOPSLA-12-Maple.pdf)
-  (see Table VII in page 10). These benchmarks use the legacy .NET Framework which is only available
-  on Windows machines.
+  (see Table VII in page 10).
+
+The source code and scripts for the [TSVD](https://github.com/microsoft/TSVD) experiment (see Table
+VII in page 10) are also included, but they cannot automatically build and run in the provided
+artifact Docker container, because these benchmarks use the legacy .NET Framework that is available
+only for Windows. For this reason we mark this experiment as **optional** for the purposes of this
+artifact. You can still run it with some manual effort, but it requires a Windows environment and
+installing corresponding dependencies.
+
+The following experiments could not be included in the artifact due to being based on
+Microsoft-internal source code:
+- Finding bugs in [Verona](https://github.com/microsoft/verona) (i.e. Zevio in the anonymized
+  version of the paper, pages 5-6). Verona itself is open-sourced on GitHub, but the experiment is
+  based on an earlier branch of Verona that is Microsoft-internal and has not been open-sourced.
+- Finding bugs in CSCS and ECSS (see Section VI-A and VI-B in pages 7-9). These systems are
+  proprietary, closed-source and Microsoft-internal.
 
 The artifact also includes the source code for the
 [Nekara](https://github.com/microsoft/coyote-scheduler) systematic testing library presented in the

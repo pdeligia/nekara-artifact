@@ -167,6 +167,40 @@ OS scheduler and machine that Docker is running, some variation in the results f
 totally normal and expected. However, the overall trend should be similar to the paper, and this is
 what running these experiments showcases.
 
+### Experiment #3: Maple (Table VII)
+
+You can find the code for this experiment ...
+
+To run the experiments for reproducing bugs found by Maple (see Table VII in page 10 of the paper)
+invoke the following command (which can take several minutes to complete) from the root
+`nekara-artifact` directory:
+```
+bash artifact.sh maple
+```
+
+### Experiment #4: TSVD (Table VII)
+
+**Note:** As discussed in [README.md](README.md), this experiment is marked **optional** for the
+purposes of this artifact, because it is Windows only and thus cannot be build or run inside the
+artifact's Ubuntu 18.04 Docker container.
+
+However, we still provide the source code for the benchmarks and scripts for the experiments, for
+artifact users who might have access to a Windows machine with the .NET Framework v4.6 installed.
+
+Assumming you have access to such Windows environment, to build the benchmarks, open the following
+solution files (`.sln`) using the Visual Studio IDE and select "Build Solution":
+- [DateTimeExtensions.sln](TSVD/Benchmarks/DateTimeExtensions/DateTimeExtensions.sln)
+- [Radical.sln](TSVD/Benchmarks/Radical/Radical.sln)
+- [System.Linq.Dynamic.sln](TSVD/Benchmarks/System.Linq.Dynamic/Src/System.Linq.Dynamic.sln)
+- [Thunderstruck.sln](TSVD/Benchmarks/Thunderstruck/Thunderstruck.sln)
+- [kubernetes-client.sln](TSVD/Benchmarks/kubernetes-client/kubernetes-client.sln)
+- [FluentAssertions.sln](TSVD/Benchmarks/fluentassertions/FluentAssertions.sln)
+
+Once each benchmark is built, you can manually run them as follows:
+**TODO:** 
+
+**TODO:** You will see the following results:
+
 ## Troubleshooting
 
 ### Issue authenticating to Docker
