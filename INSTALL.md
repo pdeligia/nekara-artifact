@@ -188,7 +188,8 @@ However, we still provide the source code for the benchmarks and scripts for the
 artifact users who might have access to a Windows machine with the .NET Framework v4.6 installed.
 
 Assumming you have access to such Windows environment, to build the benchmarks, open the following
-solution files (`.sln`) using the Visual Studio IDE and select "Build Solution":
+solution files (`.sln`) using the [Visual Studio](https://visualstudio.microsoft.com/) IDE and
+select "Build Solution":
 - [DateTimeExtensions.sln](TSVD/DateTimeExtensions/DateTimeExtensions.sln)
 - [Radical.sln](TSVD/Radical/Radical.sln)
 - [System.Linq.Dynamic.sln](TSVD/System.Linq.Dynamic/Src/System.Linq.Dynamic.sln)
