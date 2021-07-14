@@ -86,8 +86,8 @@ Now you are ready to connect to the artifact container in VS Code by clicking th
 (if you are unable to click the link, just copy paste it in your browser). This uses the "Open in VS
 Code" feature of GitHub.
 
-**Note:** If your browser asks you if you want to allow the website to open VS Code, press allow or
-open. If VS Code asks you if you want to allow the extension to open the URI, then also press Open.
+**Note:** If your browser asks you if you want to allow the website to open VS Code, select Open. If
+VS Code asks you if you want to allow the extension to open the URI, then also select Open.
 
 A new VS Code window will open (might take a few seconds) and the artifact container will start
 automatically building using the [container configuration scripts](.devcontainer). You will be able
