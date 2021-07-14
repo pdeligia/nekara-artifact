@@ -11,17 +11,17 @@ RUNS=$2
 THIS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 
 if [ "$MODE" == "build" ]; then
-  # dotnet build ${THIS_DIR}/Framework/Coyote/Coyote.sln
-  # dotnet build ${THIS_DIR}/Benchmarks/Coyote/ChainReplication/ChainReplication.csproj
-  # dotnet build ${THIS_DIR}/Benchmarks/Coyote/FailureDetector/FailureDetector.csproj
-  # dotnet build ${THIS_DIR}/Benchmarks/Coyote/Paxos/Paxos.csproj
-  # dotnet build ${THIS_DIR}/Benchmarks/Coyote/Raft/Raft.csproj
+  dotnet build ${THIS_DIR}/Framework/Coyote/Coyote.sln
+  dotnet build ${THIS_DIR}/Benchmarks/Coyote/ChainReplication/ChainReplication.csproj
+  dotnet build ${THIS_DIR}/Benchmarks/Coyote/FailureDetector/FailureDetector.csproj
+  dotnet build ${THIS_DIR}/Benchmarks/Coyote/Paxos/Paxos.csproj
+  dotnet build ${THIS_DIR}/Benchmarks/Coyote/Raft/Raft.csproj
 
-  # dotnet build ${THIS_DIR}/Framework/Coyote_N/Coyote.sln
-  # dotnet build ${THIS_DIR}/Benchmarks/Coyote_N/ChainReplication/ChainReplication.csproj
-  # dotnet build ${THIS_DIR}/Benchmarks/Coyote_N/FailureDetector/FailureDetector.csproj
-  # dotnet build ${THIS_DIR}/Benchmarks/Coyote_N/Paxos/Paxos.csproj
-  # dotnet build ${THIS_DIR}/Benchmarks/Coyote_N/Raft/Raft.csproj
+  dotnet build ${THIS_DIR}/Framework/Coyote_N/Coyote.sln
+  dotnet build ${THIS_DIR}/Benchmarks/Coyote_N/ChainReplication/ChainReplication.csproj
+  dotnet build ${THIS_DIR}/Benchmarks/Coyote_N/FailureDetector/FailureDetector.csproj
+  dotnet build ${THIS_DIR}/Benchmarks/Coyote_N/Paxos/Paxos.csproj
+  dotnet build ${THIS_DIR}/Benchmarks/Coyote_N/Raft/Raft.csproj
 
   dotnet build ${THIS_DIR}/Framework/TPL_N/Coyote.sln
   dotnet build ${THIS_DIR}/Benchmarks/TPL_N/ChainReplication/ChainReplication.csproj
