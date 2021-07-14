@@ -181,7 +181,7 @@ bash artifact.sh maple
 ### Experiment #4: TSVD (Table VII)
 
 **Note:** As discussed in [README.md](README.md), this experiment is marked **optional** for the
-purposes of this artifact, because it is Windows only and thus cannot be build or run inside the
+purposes of this artifact, because it is **Windows-only** and thus cannot be build or run inside the
 artifact's Ubuntu 18.04 Docker container.
 
 However, we still provide the source code for the benchmarks and scripts for the experiments, for
