@@ -80,30 +80,25 @@ Click "Install" to install the extension.
 
 ### Building and opening the artifact in VS Code
 
-Now you are ready to connect to the artifact container in VS Code by using this
-[link](https://open.vscode.dev/pdeligia/nekara-artifact) and selecting the "Clone repo in container
-volume" option (see highlighted button on the right side in the image below).
-
-![Open in VS Code](Images/vs-code-open-repo.png)
+Now you are ready to connect to the artifact container in VS Code by clicking this
+[link](vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/pdeligia/nekara-artifact).
+This uses the "Open in VS Code" feature of GitHub.
 
 **Note:** If your browser asks you if you want to allow the website to open VS Code, press allow or
-open. Next, if VS Code asks you if you want to allow the extension to open the URI, then press Open
-again.
+open. If VS Code asks you if you want to allow the extension to open the URI, then also press Open.
 
-VS Code will ask you how to create your container configuration. Select `From 'DockerFile'` (second
-option) as in the following image:
+A new VS Code window will open (might take a few seconds) and the artifact container will start
+automatically building using the [container configuration scripts](.devcontainer). You will be able
+to see the build process on the VS Code terminal in the bottom right panel. During this time please
+refrain from canceling the build process to make sure it completes successfully. This process can
+take several minutes. Once it finishes, you should now be connected to the container.
 
-![VS Code Configuration](Images/vs-code-configuration.png)
-
-It can take several minutes to build the artifact container before it connects to it. Once it
-finishes, you should now be connected to the container and able to see the workspace and an open
-terminal:
+You need to open a new `bash` terminal to be able to interact with the artifact. To do that select
+`Terminal` on the top panel and then select `New Terminal` (or use the keyboard shortcut ``Ctrl +
+Shift + ` ``). Your VS Code window should look like this (with an open terminal in the bottom right
+panel):
 
 ![VS Code Connected](Images/vs-code-connected.png)
-
-**Note:** If the bash terminal in the lower right panel is not already open, then select `Terminal`
-on the top panel and then select `New Terminal` (or use the keyboard shortcut ``Ctrl + Shift + `
-``).
 
 Now you are ready to [run the artifact](#running-the-artifact)!
 
