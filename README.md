@@ -23,14 +23,16 @@ described in the paper.
 The artifact includes source code and scripts for automatically building and running the
 non-proprietary experiments presented in the paper.
 
-The following experiments (and corresponding benchmarks) are included and fully-automated:
+The following experiments (and corresponding benchmarks) are included and buiding/running them is
+fully-automated:
 - Finding bugs with Nekara in [Memcached](https://github.com/memcached/memcached) (see Table II in
   page 5).
 - Comparison of systematic testing with Nekara against [Coyote](https://github.com/microsoft/Coyote)
   on the [Coyote Actors](https://microsoft.github.io/coyote/#concepts/actors/overview/) programming
   model (see Table VI in page 9).
 - Reproducing bugs found by [Maple](http://web.eecs.umich.edu/~nsatish/papers/OOPSLA-12-Maple.pdf)
-  (see Table VII in page 10).
+  (see Table VII in page 10). Note that the SpiderMonkey benchmark is not included in the artifact,
+  as it requires an older version of Ubuntu than 18.04 that is used by the artifact container.
 
 The source code and scripts for the [TSVD](https://github.com/microsoft/TSVD) experiment (see Table
 VII in page 10) are also included, but they cannot automatically build and run in the provided
