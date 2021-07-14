@@ -31,7 +31,7 @@ fully-automated:
   on the [Coyote Actors](https://microsoft.github.io/coyote/#concepts/actors/overview/) programming
   model (see Table VI in page 9).
 - Reproducing bugs found by [Maple](http://web.eecs.umich.edu/~nsatish/papers/OOPSLA-12-Maple.pdf)
-  (see Table VII in page 10). Note that the SpiderMonkey benchmark is not included in the artifact,
+  (see Table VII in page 10). **Note:** The SpiderMonkey benchmark is not included in the artifact,
   as it requires an older version of Ubuntu than 18.04 that is used by the artifact container.
 
 The source code and scripts for the [TSVD](https://github.com/microsoft/TSVD) experiment (see Table
