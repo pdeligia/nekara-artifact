@@ -1,0 +1,10 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+{
+  "name": "Nekara Artifact",
+  "image": "ubuntu:18.04",
+  "settings": {},
+  "extensions": [],
+  "postCreateCommand": "bash .devcontainer/setup.sh",
+}

@@ -43,7 +43,7 @@ Desktop](https://www.docker.com/products/docker-desktop), which is available for
 macOS.
 
 **Note:** The artifact was tested with Docker version `20.10.7`, it will possibly work with some
-earlier versions, but to be sure install the same Docker version that we did (or a later one).
+earlier versions, but to be sure install the same Docker version (or a later one).
 
 Next, run the Docker Desktop application to start Docker. You will know it's running if you look in
 the activity tray and see the Docker whale icon. Docker might take a few minutes to start. If the
@@ -63,60 +63,55 @@ You should see something like the following output:
 Docker version 20.10.7, build f0df350
 ```
 
-### Installing VS Code and required extension
+### Installing VS Code
 
 Now that you installed Docker, proceed to install the latest [VS
 Code](https://code.visualstudio.com/), which is available for Windows, Linux and macOS. This can be
 done [here](https://code.visualstudio.com/Download).
 
-Next, install the "Remote - Containers" extension that lets you run Visual Studio Code inside a
+Next, install the `Remote - Containers` extension that lets you run Visual Studio Code inside a
 Docker container. This can be done by clicking
 [here](vscode:extension/ms-vscode-remote.remote-containers) which will open up the extension in VS
 Code.
 
 ![VS Code Extension](Images/vs-code-remote-containers-extension.png)
 
-### Opening the artifact in VS Code
+Click "Install" to install the extension.
 
-Next, connect to the Docker container in VS Code by using this
+### Building and opening the artifact in VS Code
+
+Now you are ready to connect to the artifact container in VS Code by using this
 [link](https://open.vscode.dev/pdeligia/nekara-artifact) and selecting the "Clone repo in container
 volume" option (see highlighted button on the right side in the image below).
 
 ![Open in VS Code](Images/vs-code-open-repo.png)
 
-**Note:** If your browser asks you if you want to allow the website to open VS Code, press allow or open.
-Next, if VS Code asks you if you want to allow the extension to open the URI, then press Open again.
+**Note:** If your browser asks you if you want to allow the website to open VS Code, press allow or
+open. Next, if VS Code asks you if you want to allow the extension to open the URI, then press Open
+again.
 
 VS Code will ask you how to create your container configuration. Select `From 'DockerFile'` (second
 option) as in the following image:
 
 ![VS Code Configuration](Images/vs-code-configuration.png)
 
-It can take several minutes to build the Docker container before it connects to it.
-
-Once it finishes, you should now be connected to the container and able to see the workspace and an
-open terminal:
+It can take several minutes to build the artifact container before it connects to it. Once it
+finishes, you should now be connected to the container and able to see the workspace and an open
+terminal:
 
 ![VS Code Connected](Images/vs-code-connected.png)
 
-**Note:** If the bash terminal in the lower right panel does not appear, then select `Terminal` on
-the top panel and then select `New Terminal` (or use the keyboard shortcut ``Ctrl + Shift + ` ``).
+**Note:** If the bash terminal in the lower right panel is not already open, then select `Terminal`
+on the top panel and then select `New Terminal` (or use the keyboard shortcut ``Ctrl + Shift + `
+``).
 
 Now you are ready to [run the artifact](#running-the-artifact)!
 
 ## Running the artifact
 
-To build the artifact, run the following command (which can take several minutes to complete) from
-the root `nekara-artifact` directory:
-```
-bash artifact.sh build
-```
+You can use the `artifact.sh` script (in the root directory) to run experiments.
 
-The script will first build [Nekara](https://github.com/microsoft/coyote-scheduler), which is open
-sourced under the name `coyote-scheduler`, and then builds the non-proprietary benchmarks from the
-paper.
-
-Below we will give instructions on how to run each experiment, and what results you should get. For
+You can find instructions below on how to run each experiment, and what results you should get. For
 more details in what each experiment is doing, please read the corresponding section in the paper.
 
 ### Experiment #1: Memcached (Table II)
@@ -127,7 +122,7 @@ To run the experiments for finding bugs in Memcached using Nekara (see Table II 
 paper) invoke the following command (which can take several minutes to complete) from the root
 `nekara-artifact` directory:
 ```
-bash artifact.sh run memcached
+bash artifact.sh memcached
 ```
 
 ### Experiment #2: Coyote (Table VI)
@@ -165,22 +160,22 @@ You can also find the code for each benchmark (`ChainReplication`, `FailureDetec
 copies of each benchmark, one for each of the above three versions of Coyote. Each version contains
 a `Driver.cs` file with the entry point to the benchmark using the corresponding version of Coyote.
 
-You can read more details about the experiment, the three Coyote versions, and the results that we
-got in Section VII-a of the paper.
+You can read more details about the experiment, the three Coyote versions, and the results in
+Section VII-a of the paper.
 
 To run the experiments invoke the following command (which can take several minutes to complete,
 depending on your machine) from the root `nekara-artifact` directory:
 ```
-bash artifact.sh run coyote 10000
+bash artifact.sh coyote 10000
 ```
 
 **Note:** If the above command is taking too long on your machine, you can reduce the test
 iterations (i.e. runs) by changing the `10000` value to a smaller value such as `100` or `1000`.
 This will complete the experiments much faster, but if you run less than the `10000` test iterations
-than we run for the paper experiments then it is very likely that the bug-finding ability of Nekara
-or Coyote might regress for some benchmarks (e.g. if a bug is found 1/10000 times, it might not be
-found unless you run the experiment more times). This is normal and expected due to
-concurrency/scheduling nondeterminism.
+that were used in the paper then it is very likely that the bug-finding ability of Nekara or Coyote
+might regress for some benchmarks (e.g. if a bug is found 1/10000 times, it might not be found
+unless you run the experiment more times). This is normal and expected due to concurrency/scheduling
+nondeterminism.
 
 The results from running the above command can be found in the `CoyoteActors/Results` directory.
 There you will see multiple JSON files, one for each experiment. Each JSON file is named as
@@ -213,7 +208,7 @@ To run the experiments for reproducing bugs found by TSVD (see Table VII in page
 invoke the following command (which can take several minutes to complete) from the root
 `nekara-artifact` directory:
 ```
-bash artifact.sh run tsvd
+bash artifact.sh tsvd
 ```
 
 ### Experiment #4: Maple (Table VII)
@@ -224,7 +219,7 @@ To run the experiments for reproducing bugs found by Maple (see Table VII in pag
 invoke the following command (which can take several minutes to complete) from the root
 `nekara-artifact` directory:
 ```
-bash artifact.sh run maple
+bash artifact.sh maple
 ```
 
 ## Troubleshooting
