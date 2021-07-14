@@ -35,7 +35,7 @@ fully-automated:
   as it requires an older version of Ubuntu than 18.04 that is used by the artifact container.
 
 The source code and scripts for the [TSVD](https://github.com/microsoft/TSVD) experiment (see Table
-VII in page 10) are also included, but they cannot automatically build and run in the provided
+VII in page 10) are also included, but they cannot be automatically build and run in the provided
 artifact Docker container, because these benchmarks use the legacy .NET Framework that is available
 only for Windows. For this reason we mark this experiment as **optional** for the purposes of this
 artifact. You can still run it with some manual effort, but it requires a Windows environment and
