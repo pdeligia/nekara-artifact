@@ -22,7 +22,7 @@ that is internal and has not been open-sourced yet.
 
 **Optional:** [Nekara](https://github.com/microsoft/coyote-scheduler), which is open sourced under
 the name `coyote-scheduler`, can be used stand-alone outside the scope of this artifact. To do so,
-clone its [repository](https://github.com/microsoft/coyote-scheduler) and follow the build
+clone the [repository](https://github.com/microsoft/coyote-scheduler) and follow the build
 instructions in the repository README.md. You can find small examples of how to use Nekara for
 instrumenting C++ code
 [here](https://github.com/microsoft/coyote-scheduler/tree/main/test/integration).
