@@ -70,9 +70,9 @@ Code](https://code.visualstudio.com/), which is available for Windows, Linux and
 done [here](https://code.visualstudio.com/Download).
 
 Next, install the `Remote - Containers` extension that lets you run Visual Studio Code inside a
-Docker container. This can be done by clicking
-[here](vscode:extension/ms-vscode-remote.remote-containers) which will open up the extension in VS
-Code.
+Docker container. This can be done by clicking <a
+href="vscode:extension/ms-vscode-remote.remote-containers" title="VS Code Extension">here</a> which
+will open up the extension in VS Code.
 
 ![VS Code Extension](Images/vs-code-remote-containers-extension.png)
 
@@ -80,9 +80,9 @@ Click "Install" to install the extension.
 
 ### Building and opening the artifact in VS Code
 
-Now you are ready to connect to the artifact container in VS Code by clicking this
-[link](vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/pdeligia/nekara-artifact).
-This uses the "Open in VS Code" feature of GitHub.
+Now you are ready to connect to the artifact container in VS Code by clicking this <a
+href="vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/pdeligia/nekara-artifact"
+title="Open in VS Code">link</a>. This uses the "Open in VS Code" feature of GitHub.
 
 **Note:** If your browser asks you if you want to allow the website to open VS Code, press allow or
 open. If VS Code asks you if you want to allow the extension to open the URI, then also press Open.
