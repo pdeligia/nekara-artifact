@@ -1,0 +1,1 @@
+/usr/bin/c++    -rdynamic CMakeFiles/simple_semaphore.dir/simple_semaphore.o  -o simple_semaphore -lcoyote_static -lThreads::Threads 
