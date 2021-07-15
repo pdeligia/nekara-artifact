@@ -48,6 +48,3 @@ git submodule sync --recursive
 git submodule update --init --recursive
 bash ${THIS_DIR}/../Nekara/scripts/build.sh
 bash ${THIS_DIR}/../CoyoteActors/artifact.sh build
-
-# Disable telemetry in Coyote.
-set COYOTE_CLI_TELEMETRY_OPTOUT=1

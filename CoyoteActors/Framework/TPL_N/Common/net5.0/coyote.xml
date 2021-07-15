@@ -1,0 +1,686 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>coyote</name>
+    </assembly>
+    <members>
+        <member name="T:Microsoft.Coyote.SystematicTesting.CodeCoverageInstrumentation">
+            <summary>
+            Instruments a binary for code coverage.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.CodeCoverageInstrumentation.GetToolPath(System.String,System.String)">
+            <summary>
+            Returns the tool path to the code coverage instrumentor.
+            </summary>
+            <param name="settingName">The name of the setting; also used to query the environment variables.</param>
+            <param name="toolName">The name of the tool; used in messages only.</param>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.CodeCoverageInstrumentation.SetOutputDirectory(Microsoft.Coyote.Configuration,System.Boolean)">
+            <summary>
+            Set the <see cref="F:Microsoft.Coyote.SystematicTesting.CodeCoverageInstrumentation.OutputDirectory"/> to either the user-specified <see cref="F:Microsoft.Coyote.Configuration.OutputFilePath"/>
+            or to a unique output directory name in the same directory as <see cref="F:Microsoft.Coyote.Configuration.AssemblyToBeAnalyzed"/>
+            and starting with its name.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Coyote.SystematicTesting.CodeCoverageMonitor">
+            <summary>
+            Monitors the program being tested for code coverage.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.SystematicTesting.CodeCoverageMonitor.Configuration">
+            <summary>
+            Configuration.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.SystematicTesting.CodeCoverageMonitor.IsRunning">
+            <summary>
+            Monitoring process is running.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.CodeCoverageMonitor.Start(Microsoft.Coyote.Configuration)">
+            <summary>
+            Starts the code coverage monitor.
+            </summary>
+            <param name="configuration">Configuration.</param>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.CodeCoverageMonitor.Stop">
+            <summary>
+            Stops the code coverage monitor.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.CodeCoverageMonitor.GetOutputName">
+            <summary>
+            Returns the output name.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.SystematicTesting.TestingProcessScheduler.Configuration">
+            <summary>
+            Configuration.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.SystematicTesting.TestingProcessScheduler.Server">
+            <summary>
+            The server that all the TestingProcess clients will connect to.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.SystematicTesting.TestingProcessScheduler.TestingProcesses">
+            <summary>
+            Map from testing process ids to testing processes.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.SystematicTesting.TestingProcessScheduler.TestingProcessChannels">
+            <summary>
+            Map from testing process name to testing process channels.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.SystematicTesting.TestingProcessScheduler.TestProcessesConnected">
+            <summary>
+            Total number of remote test processes that have called home.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.SystematicTesting.TestingProcessScheduler.LastMessageTime">
+            <summary>
+            Time that last message was received from a parallel test.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.SystematicTesting.TestingProcessScheduler.Terminating">
+            <summary>
+            Records if we want certain child test processes to terminate, this key here is the
+            SmartSocketClient Name.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.SystematicTesting.TestingProcessScheduler.TestReports">
+            <summary>
+            The test reports per process.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.SystematicTesting.TestingProcessScheduler.TraceFiles">
+            <summary>
+            Test Trace files.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.SystematicTesting.TestingProcessScheduler.GlobalTestReport">
+            <summary>
+            The global test report, which contains merged information
+            from the test report of each testing process.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.SystematicTesting.TestingProcessScheduler.Profiler">
+            <summary>
+            The testing profiler.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.SystematicTesting.TestingProcessScheduler.SchedulerLock">
+            <summary>
+            The scheduler lock.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.SystematicTesting.TestingProcessScheduler.BugFoundByProcess">
+            <summary>
+            The process id of the process that discovered a bug, else null.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.SystematicTesting.TestingProcessScheduler.IsProcessCanceled">
+            <summary>
+            Set if ctrl-c or ctrl-break occurred.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.SystematicTesting.TestingProcessScheduler.IsRunOutOfProcess">
+            <summary>
+            Set true if we have multiple parallel processes or are running code coverage.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.SystematicTesting.TestingProcessScheduler.IsVerbose">
+            <summary>
+            Whether to write verbose output.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestingProcessScheduler.#ctor(Microsoft.Coyote.Configuration)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Coyote.SystematicTesting.TestingProcessScheduler"/> class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestingProcessScheduler.NotifyBugFound(System.UInt32)">
+            <summary>
+            Notifies the testing process scheduler that a bug was found.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestingProcessScheduler.SetTestReport(Microsoft.Coyote.SystematicTesting.TestReport,System.UInt32)">
+            <summary>
+            Sets the test report from the specified process.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestingProcessScheduler.Create(Microsoft.Coyote.Configuration)">
+            <summary>
+            Creates a new testing process scheduler.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestingProcessScheduler.Run">
+            <summary>
+            Runs the Coyote testing scheduler.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestingProcessScheduler.CreateParallelTestingProcesses">
+            <summary>
+            Creates the user specified number of parallel testing processes.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestingProcessScheduler.RunParallelTestingProcesses">
+            <summary>
+            Runs the parallel testing processes.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestingProcessScheduler.CreateAndRunInMemoryTestingProcess">
+            <summary>
+            Creates and runs an in-memory testing process.
+            </summary>
+            <returns>The number of bugs found.</returns>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestingProcessScheduler.StartServer">
+            <summary>
+            Opens the local server for TestingProcesses to connect to.
+            If we are not running anything out of process then this does nothing.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestingProcessScheduler.StopServer">
+            <summary>
+            Closes the local server, if we have one.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestingProcessScheduler.MergeTestReport(Microsoft.Coyote.SystematicTesting.TestReport,System.UInt32)">
+            <summary>
+            Merges the test report from the specified process.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestingProcessScheduler.EmitTestReport">
+            <summary>
+            Emits the test report.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Coyote.SystematicTesting.TestingPortfolio">
+            <summary>
+            A portfolio of systematic testing strategies.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestingPortfolio.ConfigureStrategyForCurrentProcess(Microsoft.Coyote.Configuration)">
+            <summary>
+            Configures the systematic testing strategy for the current testing process.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Coyote.SystematicTesting.TestingProcess">
+            <summary>
+            A testing process, this can also be the client side of a multi-process test.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.SystematicTesting.TestingProcess.Terminating">
+            <summary>
+            Whether this process is terminating.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.SystematicTesting.TestingProcess.Name">
+            <summary>
+            A name for the test client.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.SystematicTesting.TestingProcess.Configuration">
+            <summary>
+            Configuration.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.SystematicTesting.TestingProcess.TestingEngine">
+            <summary>
+            The testing engine associated with
+            this testing process.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.SystematicTesting.TestingProcess.Server">
+            <summary>
+            The channel to the TestProcessScheduler.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.SystematicTesting.TestingProcess.ProgressTask">
+            <summary>
+            A way to synchronouse background progress task with the main thread.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestingProcess.Create(Microsoft.Coyote.Configuration)">
+            <summary>
+            Creates a Coyote testing process.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestingProcess.GetTestReport">
+            <summary>
+            Get the current test report.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestingProcess.Run">
+            <summary>
+            Runs the Coyote testing process.
+            </summary>
+            <returns>The number of bugs found.</returns>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestingProcess.#ctor(Microsoft.Coyote.Configuration)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Coyote.SystematicTesting.TestingProcess"/> class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestingProcess.ConnectToServer">
+            <summary>
+            Opens the remote notification listener. If this is
+            not a parallel testing process, then this operation
+            does nothing.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestingProcess.Disconnect">
+            <summary>
+            Closes the remote notification listener. If this is
+            not a parallel testing process, then this operation
+            does nothing.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestingProcess.NotifyBugFound">
+            <summary>
+            Notifies the remote testing scheduler
+            about a discovered bug.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestingProcess.SendTestReport">
+            <summary>
+            Sends the test report associated with this testing process.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestingProcess.EmitTraces">
+            <summary>
+            Emits the testing traces.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestingProcess.StartProgressMonitorTask">
+            <summary>
+            Creates a task that pings the server with a heartbeat telling the server our current progress..
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestingProcess.SendProgressMessage">
+            <summary>
+            Sends the TestProgressMessage and if server cannot be reached, stop the testing.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Coyote.SystematicTesting.TestingProcessFactory">
+            <summary>
+            The Coyote testing process factory.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestingProcessFactory.Create(System.UInt32,Microsoft.Coyote.Configuration)">
+            <summary>
+            Creates a new testing process.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.TestingProcessFactory.CreateArgumentsFromConfiguration(System.UInt32,Microsoft.Coyote.Configuration)">
+            <summary>
+            Creates arguments from the specified configuration.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Coyote.SystematicTesting.ExitCode">
+            <summary>
+            The exit code returned by the tester.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.SystematicTesting.ExitCode.Success">
+            <summary>
+            Indicates that no bugs were found.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.SystematicTesting.ExitCode.BugFound">
+            <summary>
+            Indicates that a bug was found.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.SystematicTesting.ExitCode.InternalError">
+            <summary>
+            Indicates that an internal exception was thrown.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Coyote.SystematicTesting.Reporter">
+            <summary>
+            The Coyote testing reporter.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.Reporter.EmitTestingCoverageReport(Microsoft.Coyote.SystematicTesting.TestReport,System.Nullable{System.UInt32},System.Boolean)">
+            <summary>
+            Emits the testing coverage report.
+            </summary>
+            <param name="report">TestReport.</param>
+            <param name="processId">Optional process id that produced the report.</param>
+            <param name="isDebug">Is a debug report.</param>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.Reporter.GetOutputDirectory(System.String,System.String,System.String,System.Boolean)">
+            <summary>
+            Returns (and creates if it does not exist) the output directory with an optional suffix.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.SystematicTesting.Reporter.EmitTestingCoverageOutputFiles(Microsoft.Coyote.SystematicTesting.TestReport,System.String,System.String)">
+            <summary>
+            Emits all the testing coverage related output files.
+            </summary>
+            <param name="report">TestReport containing CoverageInfo.</param>
+            <param name="directory">Output directory name, unique for this run.</param>
+            <param name="file">Output file name.</param>
+        </member>
+        <member name="T:Microsoft.Coyote.Program">
+            <summary>
+            Entry point to the Coyote tool.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Program.RunTest(Microsoft.Coyote.Configuration)">
+            <summary>
+            Runs the test specified in the configuration.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Program.ReplayTest(Microsoft.Coyote.Configuration)">
+            <summary>
+            Replays an execution that is specified in the configuration.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Program.RewriteAssemblies(Microsoft.Coyote.Configuration,Microsoft.Coyote.Rewriting.RewritingOptions)">
+            <summary>
+            Rewrites the assemblies specified in the configuration.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Program.LoadAssemblyConfiguration(System.String)">
+            <summary>
+            Loads the configuration of the specified assembly.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Program.OnProcessExit(System.Object,System.EventArgs)">
+            <summary>
+            Callback invoked when the current process terminates.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Program.OnProcessCanceled(System.Object,System.EventArgs)">
+            <summary>
+            Callback invoked when the current process is canceled.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Program.OnUnhandledException(System.Object,System.UnhandledExceptionEventArgs)">
+            <summary>
+            Callback invoked when an unhandled exception occurs.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Program.Shutdown">
+            <summary>
+            Shutdowns any active monitors.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Program.GetPlatformVersion">
+            <summary>
+            Returns the .NET platform version this assembly was compiled for.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Coyote.Utilities.CommandLineArgumentDependency">
+            <summary>
+            Specifies a dependency between arguments.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Utilities.CommandLineArgumentDependency.Name">
+            <summary>
+            Name of an argument.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Utilities.CommandLineArgumentDependency.Value">
+            <summary>
+            Value of that argument.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Coyote.Utilities.CommandLineException">
+            <summary>
+            Exception raised from ParseArguments.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Coyote.Utilities.CommandLineArgument">
+            <summary>
+            A single command line argument.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Utilities.CommandLineArgument.LongName">
+            <summary>
+            The long name referenced using two dashes (e.g. "--max-steps").
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Utilities.CommandLineArgument.ShortName">
+            <summary>
+            The short name referenced using single dash (e.g. "-ms").
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Utilities.CommandLineArgument.DataType">
+            <summary>
+            Optional datatype (default string). Supported datatypes are primitive types
+            only (e.g. int, uint, float, string, bool).
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Utilities.CommandLineArgument.Description">
+            <summary>
+            Help text for the command line option. You can use newlines to format the help content
+            but each line will be auto-indented by the PrintHelp function.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Utilities.CommandLineArgument.IsRequired">
+            <summary>
+            Checks if the arugment is required.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Utilities.CommandLineArgument.IsPositional">
+            <summary>
+            Checks if the arugment is positional.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Utilities.CommandLineArgument.Group">
+            <summary>
+            Optional name to a <see cref="T:Microsoft.Coyote.Utilities.CommandLineGroup"/>.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Utilities.CommandLineArgument.IsHidden">
+            <summary>
+            Hide this option from the printed help message.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Utilities.CommandLineArgument.IsMultiValue">
+            <summary>
+            Checks if the value of the argument is an array (e.g. "--coverage data activity").
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Utilities.CommandLineArgument.Value">
+            <summary>
+            The parsed command line value matching DataType.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Utilities.CommandLineArgument.DefaultValue">
+            <summary>
+            The default value to use if no value provided.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Utilities.CommandLineArgument.PrintFullHelp">
+            <summary>
+            This is the print help option.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Utilities.CommandLineArgument.DependsOn">
+            <summary>
+            This argument depends on the specific value of another.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Utilities.CommandLineArgument.AllowedValues">
+            <summary>
+            Defines a list of possible values.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Coyote.Utilities.CommandLineGroup">
+            <summary>
+            Provides a way of grouping command line arguments in the help text.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Utilities.CommandLineGroup.Name">
+            <summary>
+            The unique name of the group.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Utilities.CommandLineGroup.Description">
+            <summary>
+            Help text for the command line group. You can use newlines to format the help content
+            but each line will be auto-indented by the PrintHelp function.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Utilities.CommandLineGroup.IsHidden">
+            <summary>
+            The whole group is hidden.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Utilities.CommandLineGroup.DependsOn">
+            <summary>
+            Specifies that this group is only required if the given dependency is true.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Coyote.Utilities.CommandLineGroup.AlwaysPrint">
+            <summary>
+            Whether this group should be included in all help messages.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Utilities.CommandLineGroup.AddPositionalArgument(System.String,System.String,System.Type)">
+            <summary>
+            Add a positional argument. Positional arguments have no switch (--foo) and must be specified in the
+            order that they are defined. Note that positional arguments must appear before any named arguments.
+            </summary>
+            <param name="name">The logical name of the argument.</param>
+            <param name="description">Help text for the command line option. You can use newlines to format the
+            help content but each line will be auto-indented by the PrintHelp function.</param>
+            <param name="dataType">Optional datatype (default string). Supported datatypes are primitive types
+            only (e.g. int, uint, float, string, bool).</param>
+            <returns>The new option or throws <see cref="T:System.Data.DuplicateNameException"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Coyote.Utilities.CommandLineGroup.AddArgument(System.String,System.String,System.String,System.Type,System.Boolean,System.String)">
+            <summary>
+            Add a new command line option to the group. The option names still need to be unique.
+            </summary>
+            <param name="longName">The long name referenced using two dashes (e.g. "--max-steps").</param>
+            <param name="shortName">The short name referenced using single dash (e.g. "-ms").</param>
+            <param name="description">Help text for the command line option. You can use newlines to format the
+            help content but each line will be auto-indented by the PrintHelp function.</param>
+            <param name="dataType">Optional datatype (default string). Supported datatypes are primitive types
+            only (e.g. int, float, string, bool).</param>
+            <param name="required">Whether the argument is required or not.</param>
+            <param name="defaultValue">The default value to use if no value is provided.</param>
+            <returns>The new <see cref="T:Microsoft.Coyote.Utilities.CommandLineArgument"/> object.</returns>
+        </member>
+        <member name="T:Microsoft.Coyote.Utilities.CommandLineArgumentParser">
+            <summary>
+            A handy command line argument parser.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Utilities.CommandLineArgumentParser.GroupNames">
+            <summary>
+            To remember the oder in which they were added.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Utilities.CommandLineArgumentParser.PositionalNames">
+            <summary>
+            To remember the order in which positional arguments were added.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Utilities.CommandLineArgumentParser.LongNames">
+            <summary>
+            To remember the order in which switch arguments were added.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Utilities.CommandLineArgumentParser.Groups">
+            <summary>
+            The currnet list of command line groups.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Utilities.CommandLineArgumentParser.Arguments">
+            <summary>
+            The current set of possible command line arguments.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Utilities.CommandLineArgumentParser.#ctor(System.String,System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Coyote.Utilities.CommandLineArgumentParser"/> class.
+            </summary>
+            <param name="appName">The name of the application.</param>
+            <param name="appDescription">The overview help text for the application.</param>
+        </member>
+        <member name="M:Microsoft.Coyote.Utilities.CommandLineArgumentParser.GetOrCreateGroup(System.String,System.String,System.Boolean)">
+            <summary>
+            Add a new command line group or return the existing group if it already exists.
+            </summary>
+            <param name="name">The name of the group.</param>
+            <param name="description">The help text for the group.</param>
+            <param name="alwaysPrint">Whether to include this in all help messages.</param>
+            <returns>The new command line group.</returns>
+        </member>
+        <member name="M:Microsoft.Coyote.Utilities.CommandLineArgumentParser.AddPositionalArgument(System.String,System.String,System.Type)">
+            <summary>
+            Add a positional argument. Positional arguments have no switch (--foo) and must be specified in the
+            order that they are defined. Note that positional arguments must appear before any named arguments.
+            </summary>
+            <param name="name">The logical name of the argument.</param>
+            <param name="description">Help text for the command line option. You can use newlines to format the
+            help content but each line will be auto-indented by the PrintHelp function.</param>
+            <param name="dataType">Optional datatype (default string). Supported datatypes are primitive types
+            only (e.g. int, float, string, bool).</param>
+            <returns>The new option or throws <see cref="T:System.Data.DuplicateNameException"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Coyote.Utilities.CommandLineArgumentParser.AddArgument(System.String,System.String,System.String,System.Type,System.Boolean,System.String)">
+            <summary>
+            Add a new command line option.
+            </summary>
+            <param name="longName">The long name referenced using two dashes (e.g. "--max-steps").</param>
+            <param name="shortName">The short name referenced using single dash (e.g. "-ms").</param>
+            <param name="description">Help text for the command line option. You can use newlines to format the
+            help content but each line will be auto-indented by the PrintHelp function.</param>
+            <param name="dataType">Optional datatype (default string). Supported datatypes are primitive types
+            only (e.g. int, float, string, bool).</param>
+            <param name="required">Whether argument is required.</param>
+            <param name="defaultValue">The default value to use if no value is provided.</param>
+            <returns>The new option or throws <see cref="T:System.Data.DuplicateNameException"/>.</returns>
+        </member>
+        <member name="M:Microsoft.Coyote.Utilities.CommandLineArgumentParser.ParseArguments(System.String[])">
+            <summary>
+            Parse the command line using the options defined in this argument parser.
+            </summary>
+            <param name="args">The command line.</param>
+            <returns>The parsed arguments.</returns>
+        </member>
+        <member name="M:Microsoft.Coyote.Utilities.CommandLineArgumentParser.PrintHelp(System.IO.TextWriter)">
+            <summary>
+            Shows help.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Utilities.CommandLineOptions.Parser">
+            <summary>
+            The command line parser to use.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Utilities.CommandLineOptions.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.Coyote.Utilities.CommandLineOptions"/> class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Utilities.CommandLineOptions.Parse(System.String[],Microsoft.Coyote.Configuration,Microsoft.Coyote.Rewriting.RewritingOptions)">
+            <summary>
+            Parses the command line options and returns a configuration.
+            </summary>
+            <param name="args">The command line arguments to parse.</param>
+            <param name="configuration">The Configuration object populated with the parsed command line options.</param>
+            <param name="options">The optional rewriting options.</param>
+        </member>
+        <member name="M:Microsoft.Coyote.Utilities.CommandLineOptions.UpdateConfigurationWithParsedArgument(Microsoft.Coyote.Configuration,Microsoft.Coyote.Rewriting.RewritingOptions,Microsoft.Coyote.Utilities.CommandLineArgument)">
+            <summary>
+            Updates the configuration with the specified parsed argument.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Utilities.CommandLineOptions.SanitizeConfiguration(Microsoft.Coyote.Configuration)">
+            <summary>
+            Checks the configuration for errors.
+            </summary>
+        </member>
+    </members>
+</doc>

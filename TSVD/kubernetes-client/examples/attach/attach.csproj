@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.Coyote.Test" Version="1.2.6" />
+    </ItemGroup>
+
+    <ItemGroup>
+    <ProjectReference Include="..\..\src\KubernetesClient\KubernetesClient.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType> 
+    <TargetFramework>net5</TargetFramework>
+  </PropertyGroup>
+
+</Project>

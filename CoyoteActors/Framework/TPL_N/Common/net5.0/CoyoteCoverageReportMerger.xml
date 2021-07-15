@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>CoyoteCoverageReportMerger</name>
+    </assembly>
+    <members>
+        <member name="T:Microsoft.Coyote.Program">
+            <summary>
+            The coverage report merger.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Coyote.Program.OutputFilePrefix">
+            <summary>
+            Output file prefix.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Coyote.Program.TryParseArgs(System.String[],System.Collections.Generic.List{Microsoft.Coyote.Actors.Coverage.CoverageInfo}@)">
+            <summary>
+            Parses the arguments.
+            </summary>
+        </member>
+    </members>
+</doc>
