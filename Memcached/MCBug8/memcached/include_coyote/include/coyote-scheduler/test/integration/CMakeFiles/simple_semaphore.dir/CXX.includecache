@@ -1,0 +1,16 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/udit/coyote-scheduler-pct-ffi/coyote-scheduler/test/integration/simple_semaphore.cc
+thread
+-
+vector
+-
+test.h
+/home/udit/coyote-scheduler-pct-ffi/coyote-scheduler/test/integration/test.h
+
